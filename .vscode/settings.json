@@ -1,5 +1,11 @@
 {
-  "[json][jsonc]": {
+  "[javascript][typescript]": {
+    "editor.codeActionsOnSave": {
+      "source.sortImports": true
+    }
+  },
+  "[json][jsonc][javascript][typescript]": {
+    "editor.tabSize": 2,
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
