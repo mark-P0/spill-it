@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "api:start": "cross-env NODE_ENV=production tsx ./api/bin/www",
-    "api:dev": "cross-env NODE_ENV=development DEBUG=spill-it:* tsx ./api/bin/www"
+    "api:dev": "cross-env NODE_ENV=development DEBUG=spill-it:* tsx --watch ./api/bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
