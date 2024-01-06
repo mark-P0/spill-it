@@ -1,10 +1,10 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S npm exec tsx
 
 /**
  * Module dependencies.
  */
 
-var app = require('../app');
+var { app } = require('../app');
 var debug = require('debug')('spill-it:server');
 var http = require('http');
 
