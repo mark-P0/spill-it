@@ -3,15 +3,16 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "api:start": "cross-env NODE_ENV=production node ./api/bin/www",
-    "api:dev": "cross-env NODE_ENV=development DEBUG=spill-it:* node ./api/bin/www"
+    "api:start": "cross-env NODE_ENV=production tsx ./api/bin/www",
+    "api:dev": "cross-env NODE_ENV=development DEBUG=spill-it:* tsx --watch ./api/bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "cross-env": "^7.0.3",
     "debug": "~2.6.9",
     "express": "~4.16.1",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "tsx": "^4.7.0"
   },
   "devDependencies": {
     "express-generator": "^4.16.1"
