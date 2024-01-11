@@ -1,6 +1,7 @@
 import { Router } from "express";
 import passport from "passport";
 import { GoogleStrategy } from "../auth/google";
+import { env } from "../utils/env";
 import { isNullish } from "../utils/operations";
 import { TryRouter } from "./try";
 
@@ -17,6 +18,12 @@ LoginRouter.get(
   "/google/redirect", // [Google Login] Step 3: Google will redirect to here
   passport.authenticate("google"), // [Google Login] Step 4: Call again to trigger strategy callback
   (req, res, next) => {
+    /* DELETEME */
+    if (env.NODE_ENV === "production") {
+      res.json({ data: req.user });
+      return;
+    }
+
     res.redirect("/try/user");
   }
 );
