@@ -8,6 +8,11 @@ import { LoginRouter } from "./routers/login";
 import { TryRouter } from "./routers/try";
 import { env } from "./utils/env";
 
+type Nullish = null | undefined;
+function isNullish<T>(value: T | Nullish): value is Nullish {
+  return value === null || value === undefined;
+}
+
 export const app = express();
 
 app.use(logger("dev"));
@@ -29,6 +34,21 @@ app.use(express.static(path.join(__dirname, "public")));
       maxAge: dayInMs,
       keys: [env.COOKIE_SESSION_KEY],
     })
+  );
+  app.use(
+    /** https://github.com/jaredhanson/passport/issues/904#issuecomment-1307558283 */
+    function mockSessionRegenerateAndSave(req, res, next) {
+      if (!isNullish(req.session)) {
+        if (isNullish(req.session.regenerate)) {
+          req.session.regenerate = (callback: CallableFunction) => callback();
+        }
+        if (isNullish(req.session.save)) {
+          req.session.save = (callback: CallableFunction) => callback();
+        }
+      }
+
+      next();
+    }
   );
 
   app.use(passport.initialize());
