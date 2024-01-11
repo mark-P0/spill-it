@@ -36,7 +36,12 @@ app.use(express.static(path.join(__dirname, "public")));
     })
   );
   app.use(
-    /** https://github.com/jaredhanson/passport/issues/904#issuecomment-1307558283 */
+    /**
+     * Newer versions of Passport expects the following methods, but `cookie-session` does not provide them.
+     * The following makes it seem like they are provided.
+     *
+     * https://github.com/jaredhanson/passport/issues/904#issuecomment-1307558283
+     */
     function mockSessionRegenerateAndSave(req, res, next) {
       if (!isNullish(req.session)) {
         if (isNullish(req.session.regenerate)) {
