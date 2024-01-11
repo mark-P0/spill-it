@@ -41,6 +41,28 @@ function getPlaceholderUserById(id: PlaceholderUser["id"]) {
 }
 
 /**
+ * Notes:
+ * - Tutorials use a direct "default export" `var GoogleStrategy = require("passport-google-oauth20")` instead of a destructured `Strategy`...
+ */
+export const GoogleStrategy = new Strategy(
+  {
+    clientID: env.AUTH_GOOGLE_CLIENT_ID,
+    clientSecret: env.AUTH_GOOGLE_CLIENT_SECRET,
+    callbackURL: "/login/google/redirect",
+    scope: ["profile"],
+  },
+  /* [Google Login] Step 5: Access actual info converted from code provided on redirect link. Must provide a "canonical" user object to `done` callback, and sessions must be available (added to Express app itself) */
+  (accessToken, refreshToken, profile, done) => {
+    const googleId = profile.id;
+    const handleName = profile.displayName;
+    const portraitUrl = profile.photos?.[0]?.value ?? ""; // TODO Use placeholder image stored on database
+
+    const user = registerPlaceholderUser(handleName, portraitUrl, googleId);
+    done(null, user); // Needs "session support"...
+  }
+);
+
+/**
  * - `user` is injected into Express by Passport
  *   - "Does not exist" in the documentation (https://expressjs.com/en/4x/api.html) but mentions it...
  * - This is apparently _the_ way to type it...
@@ -53,6 +75,7 @@ declare global {
     export interface User extends PlaceholderUser {}
   }
 }
+/* [Google Login] Step 6: Convert between "canonical" user representation and a serializable one (e.g. an ID sequence). The latter is used to identify sessions (e.g. cookies) */
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
@@ -60,24 +83,3 @@ passport.deserializeUser((id: PlaceholderUser["id"], done) => {
   const user = getPlaceholderUserById(id);
   done(null, user);
 });
-
-/**
- * Notes:
- * - Tutorials use a direct "default export" `var GoogleStrategy = require("passport-google-oauth20")` instead of a destructured `Strategy`...
- */
-export const GoogleStrategy = new Strategy(
-  {
-    clientID: env.AUTH_GOOGLE_CLIENT_ID,
-    clientSecret: env.AUTH_GOOGLE_CLIENT_SECRET,
-    callbackURL: "/login/google/redirect",
-    scope: ["profile"],
-  },
-  (accessToken, refreshToken, profile, done) => {
-    const googleId = profile.id;
-    const handleName = profile.displayName;
-    const portraitUrl = profile.photos?.[0]?.value ?? ""; // TODO Use placeholder image stored on database
-
-    const user = registerPlaceholderUser(handleName, portraitUrl, googleId);
-    done(null, user); // Needs "session support"...
-  }
-);
