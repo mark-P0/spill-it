@@ -1,6 +1,8 @@
 import cookieParser from "cookie-parser";
+import cookieSession from "cookie-session";
 import express from "express";
 import logger from "morgan";
+import passport from "passport";
 import path from "path";
 import { LoginRouter } from "./routers/login";
 import { TryRouter } from "./routers/try";
@@ -13,6 +15,25 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+/** Passport session support */
+{
+  const dayInMs =
+    1 * // Day
+    24 * // 1 day == 24 hrs
+    60 * // 1 hr == 60 mins
+    60 * // 1 min == 60 secs
+    1000; // 1 sec == 1000 ms
+  app.use(
+    cookieSession({
+      maxAge: dayInMs,
+      keys: [env.COOKIE_SESSION_KEY],
+    })
+  );
+
+  app.use(passport.initialize());
+  app.use(passport.session()); // Must come AFTER session middleware
+}
 
 if (env.NODE_ENV === "development") {
   app.use("/try", TryRouter);
