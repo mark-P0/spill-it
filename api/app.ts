@@ -7,11 +7,7 @@ import path from "path";
 import { LoginRouter } from "./routers/login";
 import { TryRouter } from "./routers/try";
 import { env } from "./utils/env";
-
-type Nullish = null | undefined;
-function isNullish<T>(value: T | Nullish): value is Nullish {
-  return value === null || value === undefined;
-}
+import { isNullish } from "./utils/operations";
 
 export const app = express();
 
