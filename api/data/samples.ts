@@ -1,8 +1,3 @@
-import {
-  randomInteger,
-  randomNumberByLength,
-  randomString,
-} from "../utils/random";
 import { db } from "./db";
 import { SamplesTable } from "./schema";
 
@@ -15,6 +10,10 @@ import { SamplesTable } from "./schema";
     console.warn("Sample data exists; skipping...");
     return;
   }
+
+  const { randomInteger, randomNumberByLength, randomString } = await import(
+    "../utils/random"
+  );
 
   console.warn("Adding sample data...");
   Array.from({ length: 16 }, async () => {
