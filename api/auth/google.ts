@@ -80,6 +80,12 @@ passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 passport.deserializeUser((id: PlaceholderUser["id"], done) => {
-  const user = getPlaceholderUserById(id);
+  /**
+   * Internally, Passport only checks for `null` or `false` users,
+   * even if the `done` function also accepts `undefined`...
+   * (probably because it is optional?)
+   */
+  const user = getPlaceholderUserById(id) ?? null;
+
   done(null, user);
 });
