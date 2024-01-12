@@ -58,3 +58,5 @@ export const logger = winston.createLogger({
       }),
   ]),
 });
+
+logger.info(`Logging at "${env.LOG_LEVEL}" level`);
