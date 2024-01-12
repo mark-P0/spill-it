@@ -1,3 +1,8 @@
+/**
+ * Largely based on
+ * https://www.youtube.com/playlist?list=PL4cUxeGkcC9jdm7QX143aMLAqyM-jTZ2x
+ */
+
 import passport from "passport";
 import { Strategy } from "passport-google-oauth20";
 import {
