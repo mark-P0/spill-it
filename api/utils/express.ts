@@ -1,3 +1,5 @@
+import { logger } from "./logger";
+
 function buildKeySequence(key: string, parent: string, sep = "/") {
   if (key === "/" && parent === "") {
     return "/";
@@ -47,7 +49,6 @@ export const endpoints = {
   },
 };
 assignEndpoints(endpoints);
-console.log(
-  "Using the following endpoints:",
-  JSON.stringify(endpoints, undefined, 2)
+logger.info(
+  "Using the following endpoints: " + JSON.stringify(endpoints, undefined, 2)
 );
