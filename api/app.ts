@@ -64,9 +64,19 @@ app.use(express.static(path.join(__dirname, "public")));
   app.use(passport.session()); // Must come AFTER session middleware
 }
 
-if (env.NODE_ENV === "development") {
-  app.use("/try", TryRouter);
+/**
+ * Normally, routers are mounted to an endpoint, e.g. `app.use('/try', TryRouter)`.
+ *
+ * However, these implicit assignments make it hard to follow actual endpoints.
+ * Redirects are also difficult to follow because they use the "direct" paths that are hidden in that approach.
+ *
+ * Instead, the following mount the routes directly to the app (at `/`),
+ * and the handlers (and redirects!) reference a centralized endpoint map for better maintainability.
+ */
+{
+  if (env.NODE_ENV === "development") {
+    app.use(TryRouter);
+  }
+  app.use(LoginRouter);
+  app.use(LogoutRouter);
 }
-
-app.use("/login", LoginRouter);
-app.use("/logout", LogoutRouter);
