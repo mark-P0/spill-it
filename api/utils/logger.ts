@@ -33,21 +33,19 @@ function getConsoleFormat(withColors = true) {
  */
 export const logger = winston.createLogger({
   level: env.LOG_LEVEL,
-  transports: [
+  transports: removeFalseish([
     new transports.Console({
       format: getConsoleFormat(),
     }),
-    ...(env.NODE_ENV == "development"
-      ? [
-          new transports.File({
-            filename: "api/logs/console.log", // Save the same output as the Console transport
-            format: getConsoleFormat(false),
-          }),
-          new transports.File({
-            filename: "api/logs/json.log",
-            format: format.combine(format.timestamp(), format.json()),
-          }),
-        ]
-      : []),
-  ],
+    env.NODE_ENV === "development" &&
+      new transports.File({
+        filename: "api/logs/console.log", // Save the same output as the Console transport
+        format: getConsoleFormat(false),
+      }),
+    env.NODE_ENV === "development" &&
+      new transports.File({
+        filename: "api/logs/json.log",
+        format: format.combine(format.timestamp(), format.json()),
+      }),
+  ]),
 });
