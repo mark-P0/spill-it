@@ -26,12 +26,19 @@ app.use(express.static(path.join(__dirname, "public")));
     60 * // 1 hr == 60 mins
     60 * // 1 min == 60 secs
     1000; // 1 sec == 1000 ms
-  app.use(
-    cookieSession({
-      maxAge: dayInMs,
-      keys: [env.COOKIE_SESSION_KEY],
-    })
-  );
+  const tomorrow = new Date(Date.now() + dayInMs);
+
+  /** https://expressjs.com/en/advanced/best-practice-security.html#use-cookies-securely */
+  const sessionConfig: CookieSessionInterfaces.CookieSessionOptions = {
+    name: "SPILLITSESS",
+    maxAge: dayInMs,
+    keys: [env.COOKIE_SESSION_KEY],
+    secure: true,
+    httpOnly: true,
+    expires: tomorrow, // Only in IE (https://mrcoles.com/blog/cookies-max-age-vs-expires/)
+    sameSite: "strict", // https://www.rdegges.com/2018/please-stop-using-local-storage/#sensitive-data
+  };
+  app.use(cookieSession(sessionConfig));
   app.use(
     /**
      * Newer versions of Passport expects the following methods, but `cookie-session` does not provide them.
