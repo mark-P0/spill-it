@@ -50,5 +50,6 @@ export const endpoints = {
 };
 assignEndpoints(endpoints);
 logger.info(
-  "Using the following endpoints: " + JSON.stringify(endpoints, undefined, 2)
+  "Using the following endpoints: " + JSON.stringify(endpoints, undefined, 2),
+  { file: import.meta.url }
 );

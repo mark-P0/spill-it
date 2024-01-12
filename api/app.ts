@@ -3,7 +3,7 @@ import cookieSession from "cookie-session";
 import express, { ErrorRequestHandler } from "express";
 import helmet from "helmet";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
-import logger from "morgan";
+import morgan from "morgan";
 import passport from "passport";
 import path from "path";
 import { LoginRouter } from "./routers/login";
@@ -11,11 +11,12 @@ import { LogoutRouter } from "./routers/logout";
 import { TryRouter } from "./routers/try";
 import { UsersRouter } from "./routers/users";
 import { env } from "./utils/env";
+import { logger } from "./utils/logger";
 import { isNullish } from "./utils/operations";
 
 export const app = express();
 
-app.use(logger("dev"));
+app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -97,6 +98,7 @@ app.use(express.static(path.join(__dirname, "public")));
  */
 {
   if (env.NODE_ENV === "development") {
+    logger.debug('Using "try" routes...', { file: import.meta.url });
     app.use(TryRouter);
   }
   app.use(LoginRouter);

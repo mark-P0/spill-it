@@ -1,6 +1,7 @@
 import winston, { format, transports } from "winston";
+import { getFilenameRelativeToRoot } from "./cjs-vars-in-esm";
 import { env } from "./env";
-import { removeFalseish } from "./operations";
+import { isNullish, removeFalseish } from "./operations";
 
 // TODO Move this to env parser as Zod refinement? https://zod.dev/?id=refine
 /** Ensure provided log level is acceptable */
@@ -19,10 +20,18 @@ function getConsoleFormat(withColors = true) {
   const formats = removeFalseish([
     withColors && format.colorize({ all: true }),
     format.timestamp(),
-    format.printf(
-      ({ level, message, timestamp = "Time" }) =>
-        `${timestamp} | ${level} | ${message}`
-    ),
+    format.printf((info) => {
+      const { level, message } = info; // Known
+      const {
+        timestamp, // Provided above
+        file: importMetaUrl, // Provided on logger call
+      } = info; // Unknown
+      const file = isNullish(importMetaUrl)
+        ? null
+        : getFilenameRelativeToRoot(importMetaUrl);
+
+      return removeFalseish([timestamp, level, file, message]).join(" | ");
+    }),
   ]);
   return format.combine(...formats);
 }
