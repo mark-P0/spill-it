@@ -1,4 +1,6 @@
-import { logger } from "./logger";
+import { localizeLogger } from "./logger";
+
+const logger = localizeLogger(import.meta.url);
 
 function buildKeySequence(key: string, parent: string, sep = "/") {
   if (key === "/" && parent === "") {
@@ -50,6 +52,5 @@ export const endpoints = {
 };
 assignEndpoints(endpoints);
 logger.info(
-  "Using the following endpoints: " + JSON.stringify(endpoints, undefined, 2),
-  { file: import.meta.url }
+  "Using the following endpoints: " + JSON.stringify(endpoints, undefined, 2)
 );

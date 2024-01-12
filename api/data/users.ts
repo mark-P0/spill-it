@@ -1,7 +1,9 @@
 import { eq, sql } from "drizzle-orm";
-import { logger } from "../utils/logger";
+import { localizeLogger } from "../utils/logger";
 import { db } from "./db";
 import { UsersTable } from "./schema";
+
+const logger = localizeLogger(import.meta.url);
 
 function createUsernameFromHandle(handleName: string) {
   const tentativeHandle = handleName.toLowerCase().split(/\s/g).join("-"); // TODO Ensure unique from existing database entries!
@@ -21,9 +23,7 @@ export async function readUser(id: User["id"]): Promise<User | null> {
     const user = users[0] ?? null;
     return user;
   } catch {
-    logger.error(`Failed getting user details of ID ${id}`, {
-      file: import.meta.url,
-    });
+    logger.error(`Failed getting user details of ID ${id}`);
     return null;
   }
 }
@@ -38,9 +38,7 @@ export async function readGoogleUser(googleId: string): Promise<User | null> {
     const user = users[0] ?? null;
     return user;
   } catch {
-    logger.error(`Failed getting user details of Google ID ${googleId}`, {
-      file: import.meta.url,
-    });
+    logger.error(`Failed getting user details of Google ID ${googleId}`);
     return null;
   }
 }
@@ -94,8 +92,6 @@ export async function updateIncrementGoogleUserLoginCt(googleId: string) {
       .set({ loginCt: sql`${UsersTable.loginCt} + 1` })
       .where(eq(UsersTable.googleId, googleId));
   } catch {
-    logger.error(`Failed incrementing login count of Google ID ${googleId}`, {
-      file: import.meta.url,
-    });
+    logger.error(`Failed incrementing login count of Google ID ${googleId}`);
   }
 }

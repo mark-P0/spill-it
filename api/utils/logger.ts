@@ -58,5 +58,8 @@ export const logger = winston.createLogger({
       }),
   ]),
 });
-
 logger.info(`Logging at "${env.LOG_LEVEL}" level`);
+
+export function localizeLogger(importMetaUrl: string) {
+  return logger.child({ file: importMetaUrl });
+}

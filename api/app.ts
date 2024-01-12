@@ -11,8 +11,10 @@ import { LogoutRouter } from "./routers/logout";
 import { TryRouter } from "./routers/try";
 import { UsersRouter } from "./routers/users";
 import { env } from "./utils/env";
-import { logger } from "./utils/logger";
+import { localizeLogger } from "./utils/logger";
 import { isNullish } from "./utils/operations";
+
+const logger = localizeLogger(import.meta.url);
 
 export const app = express();
 
@@ -21,7 +23,7 @@ app.use(
   morgan("dev", {
     stream: {
       write(message) {
-        logger.http(message.trim(), { file: import.meta.url });
+        logger.http(message.trim());
       },
     },
   })
@@ -107,7 +109,7 @@ app.use(express.static(path.join(__dirname, "public")));
  */
 {
   if (env.NODE_ENV === "development") {
-    logger.debug('Using "try" routes...', { file: import.meta.url });
+    logger.debug('Using "try" routes...');
     app.use(TryRouter);
   }
   app.use(LoginRouter);
@@ -133,7 +135,7 @@ app.use(express.static(path.join(__dirname, "public")));
    * - https://github.com/DefinitelyTyped/DefinitelyTyped/issues/4212
    */
   app.use(((err: Error, req, res, next) => {
-    logger.error(err?.stack ?? `${err}`, { file: import.meta.url });
+    logger.error(err?.stack ?? `${err}`);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ error: ReasonPhrases.INTERNAL_SERVER_ERROR });
