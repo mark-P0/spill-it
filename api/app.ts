@@ -31,12 +31,22 @@ app.use(express.static(path.join(__dirname, "public")));
   /** https://expressjs.com/en/advanced/best-practice-security.html#use-cookies-securely */
   const sessionConfig: CookieSessionInterfaces.CookieSessionOptions = {
     name: "SPILLITSESS",
-    maxAge: dayInMs,
     keys: [env.COOKIE_SESSION_KEY],
-    secure: true,
-    httpOnly: true,
-    expires: tomorrow, // Only in IE (https://mrcoles.com/blog/cookies-max-age-vs-expires/)
-    sameSite: "strict", // https://www.rdegges.com/2018/please-stop-using-local-storage/#sensitive-data
+    ...{
+      maxAge: dayInMs,
+      /**
+       * https://mrcoles.com/blog/cookies-max-age-vs-expires/
+       * - `max-age` is superior
+       * - Only works in IE
+       */
+      expires: tomorrow,
+    },
+    /** Has cross-site issues on Firefox... */
+    ...{
+      secure: true,
+      httpOnly: true,
+      sameSite: "strict", // https://www.rdegges.com/2018/please-stop-using-local-storage/#sensitive-data
+    },
   };
   app.use(cookieSession(sessionConfig));
   app.use(
