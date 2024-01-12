@@ -42,6 +42,8 @@ export const endpoints = {
     sample: "",
     protected: "",
     unprotected: "",
+    "not-found": "",
+    error: "",
   },
 };
 assignEndpoints(endpoints);

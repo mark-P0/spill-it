@@ -1,7 +1,8 @@
 import cookieParser from "cookie-parser";
 import cookieSession from "cookie-session";
-import express from "express";
+import express, { ErrorRequestHandler } from "express";
 import helmet from "helmet";
+import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import logger from "morgan";
 import passport from "passport";
 import path from "path";
@@ -101,4 +102,27 @@ app.use(express.static(path.join(__dirname, "public")));
   app.use(LoginRouter);
   app.use(LogoutRouter);
   app.use(UsersRouter);
+}
+
+/** Custom catch-call handlers, to override Express' defaults */
+{
+  /** When none of the above handlers are triggered, the requested resource likely does not exist. */
+  app.use((req, res, next) => {
+    res.status(StatusCodes.NOT_FOUND).json({ error: ReasonPhrases.NOT_FOUND });
+  });
+
+  /**
+   * When none of the above handlers handled the error, it might be unexpected.
+   * Assumes that all expected errors are handled properly!
+   *
+   * Type association for error handlers are broken, so it must be manually done
+   * - https://stackoverflow.com/questions/50218878/typescript-express-error-function
+   * - https://github.com/DefinitelyTyped/DefinitelyTyped/issues/4212
+   */
+  app.use(((err: Error, req, res, next) => {
+    console.error(err?.stack);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: ReasonPhrases.INTERNAL_SERVER_ERROR });
+  }) satisfies ErrorRequestHandler);
 }
