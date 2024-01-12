@@ -1,6 +1,7 @@
 import cookieParser from "cookie-parser";
 import cookieSession from "cookie-session";
 import express from "express";
+import helmet from "helmet";
 import logger from "morgan";
 import passport from "passport";
 import path from "path";
@@ -18,6 +19,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use(helmet());
 
 /** Passport session support */
 {
