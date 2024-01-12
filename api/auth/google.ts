@@ -10,6 +10,7 @@ import {
   createUserFromGoogle,
   getGoogleUser,
   getUser,
+  updateIncrementGoogleUserLoginCt,
 } from "../data/users";
 import { env } from "../utils/env";
 import { endpoints } from "../utils/express";
@@ -34,6 +35,11 @@ export const GoogleStrategy = new Strategy(
     let user = await getGoogleUser(googleId);
     if (user === null) {
       user = await createUserFromGoogle(googleId, handleName, portraitUrl);
+    }
+    /* TODO There must be a better way... */
+    {
+      updateIncrementGoogleUserLoginCt(googleId);
+      user.loginCt += 1;
     }
 
     done(null, user); // Needs "session support"...

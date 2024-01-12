@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "./db";
 import { UsersTable } from "./schema";
 
@@ -59,7 +59,7 @@ export async function createUserFromGoogle(
     const username = createUsernameFromHandle(handleName);
     const users = await db
       .insert(UsersTable)
-      .values({ username, handleName, portraitUrl, googleId })
+      .values({ username, handleName, portraitUrl, googleId, loginCt: 0 })
       .returning();
     user = users[0];
   } catch {
@@ -70,4 +70,25 @@ export async function createUserFromGoogle(
   }
 
   return user;
+}
+
+/**
+ * Update count "in-place" using current value
+ * - https://en.wikipedia.org/wiki/Update_(SQL)#Examples
+ * - https://discord.com/channels/1043890932593987624/1176593045840482394
+ * - https://discord.com/channels/1043890932593987624/1176256065684385922
+ */
+export async function updateIncrementGoogleUserLoginCt(googleId: string) {
+  if (!(await isGoogleUserExisting(googleId))) {
+    throw new Error(`User of Google ID ${googleId} does not exist!`);
+  }
+
+  try {
+    await db
+      .update(UsersTable)
+      .set({ loginCt: sql`${UsersTable.loginCt} + 1` })
+      .where(eq(UsersTable.googleId, googleId));
+  } catch {
+    console.error(`Failed incrementing login count of Google ID ${googleId}`);
+  }
 }

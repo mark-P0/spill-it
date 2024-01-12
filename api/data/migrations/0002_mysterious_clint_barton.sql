@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "loginCt" integer NOT NULL;
