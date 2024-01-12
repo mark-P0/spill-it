@@ -7,6 +7,7 @@ import {
   getUser,
 } from "../data/users";
 import { env } from "../utils/env";
+import { endpoints } from "../utils/express";
 
 /**
  * Notes:
@@ -16,7 +17,7 @@ export const GoogleStrategy = new Strategy(
   {
     clientID: env.AUTH_GOOGLE_CLIENT_ID,
     clientSecret: env.AUTH_GOOGLE_CLIENT_SECRET,
-    callbackURL: "/login/google/redirect",
+    callbackURL: endpoints.api.v0.login.google.redirect,
     scope: ["profile"],
   },
   /* [Google Login] Step 5: Access actual info converted from code provided on redirect link. Must provide a "canonical" user object to `done` callback, and sessions must be available (added to Express app itself) */

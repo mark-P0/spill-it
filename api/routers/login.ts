@@ -8,15 +8,18 @@ import { TryRouter } from "./try";
 
 export const LoginRouter = Router();
 
-LoginRouter.get(endpoints.login["/"], (req, res, next) => {
-  res.redirect(endpoints.login.google["/"]);
+LoginRouter.get(endpoints.api.v0.login["/"], (req, res, next) => {
+  res.redirect(endpoints.api.v0.login.google["/"]);
 });
 
 passport.use(GoogleStrategy);
-LoginRouter.get(endpoints.login.google["/"], passport.authenticate("google")); // [Google Login] Step 1: Trigger login; will redirect to Google
+LoginRouter.get(
+  endpoints.api.v0.login.google["/"],
+  passport.authenticate("google")
+); // [Google Login] Step 1: Trigger login; will redirect to Google
 /* [Google Login] Step 2: Actually log in on Google's UI */
 LoginRouter.get(
-  endpoints.login.google.redirect, // [Google Login] Step 3: Google will redirect to here
+  endpoints.api.v0.login.google.redirect, // [Google Login] Step 3: Google will redirect to here
   passport.authenticate("google"), // [Google Login] Step 4: Call again to trigger strategy callback
   (req, res, next) => {
     /* DELETEME */
@@ -44,7 +47,7 @@ LoginRouter.get(
     endpoints.try.protected,
     (req, res, next) => {
       if (isNullish(req.user)) {
-        res.redirect(endpoints.login["/"]);
+        res.redirect(endpoints.api.v0.login["/"]);
         return;
       }
 

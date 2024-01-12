@@ -24,14 +24,18 @@ function assignEndpoints(obj: EndpointMap, parent = "") {
 
 export const endpoints = {
   "/": "",
-  login: {
-    "/": "",
-    google: {
-      "/": "",
-      redirect: "",
+  api: {
+    v0: {
+      login: {
+        "/": "",
+        google: {
+          "/": "",
+          redirect: "",
+        },
+      },
+      logout: "",
     },
   },
-  logout: "",
   try: {
     hello: "",
     sample: "",
