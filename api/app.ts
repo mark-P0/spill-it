@@ -5,6 +5,7 @@ import logger from "morgan";
 import passport from "passport";
 import path from "path";
 import { LoginRouter } from "./routers/login";
+import { LogoutRouter } from "./routers/logout";
 import { TryRouter } from "./routers/try";
 import { env } from "./utils/env";
 import { isNullish } from "./utils/operations";
@@ -61,3 +62,4 @@ if (env.NODE_ENV === "development") {
 }
 
 app.use("/login", LoginRouter);
+app.use("/logout", LogoutRouter);
