@@ -20,7 +20,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use(helmet());
+/**
+ * Security best practices
+ * https://expressjs.com/en/advanced/best-practice-security.html
+ */
+{
+  app.use(helmet());
+  app.disable("x-powered-by"); // Should be disabled by `helmet` already... (https://www.npmjs.com/package/helmet#x-powered-by)
+}
 
 /** Passport session support */
 {
