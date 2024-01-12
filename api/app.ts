@@ -11,7 +11,7 @@ import { LogoutRouter } from "./routers/logout";
 import { TryRouter } from "./routers/try";
 import { UsersRouter } from "./routers/users";
 import { env } from "./utils/env";
-import { localizeLogger } from "./utils/logger";
+import { logger as directLogger, localizeLogger } from "./utils/logger";
 import { isNullish } from "./utils/operations";
 
 const logger = localizeLogger(import.meta.url);
@@ -25,7 +25,7 @@ app.use(
     {
       stream: {
         write(message) {
-          logger.http(message.trim());
+          directLogger.http(message.trim());
         },
       },
     }
