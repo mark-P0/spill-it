@@ -8,8 +8,8 @@ import { Strategy } from "passport-google-oauth20";
 import {
   User as DBUser,
   createUserFromGoogle,
-  getGoogleUser,
-  getUser,
+  readGoogleUser,
+  readUser,
   updateIncrementGoogleUserLoginCt,
 } from "../data/users";
 import { env } from "../utils/env";
@@ -32,7 +32,7 @@ export const GoogleStrategy = new Strategy(
     const handleName = profile.displayName;
     const portraitUrl = profile.photos?.[0]?.value ?? ""; // TODO Use placeholder image stored on database
 
-    let user = await getGoogleUser(googleId);
+    let user = await readGoogleUser(googleId);
     if (user === null) {
       user = await createUserFromGoogle(googleId, handleName, portraitUrl);
     }
@@ -69,7 +69,7 @@ passport.deserializeUser(async (id: DBUser["id"], done) => {
    * even if the `done` function also accepts `undefined`...
    * (probably because it is optional?)
    */
-  const user = (await getUser(id)) ?? null;
+  const user = (await readUser(id)) ?? null;
 
   done(null, user);
 });

@@ -10,7 +10,7 @@ function createUsernameFromHandle(handleName: string) {
 export type User = typeof UsersTable.$inferSelect;
 type UserDetails = typeof UsersTable.$inferInsert;
 
-export async function getUser(id: User["id"]): Promise<User | null> {
+export async function readUser(id: User["id"]): Promise<User | null> {
   try {
     const users = await db
       .select()
@@ -25,7 +25,7 @@ export async function getUser(id: User["id"]): Promise<User | null> {
   }
 }
 
-export async function getGoogleUser(googleId: string): Promise<User | null> {
+export async function readGoogleUser(googleId: string): Promise<User | null> {
   try {
     const users = await db
       .select()
@@ -41,7 +41,7 @@ export async function getGoogleUser(googleId: string): Promise<User | null> {
 }
 
 export async function isGoogleUserExisting(googleId: string): Promise<boolean> {
-  const user = await getGoogleUser(googleId);
+  const user = await readGoogleUser(googleId);
   return user !== null;
 }
 
