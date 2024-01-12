@@ -36,6 +36,8 @@ function getConsoleFormat(withColors = true) {
   return format.combine(...formats);
 }
 
+const logFileId = Date.now();
+
 /**
  * - https://betterstack.com/community/guides/logging/how-to-install-setup-and-use-winston-and-morgan-to-log-node-js-applications/
  * - https://www.npmjs.com/package/winston
@@ -48,12 +50,12 @@ export const logger = winston.createLogger({
     }),
     env.NODE_ENV === "development" &&
       new transports.File({
-        filename: "api/logs/console.log", // Save the same output as the Console transport
-        format: getConsoleFormat(false),
+        filename: `api/logs/console/${logFileId}.log`,
+        format: getConsoleFormat(false), // Save the same output as the Console transport
       }),
     env.NODE_ENV === "development" &&
       new transports.File({
-        filename: "api/logs/json.log",
+        filename: `api/logs/json/${logFileId}.log`,
         format: format.combine(format.timestamp(), format.json()),
       }),
   ]),
