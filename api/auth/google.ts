@@ -1,44 +1,12 @@
 import passport from "passport";
 import { Strategy } from "passport-google-oauth20";
+import {
+  User as DBUser,
+  createUserFromGoogle,
+  getGoogleUser,
+  getUser,
+} from "../data/users";
 import { env } from "../utils/env";
-import { randomString } from "../utils/random";
-
-/* TODO Replace with actual database schema! */
-type PlaceholderUser = {
-  id: string;
-  username: string;
-  handleName: string;
-  portraitUrl: string;
-  googleId: string | null;
-};
-const PlaceholderUserMap = new Map<PlaceholderUser["id"], PlaceholderUser>();
-
-function createUsernameFromHandle(handleName: string) {
-  const tentativeHandle = handleName.toLowerCase().split(/\s/g).join("-"); // TODO Ensure unique from existing database entries!
-  return tentativeHandle;
-}
-
-function registerPlaceholderUser(
-  handleName: PlaceholderUser["handleName"],
-  portraitUrl: PlaceholderUser["portraitUrl"],
-  googleId: PlaceholderUser["googleId"]
-) {
-  const id = randomString(32);
-  const user: PlaceholderUser = {
-    id,
-    username: createUsernameFromHandle(handleName),
-    handleName,
-    portraitUrl,
-    googleId,
-  };
-
-  PlaceholderUserMap.set(id, user);
-  return user;
-}
-
-function getPlaceholderUserById(id: PlaceholderUser["id"]) {
-  return PlaceholderUserMap.get(id);
-}
 
 /**
  * Notes:
@@ -52,12 +20,16 @@ export const GoogleStrategy = new Strategy(
     scope: ["profile"],
   },
   /* [Google Login] Step 5: Access actual info converted from code provided on redirect link. Must provide a "canonical" user object to `done` callback, and sessions must be available (added to Express app itself) */
-  (accessToken, refreshToken, profile, done) => {
+  async (accessToken, refreshToken, profile, done) => {
     const googleId = profile.id;
     const handleName = profile.displayName;
     const portraitUrl = profile.photos?.[0]?.value ?? ""; // TODO Use placeholder image stored on database
 
-    const user = registerPlaceholderUser(handleName, portraitUrl, googleId);
+    let user = await getGoogleUser(googleId);
+    if (user === null) {
+      user = await createUserFromGoogle(googleId, handleName, portraitUrl);
+    }
+
     done(null, user); // Needs "session support"...
   }
 );
@@ -72,20 +44,20 @@ export const GoogleStrategy = new Strategy(
  */
 declare global {
   namespace Express {
-    export interface User extends PlaceholderUser {}
+    export interface User extends DBUser {}
   }
 }
 /* [Google Login] Step 6: Convert between "canonical" user representation and a serializable one (e.g. an ID sequence). The latter is used to identify sessions (e.g. cookies) */
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
-passport.deserializeUser((id: PlaceholderUser["id"], done) => {
+passport.deserializeUser(async (id: DBUser["id"], done) => {
   /**
    * Internally, Passport only checks for `null` or `false` users,
    * even if the `done` function also accepts `undefined`...
    * (probably because it is optional?)
    */
-  const user = getPlaceholderUserById(id) ?? null;
+  const user = (await getUser(id)) ?? null;
 
   done(null, user);
 });
