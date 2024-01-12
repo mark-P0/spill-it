@@ -126,12 +126,14 @@ app.use(express.static(path.join(__dirname, "public")));
    * When none of the above handlers handled the error, it might be unexpected.
    * Assumes that all expected errors are handled properly!
    *
+   * The goal is for the app to NOT reach this handler!
+   *
    * Type association for error handlers are broken, so it must be manually done
    * - https://stackoverflow.com/questions/50218878/typescript-express-error-function
    * - https://github.com/DefinitelyTyped/DefinitelyTyped/issues/4212
    */
   app.use(((err: Error, req, res, next) => {
-    console.error(err?.stack);
+    logger.error(err?.stack ?? `${err}`, { file: import.meta.url });
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ error: ReasonPhrases.INTERNAL_SERVER_ERROR });

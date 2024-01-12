@@ -7,7 +7,7 @@ import { SamplesTable } from "./schema";
 //
 //   /* Only add sample data when nothing exists */
 //   if (samples.length !== 0) {
-//     console.warn("Sample data exists; skipping...");
+//     logger.warn("Sample data exists; skipping...", { file: import.meta.url });
 //     return;
 //   }
 //
@@ -15,13 +15,13 @@ import { SamplesTable } from "./schema";
 //     "../utils/random"
 //   );
 //
-//   console.warn("Adding sample data...");
+//   logger.warn("Adding sample data...", { file: import.meta.url });
 //   Array.from({ length: 16 }, async () => {
 //     const fullName = randomString(randomInteger(8, 16));
 //     const phone = randomNumberByLength(randomInteger(8, 16)).toString();
 //     await addSample({ fullName, phone });
 //   });
-//   console.warn("Sample data added.");
+//   logger.warn("Sample data added.", { file: import.meta.url });
 // })();
 
 type Sample = typeof SamplesTable.$inferSelect;

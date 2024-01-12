@@ -1,4 +1,5 @@
 import { eq, sql } from "drizzle-orm";
+import { logger } from "../utils/logger";
 import { db } from "./db";
 import { UsersTable } from "./schema";
 
@@ -20,7 +21,9 @@ export async function readUser(id: User["id"]): Promise<User | null> {
     const user = users[0] ?? null;
     return user;
   } catch {
-    console.error(`Failed getting user details of ID ${id}`);
+    logger.error(`Failed getting user details of ID ${id}`, {
+      file: import.meta.url,
+    });
     return null;
   }
 }
@@ -35,7 +38,9 @@ export async function readGoogleUser(googleId: string): Promise<User | null> {
     const user = users[0] ?? null;
     return user;
   } catch {
-    console.error(`Failed getting user details of Google ID ${googleId}`);
+    logger.error(`Failed getting user details of Google ID ${googleId}`, {
+      file: import.meta.url,
+    });
     return null;
   }
 }
@@ -89,6 +94,8 @@ export async function updateIncrementGoogleUserLoginCt(googleId: string) {
       .set({ loginCt: sql`${UsersTable.loginCt} + 1` })
       .where(eq(UsersTable.googleId, googleId));
   } catch {
-    console.error(`Failed incrementing login count of Google ID ${googleId}`);
+    logger.error(`Failed incrementing login count of Google ID ${googleId}`, {
+      file: import.meta.url,
+    });
   }
 }
