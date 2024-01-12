@@ -15,3 +15,8 @@ TryRouter.get(endpoints.try.sample, async (req, res) => {
 
   res.json({ data });
 });
+
+TryRouter.get(endpoints.try["not-found"]); // Should not be handled by anything as it shouldn't exist :)
+TryRouter.get(endpoints.try.error, () => {
+  throw new Error("Something went horribly wrong");
+});
