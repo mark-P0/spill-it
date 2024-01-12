@@ -1,7 +1,6 @@
 import { Router } from "express";
 import passport from "passport";
 import { GoogleStrategy } from "../auth/google";
-import { env } from "../utils/env";
 import { endpoints } from "../utils/express";
 import { isNullish } from "../utils/operations";
 import { TryRouter } from "./try";
@@ -22,22 +21,12 @@ LoginRouter.get(
   endpoints.api.v0.login.google.redirect, // [Google Login] Step 3: Google will redirect to here
   passport.authenticate("google"), // [Google Login] Step 4: Call again to trigger strategy callback
   (req, res, next) => {
-    /* DELETEME */
-    if (env.NODE_ENV === "production") {
-      res.json({ data: req.user });
-      return;
-    }
-
-    res.redirect(endpoints.try.user);
+    res.redirect(endpoints.api.v0.users.me);
   }
 );
 
 /* DELETEME */
 {
-  TryRouter.get(endpoints.try.user, (req, res, next) => {
-    res.json({ data: req.user });
-  });
-
   TryRouter.get(endpoints.try.unprotected, (req, res, next) => {
     res.json({
       data: "This is an unprotected resource. It can be accessed by anyone, logged in or not.",

@@ -7,6 +7,7 @@ import path from "path";
 import { LoginRouter } from "./routers/login";
 import { LogoutRouter } from "./routers/logout";
 import { TryRouter } from "./routers/try";
+import { UsersRouter } from "./routers/users";
 import { env } from "./utils/env";
 import { isNullish } from "./utils/operations";
 
@@ -89,4 +90,5 @@ app.use(express.static(path.join(__dirname, "public")));
   }
   app.use(LoginRouter);
   app.use(LogoutRouter);
+  app.use(UsersRouter);
 }

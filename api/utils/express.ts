@@ -34,12 +34,12 @@ export const endpoints = {
         },
       },
       logout: "",
+      users: { me: "" },
     },
   },
   try: {
     hello: "",
     sample: "",
-    user: "",
     protected: "",
     unprotected: "",
   },
