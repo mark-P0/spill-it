@@ -1,5 +1,6 @@
 import winston, { format, transports } from "winston";
 import { env } from "./env";
+import { removeFalseish } from "./operations";
 
 // TODO Move this to env parser as Zod refinement? https://zod.dev/?id=refine
 /** Ensure provided log level is acceptable */
@@ -14,6 +15,18 @@ import { env } from "./env";
   }
 }
 
+function getConsoleFormat(withColors = true) {
+  const formats = removeFalseish([
+    withColors && format.colorize({ all: true }),
+    format.timestamp(),
+    format.printf(
+      ({ level, message, timestamp = "Time" }) =>
+        `${timestamp} | ${level} | ${message}`
+    ),
+  ]);
+  return format.combine(...formats);
+}
+
 /**
  * - https://betterstack.com/community/guides/logging/how-to-install-setup-and-use-winston-and-morgan-to-log-node-js-applications/
  * - https://www.npmjs.com/package/winston
@@ -22,27 +35,13 @@ export const logger = winston.createLogger({
   level: env.LOG_LEVEL,
   transports: [
     new transports.Console({
-      format: format.combine(
-        format.colorize({ all: true }),
-        format.timestamp(),
-        format.printf(
-          ({ level, message, timestamp = "Time" }) =>
-            `${timestamp} | ${level} | ${message}`
-        )
-      ),
+      format: getConsoleFormat(),
     }),
     ...(env.NODE_ENV == "development"
       ? [
           new transports.File({
             filename: "api/logs/console.log", // Save the same output as the Console transport
-            format: format.combine(
-              // format.colorize({ all: true }), // Colors unnecessary
-              format.timestamp(),
-              format.printf(
-                ({ level, message, timestamp = "Time" }) =>
-                  `${timestamp} | ${level} | ${message}`
-              )
-            ),
+            format: getConsoleFormat(false),
           }),
           new transports.File({
             filename: "api/logs/json.log",
