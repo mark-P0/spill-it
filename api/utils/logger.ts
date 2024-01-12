@@ -31,5 +31,24 @@ export const logger = winston.createLogger({
         )
       ),
     }),
+    ...(env.NODE_ENV == "development"
+      ? [
+          new transports.File({
+            filename: "api/logs/console.log", // Save the same output as the Console transport
+            format: format.combine(
+              // format.colorize({ all: true }), // Colors unnecessary
+              format.timestamp(),
+              format.printf(
+                ({ level, message, timestamp = "Time" }) =>
+                  `${timestamp} | ${level} | ${message}`
+              )
+            ),
+          }),
+          new transports.File({
+            filename: "api/logs/json.log",
+            format: format.combine(format.timestamp(), format.json()),
+          }),
+        ]
+      : []),
   ],
 });
