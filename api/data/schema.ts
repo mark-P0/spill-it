@@ -11,3 +11,11 @@ export const SamplesTable = pgTable("samples", {
   fullName: text("fullName"),
   phone: varchar("phone", { length: 256 }),
 });
+
+export const UsersTable = pgTable("users", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull(),
+  handleName: text("handleName").notNull(),
+  portraitUrl: text("portraitUrl").notNull(),
+  googleId: text("googleId"),
+});
