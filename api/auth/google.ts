@@ -14,6 +14,9 @@ import {
 } from "../data/users";
 import { env } from "../utils/env";
 import { endpoints } from "../utils/express";
+import { localizeLogger } from "../utils/logger";
+
+const logger = localizeLogger(import.meta.url);
 
 /**
  * Notes:
@@ -32,16 +35,21 @@ export const GoogleStrategy = new Strategy(
     const handleName = profile.displayName;
     const portraitUrl = profile.photos?.[0]?.value ?? ""; // TODO Use placeholder image stored on database
 
+    logger.info(`Fetching info of Google user "${googleId}"`);
     let user = await readGoogleUser(googleId);
     if (user === null) {
+      logger.info(`Google user "${googleId}" does not exist; creating...`);
       user = await createUserFromGoogle(googleId, handleName, portraitUrl);
     }
-    /* TODO There must be a better way... */
     {
+      logger.info(`Incrementing login count for Google user ${googleId}`);
+      logger.warn("Login count separately incremented!"); // TODO There must be a better way...
+
       updateIncrementGoogleUserLoginCt(googleId);
       user.loginCt += 1;
     }
 
+    logger.debug(`Submitting info of Google user ${googleId} into sessions(?)`);
     done(null, user); // Needs "session support"...
   }
 );
@@ -61,15 +69,21 @@ declare global {
 }
 /* [Google Login] Step 6: Convert between "canonical" user representation and a serializable one (e.g. an ID sequence). The latter is used to identify sessions (e.g. cookies) */
 passport.serializeUser((user, done) => {
+  logger.debug(`Serializing user into "${user.id}"`);
   done(null, user.id);
 });
 passport.deserializeUser(async (id: DBUser["id"], done) => {
+  logger.debug(`Deserializing "${id}" into user`);
+
   /**
    * Internally, Passport only checks for `null` or `false` users,
    * even if the `done` function also accepts `undefined`...
    * (probably because it is optional?)
    */
   const user = (await readUser(id)) ?? null;
+  if (user === null) {
+    logger.warn(`User "${id}" does not exist!`);
+  }
 
   done(null, user);
 });

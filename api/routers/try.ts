@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { getAllSamples } from "../data/samples";
 import { endpoints } from "../utils/express";
+import { localizeLogger } from "../utils/logger";
+
+const logger = localizeLogger(import.meta.url);
 
 export const TryRouter = Router();
 
@@ -12,6 +15,7 @@ TryRouter.get(endpoints.try.hello, (req, res) => {
 
 TryRouter.get(endpoints.try.sample, async (req, res) => {
   const data = await getAllSamples();
+  logger.debug("Data: " + JSON.stringify(data, undefined, 1));
 
   res.json({ data });
 });

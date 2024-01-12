@@ -2,25 +2,38 @@ import { Router } from "express";
 import passport from "passport";
 import { GoogleStrategy } from "../auth/google";
 import { endpoints } from "../utils/express";
+import { localizeLogger } from "../utils/logger";
 import { isNullish } from "../utils/operations";
 import { TryRouter } from "./try";
+
+const logger = localizeLogger(import.meta.url);
 
 export const LoginRouter = Router();
 
 LoginRouter.get(endpoints.api.v0.login["/"], (req, res, next) => {
+  logger.info("Defaulting login to Google");
   res.redirect(endpoints.api.v0.login.google["/"]);
 });
 
 passport.use(GoogleStrategy);
 LoginRouter.get(
   endpoints.api.v0.login.google["/"],
-  passport.authenticate("google")
-); // [Google Login] Step 1: Trigger login; will redirect to Google
+  (req, res, next) => {
+    logger.info("Logging in with Google");
+    next();
+  },
+  passport.authenticate("google") // [Google Login] Step 1: Trigger login; will redirect to Google
+);
 /* [Google Login] Step 2: Actually log in on Google's UI */
 LoginRouter.get(
   endpoints.api.v0.login.google.redirect, // [Google Login] Step 3: Google will redirect to here
+  (req, res, next) => {
+    logger.info("Redirected from Google");
+    next();
+  },
   passport.authenticate("google"), // [Google Login] Step 4: Call again to trigger strategy callback
   (req, res, next) => {
+    logger.info("Redirecting to user info");
     res.redirect(endpoints.api.v0.users.me);
   }
 );
