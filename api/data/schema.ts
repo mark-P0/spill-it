@@ -3,7 +3,7 @@
  * - Dedicated schema files recommended for migrations to avoid runtime executions...
  */
 
-import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+import { integer, pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
 
 /** https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle */
 export const SamplesTable = pgTable("samples", {
@@ -18,4 +18,5 @@ export const UsersTable = pgTable("users", {
   handleName: text("handleName").notNull(),
   portraitUrl: text("portraitUrl").notNull(),
   googleId: text("googleId"),
+  loginCt: integer("loginCt").notNull(),
 });

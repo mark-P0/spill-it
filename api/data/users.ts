@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "./db";
 import { UsersTable } from "./schema";
 
@@ -10,7 +10,7 @@ function createUsernameFromHandle(handleName: string) {
 export type User = typeof UsersTable.$inferSelect;
 type UserDetails = typeof UsersTable.$inferInsert;
 
-export async function getUser(id: User["id"]): Promise<User | null> {
+export async function readUser(id: User["id"]): Promise<User | null> {
   try {
     const users = await db
       .select()
@@ -25,7 +25,7 @@ export async function getUser(id: User["id"]): Promise<User | null> {
   }
 }
 
-export async function getGoogleUser(googleId: string): Promise<User | null> {
+export async function readGoogleUser(googleId: string): Promise<User | null> {
   try {
     const users = await db
       .select()
@@ -41,7 +41,7 @@ export async function getGoogleUser(googleId: string): Promise<User | null> {
 }
 
 export async function isGoogleUserExisting(googleId: string): Promise<boolean> {
-  const user = await getGoogleUser(googleId);
+  const user = await readGoogleUser(googleId);
   return user !== null;
 }
 
@@ -59,7 +59,7 @@ export async function createUserFromGoogle(
     const username = createUsernameFromHandle(handleName);
     const users = await db
       .insert(UsersTable)
-      .values({ username, handleName, portraitUrl, googleId })
+      .values({ username, handleName, portraitUrl, googleId, loginCt: 0 })
       .returning();
     user = users[0];
   } catch {
@@ -70,4 +70,25 @@ export async function createUserFromGoogle(
   }
 
   return user;
+}
+
+/**
+ * Update count "in-place" using current value
+ * - https://en.wikipedia.org/wiki/Update_(SQL)#Examples
+ * - https://discord.com/channels/1043890932593987624/1176593045840482394
+ * - https://discord.com/channels/1043890932593987624/1176256065684385922
+ */
+export async function updateIncrementGoogleUserLoginCt(googleId: string) {
+  if (!(await isGoogleUserExisting(googleId))) {
+    throw new Error(`User of Google ID ${googleId} does not exist!`);
+  }
+
+  try {
+    await db
+      .update(UsersTable)
+      .set({ loginCt: sql`${UsersTable.loginCt} + 1` })
+      .where(eq(UsersTable.googleId, googleId));
+  } catch {
+    console.error(`Failed incrementing login count of Google ID ${googleId}`);
+  }
 }
