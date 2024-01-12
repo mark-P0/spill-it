@@ -16,7 +16,16 @@ import { isNullish } from "./utils/operations";
 
 export const app = express();
 
-app.use(morgan("dev"));
+app.use(
+  /** https://betterstack.com/community/guides/logging/how-to-install-setup-and-use-winston-and-morgan-to-log-node-js-applications/#logging-in-an-express-application-using-winston-and-morgan */
+  morgan("dev", {
+    stream: {
+      write(message) {
+        logger.http(message.trim(), { file: import.meta.url });
+      },
+    },
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
