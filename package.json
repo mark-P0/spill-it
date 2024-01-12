@@ -9,13 +9,12 @@
     "api:start": "npm run api:check && npm run api:preview",
     "api:check": "tsc",
     "api:preview": "cross-env NODE_ENV=production tsx --env-file=.env ./api/bin/www",
-    "api:dev": "cross-env NODE_ENV=development DEBUG=spill-it:* tsx --env-file=.env --watch ./api/bin/www"
+    "api:dev": "cross-env NODE_ENV=development tsx --env-file=.env --watch ./api/bin/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "cookie-session": "^2.0.0",
     "cross-env": "^7.0.3",
-    "debug": "~2.6.9",
     "drizzle-orm": "^0.29.3",
     "express": "~4.16.1",
     "helmet": "^7.1.0",
