@@ -1,7 +1,7 @@
 import winston, { format, transports } from "winston";
 import { getFilenameRelativeToRoot } from "./cjs-vars-in-esm";
 import { env } from "./env";
-import { isNullish, removeFalseish } from "./operations";
+import { isFalseish, removeFalseish } from "./operations";
 
 /** Can't infer keys even on type level, maybe because it is an interface? */
 const levels = Object.keys(winston.config.npm.levels);
@@ -39,7 +39,7 @@ function getConsoleFormat(withColors = true) {
         timestamp, // Provided above
         file: importMetaUrl, // Provided on logger call
       } = info; // Unknown
-      const file = isNullish(importMetaUrl)
+      const file = isFalseish(importMetaUrl)
         ? null
         : getFilenameRelativeToRoot(importMetaUrl);
 
