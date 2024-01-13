@@ -49,7 +49,15 @@ function getConsoleFormat(withColors = true) {
   return format.combine(...formats);
 }
 
-const logFileId = Date.now();
+/**
+ * Naive
+ *
+ * https://stackoverflow.com/a/29774197/11389648
+ */
+function createDailyLogFileId() {
+  return new Date().toISOString().split("T")[0] ?? "";
+}
+const logFileId = createDailyLogFileId();
 
 /**
  * - https://betterstack.com/community/guides/logging/how-to-install-setup-and-use-winston-and-morgan-to-log-node-js-applications/
