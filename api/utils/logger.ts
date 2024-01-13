@@ -1,7 +1,7 @@
 import winston, { format, transports } from "winston";
 import { getFilenameRelativeToRoot } from "./cjs-vars-in-esm";
 import { env } from "./env";
-import { isFalseish, removeFalseish } from "./operations";
+import { isFalseish, removeFalseish } from "./falseish";
 
 /** Can't infer keys even on type level, maybe because it is an interface? */
 const levels = Object.keys(winston.config.npm.levels);
