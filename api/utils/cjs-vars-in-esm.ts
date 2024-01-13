@@ -20,5 +20,8 @@ export function getDirname(importMetaUrl: string) {
 
 /** Assumes Node was invoked at the "project root"! */
 export function getFilenameRelativeToRoot(importMetaUrl: string) {
-  return getFilename(importMetaUrl).replace(process.cwd(), "");
+  // return getFilename(importMetaUrl).replace(process.cwd(), "");
+
+  const root = url.pathToFileURL(process.cwd()).href;
+  return importMetaUrl.replace(root, "");
 }
