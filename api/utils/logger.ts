@@ -3,11 +3,17 @@ import { getFilenameRelativeToRoot } from "./cjs-vars-in-esm";
 import { env } from "./env";
 import { isNullish, removeFalseish } from "./operations";
 
+/** Can't infer keys even on type level, maybe because it is an interface? */
+const levels = Object.keys(winston.config.npm.levels);
+const longestLevelStr = levels.reduce(
+  (running, current) => (current.length > running.length ? current : running),
+  ""
+);
+const longestLevelStrLen = longestLevelStr.length;
+
 // TODO Move this to env parser as Zod refinement? https://zod.dev/?id=refine
 /** Ensure provided log level is acceptable */
 {
-  /** Can't infer keys even on type level, maybe because it is an interface? */
-  const levels = Object.keys(winston.config.npm.levels);
   if (!levels.includes(env.LOG_LEVEL)) {
     const levelsStr = levels.join(",");
     throw new Error(
@@ -18,6 +24,13 @@ import { isNullish, removeFalseish } from "./operations";
 
 function getConsoleFormat(withColors = true) {
   const formats = removeFalseish([
+    format(
+      /** Seemed like what `winston.format.padLevels()` would do but does not seem like it...? */
+      function padUppercaseLevels(info) {
+        info.level = info.level.padEnd(longestLevelStrLen, " ").toUpperCase();
+        return info;
+      }
+    )(),
     withColors && format.colorize({ all: true }),
     format.timestamp(),
     format.printf((info) => {
