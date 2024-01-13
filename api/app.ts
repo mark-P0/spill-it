@@ -11,8 +11,8 @@ import { LogoutRouter } from "./routers/logout";
 import { TryRouter } from "./routers/try";
 import { UsersRouter } from "./routers/users";
 import { env } from "./utils/env";
+import { isFalseish } from "./utils/falseish";
 import { logger as directLogger, localizeLogger } from "./utils/logger";
-import { isNullish } from "./utils/operations";
 
 const logger = localizeLogger(import.meta.url);
 
@@ -84,11 +84,11 @@ app.use(express.static(path.join(__dirname, "public")));
      * https://github.com/jaredhanson/passport/issues/904#issuecomment-1307558283
      */
     function mockSessionRegenerateAndSave(req, res, next) {
-      if (!isNullish(req.session)) {
-        if (isNullish(req.session.regenerate)) {
+      if (!isFalseish(req.session)) {
+        if (isFalseish(req.session.regenerate)) {
           req.session.regenerate = (callback: CallableFunction) => callback();
         }
-        if (isNullish(req.session.save)) {
+        if (isFalseish(req.session.save)) {
           req.session.save = (callback: CallableFunction) => callback();
         }
       }
