@@ -26,6 +26,9 @@ dependencies:
   http-status-codes:
     specifier: ^2.3.0
     version: 2.3.0
+  jose:
+    specifier: ^5.2.0
+    version: 5.2.0
   morgan:
     specifier: ~1.9.1
     version: 1.9.1
@@ -1356,6 +1359,10 @@ packages:
 
   /isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
+    dev: false
+
+  /jose@5.2.0:
+    resolution: {integrity: sha512-oW3PCnvyrcm1HMvGTzqjxxfnEs9EoFOFWi2HsEGhlFVOXxTE3K9GKWVMFoFw06yPUqwpvEWic1BmtUZBI/tIjw==}
     dev: false
 
   /json-diff@0.9.0:

@@ -36,6 +36,10 @@ export const endpoints = {
           "/": "",
           redirect: "",
         },
+        "google-manual": {
+          "/": "",
+          redirect: "",
+        },
       },
       logout: "",
       users: { me: "" },

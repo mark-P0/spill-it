@@ -7,6 +7,7 @@ import morgan from "morgan";
 import passport from "passport";
 import path from "path";
 import { LoginRouter } from "./routers/login";
+import { LoginGoogleManualRouter } from "./routers/login/google-manual";
 import { LogoutRouter } from "./routers/logout";
 import { TryRouter } from "./routers/try";
 import { UsersRouter } from "./routers/users";
@@ -115,7 +116,8 @@ app.use(express.static(path.join(__dirname, "public")));
     logger.debug('Using "try" routes...');
     app.use(TryRouter);
   }
-  app.use(LoginRouter);
+  app.use(LoginGoogleManualRouter);
+  // app.use(LoginRouter); // DELETEME
   app.use(LogoutRouter);
   app.use(UsersRouter);
 }
