@@ -30,6 +30,6 @@ export const UsersTable = pgTable("users", {
 
 export const SessionsTable = pgTable("sessions", {
   id: serial("id").primaryKey(),
-  userId: integer("authorId").notNull(), // Users primary key
+  userId: integer("userId").notNull(), // Users primary key
   expiry: timestamp("expiry").notNull(),
 });
