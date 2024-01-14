@@ -52,6 +52,14 @@ export const endpoints = {
     unprotected: "",
     "not-found": "",
     error: "",
+    ui: {
+      login: {
+        google: {
+          "/": "",
+          redirect: "",
+        },
+      },
+    },
   },
 };
 assignEndpoints(endpoints);
