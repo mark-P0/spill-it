@@ -9,6 +9,7 @@ import path from "path";
 import { LoginRouter } from "./routers/login";
 import { LoginGoogleManualRouter } from "./routers/login/google-manual";
 import { LogoutRouter } from "./routers/logout";
+import { SessionsRouter } from "./routers/sessions";
 import { TryRouter } from "./routers/try";
 import { UsersRouter } from "./routers/users";
 import { env } from "./utils/env";
@@ -116,8 +117,9 @@ app.use(express.static(path.join(__dirname, "public")));
     logger.debug('Using "try" routes...');
     app.use(TryRouter);
   }
-  app.use(LoginGoogleManualRouter);
+  // app.use(LoginGoogleManualRouter); // DELETEME
   // app.use(LoginRouter); // DELETEME
+  app.use(SessionsRouter);
   app.use(LogoutRouter);
   app.use(UsersRouter);
 }

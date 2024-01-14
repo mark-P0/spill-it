@@ -43,6 +43,7 @@ export const endpoints = {
       },
       logout: "",
       users: { me: "" },
+      sessions: { google: "" },
     },
   },
   try: {

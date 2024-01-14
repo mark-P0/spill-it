@@ -110,8 +110,11 @@ async function extractGoogleInfoFromJwt(jwt: string) {
   return { googleId: sub, name, picture };
 }
 
-export async function convertCodeIntoGoogleInfo(code: string) {
-  const tokens = await exchangeCodeForTokens({ code });
+export async function convertCodeIntoGoogleInfo(
+  code: string,
+  redirectUri?: string // TODO Make non-optional after deleting old code
+) {
+  const tokens = await exchangeCodeForTokens({ code, redirectUri });
   const googleInfo = await extractGoogleInfoFromJwt(tokens.id_token);
   return googleInfo;
 }
