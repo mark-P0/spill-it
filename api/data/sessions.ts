@@ -1,7 +1,7 @@
 import { addDays, addMinutes, isBefore } from "date-fns";
 import { eq } from "drizzle-orm";
 import { env } from "../utils/env";
-import { safeAsync } from "../utils/try-catch";
+import { ensureError, safeAsync } from "../utils/try-catch";
 import { db } from "./db";
 import { SessionsTable } from "./schema";
 import { User } from "./users";
@@ -16,13 +16,13 @@ type SessionDetails = typeof SessionsTable.$inferInsert;
 export async function readUserSession(
   userId: User["id"]
 ): Promise<Session | null> {
-  const resultSessions = await safeAsync(() =>
+  const result = await safeAsync(() =>
     db.select().from(SessionsTable).where(eq(SessionsTable.userId, userId))
   );
-  if (!resultSessions.success) {
+  if (!result.success) {
     throw new Error("Failed reading sessions table");
   }
-  const sessions = resultSessions.value;
+  const sessions = result.value;
 
   return sessions[0] ?? null;
 }
@@ -40,16 +40,16 @@ const defaultExpiry = () => {
   env.NODE_ENV satisfies never;
 };
 export async function createSession(userId: User["id"]): Promise<Session> {
-  const resultInsert = await safeAsync(() =>
+  const result = await safeAsync(() =>
     db
       .insert(SessionsTable)
       .values({ userId, expiry: defaultExpiry() })
       .returning()
   );
-  if (!resultInsert.success) {
+  if (!result.success) {
     throw new Error("Failed inserting to sessions table");
   }
-  const sessions = resultInsert.value;
+  const sessions = result.value;
 
   const session = sessions[0];
   if (session === undefined) {
@@ -57,4 +57,13 @@ export async function createSession(userId: User["id"]): Promise<Session> {
   }
 
   return session;
+}
+
+export async function deleteSession(id: Session["id"]) {
+  try {
+    await db.delete(SessionsTable).where(eq(SessionsTable.id, id));
+  } catch (possibleError) {
+    const error = ensureError(possibleError);
+    throw new Error("Failed deleting on sessions table", { cause: error });
+  }
 }

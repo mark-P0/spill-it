@@ -7,7 +7,7 @@
  */
 null;
 
-function ensureError(value: unknown): Error {
+export function ensureError(value: unknown): Error {
   if (value instanceof Error) return value;
 
   let valueStr = "[Thrown value cannot be stringified]";

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { convertCodeIntoGoogleInfo } from "../auth/google-manual";
 import {
   createSession,
+  deleteSession,
   isSessionExpired,
   readUserSession,
 } from "../data/sessions";
@@ -127,6 +128,7 @@ SessionsRouter.get(endpoints.api.v0.sessions.google, async (req, res, next) => {
     }
     user = resultUser.value;
   }
+  user satisfies NonNullable<typeof user>;
 
   logger.info("Querying user session on database...");
   const userId = user.id; // For some reason TS will not accept nesting this in below
@@ -140,6 +142,19 @@ SessionsRouter.get(endpoints.api.v0.sessions.google, async (req, res, next) => {
   let session = resultSession.value;
 
   const hasSessionButExpired = session !== null && isSessionExpired(session);
+  if (session !== null && hasSessionButExpired) {
+    logger.info("Session expired; deleting...");
+    /* TODO Have a background task that regularly deletes expired sessions? */
+    const sessionId = session.id;
+    const resultDelete = await safeAsync(() => deleteSession(sessionId));
+    if (!resultDelete.success) {
+      logger.error(resultDelete.error.stack);
+      return res
+        .status(StatusCodes.BAD_GATEWAY)
+        .json({ error: "Delete expired session failed" });
+    }
+  }
+
   if (session === null || hasSessionButExpired) {
     logger.info("Session does not exist; creating...");
     const resultSession = await safeAsync(() => createSession(userId));
