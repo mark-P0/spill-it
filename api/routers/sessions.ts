@@ -61,6 +61,7 @@ export const SessionsRouter = Router();
 
 /** Get a session ID using Google authorization code */
 SessionsRouter.get(endpoints.api.v0.sessions.google, async (req, res, next) => {
+  logger.info("Parsing headers...");
   const parsingHeaders = z
     .object({ authorization: z.string() })
     .safeParse(req.headers);
@@ -83,6 +84,7 @@ SessionsRouter.get(endpoints.api.v0.sessions.google, async (req, res, next) => {
   }
   const authHeaderValue = resultAuthHeaderValue.value;
 
+  logger.info("Fetching Google info using provided auth params...");
   const { code, redirectedOn } = authHeaderValue.params;
   const resultInfo = await safeAsync(() =>
     convertCodeIntoGoogleInfo(code, redirectedOn)
@@ -95,6 +97,7 @@ SessionsRouter.get(endpoints.api.v0.sessions.google, async (req, res, next) => {
   }
   const info = resultInfo.value;
 
+  logger.info("Querying user info on database...");
   const { googleId } = info;
   const resultUser = await safeAsync(() => readGoogleUser(googleId));
   if (!resultUser.success) {
@@ -106,6 +109,7 @@ SessionsRouter.get(endpoints.api.v0.sessions.google, async (req, res, next) => {
   let user = resultUser.value;
 
   if (user === null) {
+    logger.info("User does not exist; creating...");
     const { name, picture } = info;
     const resultUser = await safeAsync(() =>
       createUserFromGoogle(googleId, name, picture)
