@@ -19,7 +19,8 @@ function ensureError(value: unknown): Error {
   return new Error(`A non-Error was thrown, stringified as: ${valueStr}`);
 }
 
-type Result<T> = [T, null] | [null, Error]; // Monadic-ish?
+// type Result<T> = [T, null] | [null, Error]; // Monadic-ish?
+type Result<T> = { success: true; value: T } | { success: false; error: Error }; // Same format as Zod...? Or is it from another source?
 
 /**
  * try-catch wrapper
@@ -29,10 +30,10 @@ type Result<T> = [T, null] | [null, Error]; // Monadic-ish?
 export function safe<T>(action: () => T): Result<T> {
   try {
     const value = action();
-    return [value, null];
+    return { success: true, value };
   } catch (possibleError) {
     const error = ensureError(possibleError);
-    return [null, error];
+    return { success: false, error };
   }
 }
 
@@ -42,9 +43,9 @@ export async function safeAsync<T>(
 ): Promise<Result<T>> {
   try {
     const value = await action();
-    return [value, null];
+    return { success: true, value };
   } catch (possibleError) {
     const error = ensureError(possibleError);
-    return [null, error];
+    return { success: false, error };
   }
 }

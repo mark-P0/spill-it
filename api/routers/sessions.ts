@@ -69,31 +69,33 @@ SessionsRouter.get(endpoints.api.v0.sessions.google, async (req, res, next) => {
       .status(StatusCodes.BAD_REQUEST)
       .json({ error: "Invalid headers" });
   }
-
   const headers = parsingHeaders.data;
-  const [authValues, authValuesError] = safe(() =>
+
+  const resultAuthHeaderValue = safe(() =>
     parseAuthHeaderValue(headers.authorization)
   );
-  if (authValuesError !== null) {
-    logger.error(authValuesError.stack);
+  if (!resultAuthHeaderValue.success) {
+    logger.error(resultAuthHeaderValue.error.stack);
     return res
       .status(StatusCodes.BAD_REQUEST)
       .json({ error: "Invalid authorization header" });
   }
+  const authHeaderValue = resultAuthHeaderValue.value;
 
-  const { code, redirectedOn } = authValues.params;
-  const [info, infoErrors] = await safeAsync(
-    async () => await convertCodeIntoGoogleInfo(code, redirectedOn)
+  const { code, redirectedOn } = authHeaderValue.params;
+  const resultInfo = await safeAsync(() =>
+    convertCodeIntoGoogleInfo(code, redirectedOn)
   );
-  if (infoErrors !== null) {
-    logger.error(infoErrors.stack);
+  if (!resultInfo.success) {
+    logger.error(resultInfo.error.stack);
     return res
       .status(StatusCodes.UNAUTHORIZED)
       .json({ error: "Invalid authorization code" });
   }
+  const info = resultInfo.value;
 
   // TODO Create new entry on session table
   // TODO If fail, 502 Data operation failed
 
-  res.json({ data: { headers, authValues, info } });
+  res.json({ data: { headers, authHeaderValue, info } });
 });
