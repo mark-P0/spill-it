@@ -2,6 +2,7 @@ import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { convertCodeIntoGoogleInfo } from "../auth/google-manual";
+import { isSessionExpired, readUserSession } from "../data/sessions";
 import { createUserFromGoogle, readGoogleUser } from "../data/users";
 import { endpoints } from "../utils/express";
 import { localizeLogger } from "../utils/logger";
@@ -104,7 +105,7 @@ SessionsRouter.get(endpoints.api.v0.sessions.google, async (req, res, next) => {
     logger.error(resultUser.error.stack);
     return res
       .status(StatusCodes.BAD_GATEWAY)
-      .json({ error: "Read data operation failed" });
+      .json({ error: "Read user failed" });
   }
   let user = resultUser.value;
 
@@ -118,20 +119,37 @@ SessionsRouter.get(endpoints.api.v0.sessions.google, async (req, res, next) => {
       logger.error(resultUser.error.stack);
       return res
         .status(StatusCodes.BAD_GATEWAY)
-        .json({ error: "Create data operation failed" });
+        .json({ error: "Create user failed" });
     }
     user = resultUser.value;
   }
 
-  // TODO Check if user (as Google ID) exists on session table
-  // TODO If fail, 502 Data operation failed
+  logger.info("Querying user session on database...");
+  const userId = user.id; // For some reason TS will not accept nesting this in below
+  const resultSession = await safeAsync(() => readUserSession(userId));
+  if (!resultSession.success) {
+    logger.error(resultSession.error.stack);
+    return res
+      .status(StatusCodes.BAD_GATEWAY)
+      .json({ error: "Read session failed" });
+  }
+  let session = resultSession.value;
 
   // TODO If exists, and not expired, 200 {data: {sessionId}}
   // TODO If exists, and expired, create new entry
   // TODO If not exists, create new entry
+  const hasSessionButExpired = session !== null && isSessionExpired(session);
+  if (session === null || hasSessionButExpired) {
+    // TODO on create new entry: add new row on database
+    // TODO IF fail, 502 Data operation failed
 
-  // TODO on create new entry: add new row on database
-  // TODO IF fail, 502 Data operation failed
+    logger.info("Session does not exist; creating...");
+    return res.status(StatusCodes.NOT_IMPLEMENTED).json("todo");
+  }
+
+  session satisfies NonNullable<typeof session>;
+  // logger.info("Session found");
+  // return res.json({ data: session.id });
 
   res.json({ data: { headers, authHeaderValue, info, user } });
 });
