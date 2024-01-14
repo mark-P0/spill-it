@@ -9,6 +9,7 @@ import {
   serial,
   text,
   timestamp,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 
@@ -30,6 +31,15 @@ export const UsersTable = pgTable("users", {
 
 export const SessionsTable = pgTable("sessions", {
   id: serial("id").primaryKey(),
+
+  /**
+   * UUID type mentioned in Drizzle docs but not in list
+   * - https://orm.drizzle.team/docs/column-types/pg#default-value
+   * - https://github.com/drizzle-team/drizzle-orm-docs/issues/120
+   * - https://www.postgresql.org/docs/current/datatype-uuid.html
+   */
+  uuid: uuid("uuid").unique().notNull().defaultRandom(),
+
   userId: integer("userId").notNull(), // Users primary key
   expiry: timestamp("expiry").notNull(),
 });

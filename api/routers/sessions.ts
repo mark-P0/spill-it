@@ -153,7 +153,7 @@ SessionsRouter.get(endpoints.api.v0.sessions.google, async (req, res, next) => {
   }
   session satisfies NonNullable<typeof session>;
 
-  logger.info("Providing session ID...");
-  const SPILLITSESS = session.id;
+  logger.info("Providing session effective ID...");
+  const SPILLITSESS = session.uuid;
   return res.json({ data: { SPILLITSESS } });
 });

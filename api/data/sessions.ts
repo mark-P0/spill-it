@@ -11,6 +11,7 @@ export function isSessionExpired(session: Session) {
 }
 
 type Session = typeof SessionsTable.$inferSelect;
+type SessionDetails = typeof SessionsTable.$inferInsert;
 
 export async function readUserSession(
   userId: User["id"]
