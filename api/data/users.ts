@@ -95,3 +95,15 @@ export async function updateIncrementGoogleUserLoginCt(googleId: string) {
     logger.error(`Failed incrementing login count of Google ID ${googleId}`);
   }
 }
+
+export async function readGoogleUserSessionId(
+  googleId: string
+): Promise<string | null> {
+  const details = await db.query.UsersTable.findFirst({
+    where: eq(UsersTable.googleId, googleId),
+    with: {
+      session: true,
+    },
+  });
+  if (details === undefined) return null;
+}
