@@ -2,6 +2,7 @@ import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { convertCodeIntoGoogleInfo } from "../auth/google-manual";
+import { createUserFromGoogle, readGoogleUser } from "../data/users";
 import { endpoints } from "../utils/express";
 import { localizeLogger } from "../utils/logger";
 import { safe, safeAsync } from "../utils/try-catch";
@@ -94,8 +95,39 @@ SessionsRouter.get(endpoints.api.v0.sessions.google, async (req, res, next) => {
   }
   const info = resultInfo.value;
 
-  // TODO Create new entry on session table
+  const { googleId } = info;
+  const resultUser = await safeAsync(() => readGoogleUser(googleId));
+  if (!resultUser.success) {
+    logger.error(resultUser.error.stack);
+    return res
+      .status(StatusCodes.BAD_GATEWAY)
+      .json({ error: "Read data operation failed" });
+  }
+  let user = resultUser.value;
+
+  if (user === null) {
+    const { name, picture } = info;
+    const resultUser = await safeAsync(() =>
+      createUserFromGoogle(googleId, name, picture)
+    );
+    if (!resultUser.success) {
+      logger.error(resultUser.error.stack);
+      return res
+        .status(StatusCodes.BAD_GATEWAY)
+        .json({ error: "Create data operation failed" });
+    }
+    user = resultUser.value;
+  }
+
+  // TODO Check if user (as Google ID) exists on session table
   // TODO If fail, 502 Data operation failed
 
-  res.json({ data: { headers, authHeaderValue, info } });
+  // TODO If exists, and not expired, 200 {data: {sessionId}}
+  // TODO If exists, and expired, create new entry
+  // TODO If not exists, create new entry
+
+  // TODO on create new entry: add new row on database
+  // TODO IF fail, 502 Data operation failed
+
+  res.json({ data: { headers, authHeaderValue, info, user } });
 });
