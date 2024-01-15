@@ -3,15 +3,9 @@
  * - https://developers.google.com/identity/protocols/oauth2/web-server
  */
 
-import {
-  createRemoteJWKSet,
-  decodeJwt,
-  decodeProtectedHeader,
-  jwtVerify,
-} from "jose";
+import { createRemoteJWKSet, jwtVerify } from "jose";
 import { z } from "zod";
 import { env } from "../utils/env";
-import { logger } from "../utils/logger";
 
 // TODO Cache this? Is it cached by default?
 /**

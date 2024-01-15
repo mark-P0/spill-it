@@ -2,7 +2,7 @@
 
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { buildAuthUrl } from "../../auth/google-manual";
+import { buildAuthUrl } from "../../auth/google";
 import { endpoints } from "../../utils/express";
 import { TryRouter } from "../try";
 
