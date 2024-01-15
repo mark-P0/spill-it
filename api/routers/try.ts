@@ -4,7 +4,6 @@ import { endpoints } from "../utils/express";
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(import.meta.url);
-
 export const TryRouter = Router();
 
 TryRouter.get(endpoints.try.hello, (req, res) => {

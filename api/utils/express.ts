@@ -30,24 +30,23 @@ export const endpoints = {
   "/": "",
   api: {
     v0: {
-      login: {
-        "/": "",
-        google: {
-          "/": "",
-          redirect: "",
-        },
-      },
-      logout: "",
       users: { me: "" },
+      sessions: { google: "" },
     },
   },
   try: {
     hello: "",
     sample: "",
-    protected: "",
-    unprotected: "",
     "not-found": "",
     error: "",
+    ui: {
+      login: {
+        google: {
+          "/": "",
+          redirect: "",
+        },
+      },
+    },
   },
 };
 assignEndpoints(endpoints);

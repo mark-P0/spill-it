@@ -1,89 +1,109 @@
 /**
- * Largely based on
- * https://www.youtube.com/playlist?list=PL4cUxeGkcC9jdm7QX143aMLAqyM-jTZ2x
+ * - https://developers.google.com/identity/openid-connect/openid-connect
+ * - https://developers.google.com/identity/protocols/oauth2/web-server
  */
 
-import passport from "passport";
-import { Strategy } from "passport-google-oauth20";
-import {
-  User as DBUser,
-  createUserFromGoogle,
-  readGoogleUser,
-  readUser,
-  updateIncrementGoogleUserLoginCt,
-} from "../data/users";
+import { createRemoteJWKSet, jwtVerify } from "jose";
+import { z } from "zod";
 import { env } from "../utils/env";
-import { endpoints } from "../utils/express";
-import { localizeLogger } from "../utils/logger";
 
-const logger = localizeLogger(import.meta.url);
-
+// TODO Cache this? Is it cached by default?
 /**
- * Notes:
- * - Tutorials use a direct "default export" `var GoogleStrategy = require("passport-google-oauth20")` instead of a destructured `Strategy`...
+ * - https://developers.google.com/identity/openid-connect/openid-connect#sendauthrequest
+ * - https://developers.google.com/identity/openid-connect/openid-connect#discovery
  */
-export const GoogleStrategy = new Strategy(
-  {
-    clientID: env.AUTH_GOOGLE_CLIENT_ID,
-    clientSecret: env.AUTH_GOOGLE_CLIENT_SECRET,
-    callbackURL: endpoints.api.v0.login.google.redirect,
-    scope: ["profile"],
-  },
-  /* [Google Login] Step 5: Access actual info converted from code provided on redirect link. Must provide a "canonical" user object to `done` callback, and sessions must be available (added to Express app itself) */
-  async (accessToken, refreshToken, profile, done) => {
-    const googleId = profile.id;
-    const handleName = profile.displayName;
-    const portraitUrl = profile.photos?.[0]?.value ?? ""; // TODO Use placeholder image stored on database
+async function fetchDiscoveryDocument(
+  url = "https://accounts.google.com/.well-known/openid-configuration"
+) {
+  const response = await fetch(url);
+  const doc = await response.json();
 
-    logger.info(`Fetching info of Google user "${googleId}"`);
-    let user = await readGoogleUser(googleId);
-    if (user === null) {
-      logger.info(`Google user "${googleId}" does not exist; creating...`);
-      user = await createUserFromGoogle(googleId, handleName, portraitUrl);
-    }
-    {
-      logger.info(`Incrementing login count for Google user ${googleId}`);
-      logger.warn("Login count separately incremented!"); // TODO There must be a better way...
-
-      updateIncrementGoogleUserLoginCt(googleId);
-      user.loginCt += 1;
-    }
-
-    logger.debug(`Submitting info of Google user ${googleId} into sessions(?)`);
-    done(null, user); // Needs "session support"...
-  }
-);
-
-/**
- * - `user` is injected into Express by Passport
- *   - "Does not exist" in the documentation (https://expressjs.com/en/4x/api.html) but mentions it...
- * - This is apparently _the_ way to type it...
- *   - https://stackoverflow.com/a/47448486
- *   - https://github.com/DefinitelyTyped/DefinitelyTyped/blob/b2814547727b5c4cfc220af2fabe5b5da116ca96/types/express-serve-static-core/index.d.ts#L8
- *   - https://github.com/DefinitelyTyped/DefinitelyTyped/blob/b2814547727b5c4cfc220af2fabe5b5da116ca96/types/passport/index.d.ts#L8
- */
-declare global {
-  namespace Express {
-    export interface User extends DBUser {}
-  }
+  return z
+    .object({
+      authorization_endpoint: z.string(),
+      token_endpoint: z.string(),
+      jwks_uri: z.string(),
+    })
+    .parse(doc);
 }
-/* [Google Login] Step 6: Convert between "canonical" user representation and a serializable one (e.g. an ID sequence). The latter is used to identify sessions (e.g. cookies) */
-passport.serializeUser((user, done) => {
-  logger.debug(`Serializing user into "${user.id}"`);
-  done(null, user.id);
-});
-passport.deserializeUser(async (id: DBUser["id"], done) => {
-  logger.debug(`Deserializing "${id}" into user`);
 
-  /**
-   * Internally, Passport only checks for `null` or `false` users,
-   * even if the `done` function also accepts `undefined`...
-   * (probably because it is optional?)
-   */
-  const user = (await readUser(id)) ?? null;
-  if (user === null) {
-    logger.warn(`User "${id}" does not exist!`);
+/**
+ * - https://developers.google.com/identity/openid-connect/openid-connect#sendauthrequest
+ * - https://developers.google.com/identity/openid-connect/openid-connect#authenticationuriparameters
+ */
+export async function buildAuthUrl(
+  redirectUri: string,
+  scopes = ["openid", "email", "profile"],
+  includeGrantedScopes = true
+) {
+  const { authorization_endpoint } = await fetchDiscoveryDocument();
+  const url = new URL(authorization_endpoint);
+
+  url.searchParams.set("client_id", env.AUTH_GOOGLE_CLIENT_ID);
+  url.searchParams.set("response_type", "code");
+  url.searchParams.set("scope", scopes.join(" "));
+  url.searchParams.set("redirect_uri", redirectUri);
+  // url.searchParams.set("state", ""); // TODO Use? Helps protect against CSRF
+  // url.searchParams.set("nonce", ""); // TODO Use? Helps protect against "replay attacks"
+  if (includeGrantedScopes) {
+    url.searchParams.set("include_granted_scopes", "true"); // Incremental authorization
   }
 
-  done(null, user);
-});
+  return url.href;
+}
+
+/** https://developers.google.com/identity/openid-connect/openid-connect#exchangecode */
+async function exchangeCodeForTokens(code: string, redirectUri: string) {
+  const { token_endpoint } = await fetchDiscoveryDocument();
+  const url = new URL(token_endpoint);
+
+  const params = new URLSearchParams();
+  params.set("code", code);
+  params.set("client_id", env.AUTH_GOOGLE_CLIENT_ID);
+  params.set("client_secret", env.AUTH_GOOGLE_CLIENT_SECRET);
+  params.set("redirect_uri", redirectUri);
+  params.set("grant_type", "authorization_code");
+
+  const res = await fetch(url, { method: "POST", body: params });
+  const data = await res.json();
+
+  return z
+    .object({
+      access_token: z.string(),
+      expires_in: z.number(),
+      id_token: z.string(),
+      scope: z.string(),
+      token_type: z.string(),
+      refresh_token: z.string().optional(),
+    })
+    .parse(data);
+}
+
+/**
+ * - https://developers.google.com/identity/openid-connect/openid-connect#obtainuserinfo
+ * - https://github.com/panva/jose/blob/main/docs/functions/jwt_verify.jwtVerify.md
+ */
+async function extractGoogleInfoFromJwt(jwt: string) {
+  const { jwks_uri } = await fetchDiscoveryDocument();
+  const jwks = createRemoteJWKSet(new URL(jwks_uri));
+
+  const { payload } = await jwtVerify(jwt, jwks); // Also validates the token
+  const { sub, name, picture } = z
+    .object({
+      sub: z.string(),
+      name: z.string(), // TODO Make these optional? Strictly speaking they are not always present...
+      picture: z.string(), // TODO Make these optional? Strictly speaking they are not always present...
+    })
+    .parse(payload);
+
+  return { googleId: sub, name, picture };
+}
+
+export async function convertCodeIntoGoogleInfo(
+  code: string,
+  redirectUri: string
+) {
+  const tokens = await exchangeCodeForTokens(code, redirectUri);
+  const googleInfo = await extractGoogleInfoFromJwt(tokens.id_token);
+  return googleInfo;
+}

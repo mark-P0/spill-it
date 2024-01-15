@@ -22,6 +22,27 @@
       "when": 1705077839786,
       "tag": "0002_mysterious_clint_barton",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1705252960104,
+      "tag": "0003_glorious_night_thrasher",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1705253818707,
+      "tag": "0004_round_chat",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1705258531877,
+      "tag": "0005_huge_deathstrike",
+      "breakpoints": true
     }
   ]
 }
