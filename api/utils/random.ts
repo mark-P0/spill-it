@@ -1,3 +1,5 @@
+import { letters } from "./strings";
+
 export function randomFloat(from: number, to: number): number {
   const range = to - from;
   return Math.random() * range + from;
@@ -19,13 +21,6 @@ export function randomChoice<T>(items: ArrayLike<T>): T {
   return choice;
 }
 
-const lettersLowercase = Array.from({ length: 26 }, (_, idx) =>
-  String.fromCharCode("a".charCodeAt(0) + idx)
-);
-const lettersUppercase = Array.from({ length: 26 }, (_, idx) =>
-  String.fromCharCode("A".charCodeAt(0) + idx)
-);
-const letters = [...lettersLowercase, ...lettersUppercase];
 export function randomLetter(): string {
   return randomChoice(letters);
 }

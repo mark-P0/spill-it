@@ -11,16 +11,8 @@ import {
 import { createUserFromGoogle, readGoogleUser } from "../data/users";
 import { endpoints } from "../utils/express";
 import { localizeLogger } from "../utils/logger";
+import { splitAtFirstInstance } from "../utils/strings";
 import { safe, safeAsync } from "../utils/try-catch";
-
-function splitAtFirstInstance(str: string, sep: string): [string, string] {
-  const sepIdx = str.indexOf(sep);
-  if (sepIdx === -1) {
-    return [str, ""];
-  }
-
-  return [str.slice(0, sepIdx), str.slice(sepIdx + 1)];
-}
 
 /**
  * https://stackoverflow.com/a/43164958
