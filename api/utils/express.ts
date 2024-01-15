@@ -30,18 +30,6 @@ export const endpoints = {
   "/": "",
   api: {
     v0: {
-      login: {
-        "/": "",
-        google: {
-          "/": "",
-          redirect: "",
-        },
-        "google-manual": {
-          "/": "",
-          redirect: "",
-        },
-      },
-      logout: "",
       users: { me: "" },
       sessions: { google: "" },
     },
@@ -49,8 +37,6 @@ export const endpoints = {
   try: {
     hello: "",
     sample: "",
-    protected: "",
-    unprotected: "",
     "not-found": "",
     error: "",
     ui: {
