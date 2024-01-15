@@ -1,20 +1,15 @@
 import cookieParser from "cookie-parser";
-import cookieSession from "cookie-session";
 import express, { ErrorRequestHandler } from "express";
 import helmet from "helmet";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import morgan from "morgan";
-import passport from "passport";
 import path from "path";
-import { LoginRouter } from "./routers/login";
 import { LoginGoogleManualRouter } from "./routers/login/google-manual";
-import { LogoutRouter } from "./routers/logout";
 import { SessionsRouter } from "./routers/sessions";
 import { TryRouter } from "./routers/try";
 import "./routers/try/ui";
 import { UsersRouter } from "./routers/users";
 import { env } from "./utils/env";
-import { isFalseish } from "./utils/falseish";
 import { logger as directLogger, localizeLogger } from "./utils/logger";
 
 const logger = localizeLogger(import.meta.url);
@@ -48,62 +43,6 @@ app.use(express.static(path.join(__dirname, "public")));
   app.disable("x-powered-by"); // Should be disabled by `helmet` already... (https://www.npmjs.com/package/helmet#x-powered-by)
 }
 
-/** Passport session support */
-{
-  const dayInMs =
-    1 * // Day
-    24 * // 1 day == 24 hrs
-    60 * // 1 hr == 60 mins
-    60 * // 1 min == 60 secs
-    1000; // 1 sec == 1000 ms
-  const tomorrow = new Date(Date.now() + dayInMs);
-
-  /** https://expressjs.com/en/advanced/best-practice-security.html#use-cookies-securely */
-  const sessionConfig: CookieSessionInterfaces.CookieSessionOptions = {
-    name: "SPILLITSESS",
-    keys: [env.COOKIE_SESSION_KEY],
-    ...{
-      maxAge: dayInMs,
-      /**
-       * https://mrcoles.com/blog/cookies-max-age-vs-expires/
-       * - `max-age` is superior
-       * - Only works in IE
-       */
-      expires: tomorrow,
-    },
-    /** Has cross-site issues on Firefox... */
-    ...{
-      secure: true,
-      httpOnly: true,
-      sameSite: "strict", // https://www.rdegges.com/2018/please-stop-using-local-storage/#sensitive-data
-    },
-  };
-  app.use(cookieSession(sessionConfig));
-  app.use(
-    /**
-     * Newer versions of Passport expects the following methods, but `cookie-session` does not provide them.
-     * The following makes it seem like they are provided.
-     *
-     * https://github.com/jaredhanson/passport/issues/904#issuecomment-1307558283
-     */
-    function mockSessionRegenerateAndSave(req, res, next) {
-      if (!isFalseish(req.session)) {
-        if (isFalseish(req.session.regenerate)) {
-          req.session.regenerate = (callback: CallableFunction) => callback();
-        }
-        if (isFalseish(req.session.save)) {
-          req.session.save = (callback: CallableFunction) => callback();
-        }
-      }
-
-      next();
-    }
-  );
-
-  app.use(passport.initialize());
-  app.use(passport.session()); // Must come AFTER session middleware
-}
-
 /**
  * Normally, routers are mounted to an endpoint, e.g. `app.use('/try', TryRouter)`.
  *
@@ -119,9 +58,7 @@ app.use(express.static(path.join(__dirname, "public")));
     app.use(TryRouter);
   }
   // app.use(LoginGoogleManualRouter); // DELETEME
-  // app.use(LoginRouter); // DELETEME
   app.use(SessionsRouter);
-  app.use(LogoutRouter);
   app.use(UsersRouter);
 }
 
