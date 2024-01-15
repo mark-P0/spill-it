@@ -11,6 +11,7 @@ import { LoginGoogleManualRouter } from "./routers/login/google-manual";
 import { LogoutRouter } from "./routers/logout";
 import { SessionsRouter } from "./routers/sessions";
 import { TryRouter } from "./routers/try";
+import "./routers/try/ui";
 import { UsersRouter } from "./routers/users";
 import { env } from "./utils/env";
 import { isFalseish } from "./utils/falseish";
