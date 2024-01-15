@@ -4,7 +4,6 @@ import helmet from "helmet";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import morgan from "morgan";
 import path from "path";
-import { LoginGoogleManualRouter } from "./routers/login/google-manual";
 import { SessionsRouter } from "./routers/sessions";
 import { TryRouter } from "./routers/try";
 import "./routers/try/ui";
@@ -57,7 +56,6 @@ app.use(express.static(path.join(__dirname, "public")));
     logger.debug('Using "try" routes...');
     app.use(TryRouter);
   }
-  // app.use(LoginGoogleManualRouter); // DELETEME
   app.use(SessionsRouter);
   app.use(UsersRouter);
 }
