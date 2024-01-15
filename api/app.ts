@@ -15,19 +15,31 @@ const logger = localizeLogger(import.meta.url);
 
 export const app = express();
 
-app.use(
-  /** https://betterstack.com/community/guides/logging/how-to-install-setup-and-use-winston-and-morgan-to-log-node-js-applications/#logging-in-an-express-application-using-winston-and-morgan */
-  morgan(
-    "tiny", // The format used in the above Winston+Morgan reference is equivalent to this predefined format
-    {
+{
+  /**
+   * https://betterstack.com/community/guides/logging/how-to-install-setup-and-use-winston-and-morgan-to-log-node-js-applications/#logging-in-an-express-application-using-winston-and-morgan
+   * - The `morgan` format used in this seems to be equivalent to the `"tiny"` predefined format
+   */
+  const combinedMorganWinston = (immediate = false) =>
+    morgan("tiny", {
       stream: {
         write(message) {
           directLogger.http(message.trim());
         },
       },
-    }
-  )
-);
+
+      /**
+       * - https://github.com/expressjs/morgan#immediate
+       * - https://stackoverflow.com/questions/48282686/how-to-properly-split-logging-between-requests-and-responses-with-morgan
+       *
+       * Separate instances of the middleware can be used to log both requests and responses
+       */
+      immediate,
+    });
+  app.use(combinedMorganWinston(true)); // Log requests immediately
+  app.use(combinedMorganWinston()); // Log on response (default)
+}
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
