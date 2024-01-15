@@ -1,17 +1,19 @@
 import { addDays, addMinutes, isBefore } from "date-fns";
 import { eq } from "drizzle-orm";
 import { env } from "../utils/env";
+import { localizeLogger } from "../utils/logger";
 import { ensureError, safeAsync } from "../utils/try-catch";
 import { db } from "./db";
 import { SessionsTable } from "./schema";
 import { User } from "./users";
 
+const logger = localizeLogger(import.meta.url);
+type Session = typeof SessionsTable.$inferSelect;
+type SessionDetails = typeof SessionsTable.$inferInsert;
+
 export function isSessionExpired(session: Session) {
   return isBefore(session.expiry, new Date());
 }
-
-type Session = typeof SessionsTable.$inferSelect;
-type SessionDetails = typeof SessionsTable.$inferInsert;
 
 export async function readUserSession(
   userId: User["id"]
@@ -32,8 +34,10 @@ const tomorrow = () => addDays(today(), 1);
 const after1Min = () => addMinutes(today(), 1);
 const defaultExpiry = () => {
   switch (env.NODE_ENV) {
-    case "development":
+    case "development": {
+      logger.warn("Using development default session expiry");
       return after1Min();
+    }
     case "production":
       return tomorrow();
   }
