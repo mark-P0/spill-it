@@ -27,38 +27,33 @@ async function fetchDiscoveryDocument(
     .parse(doc);
 }
 
-/** https://developers.google.com/identity/openid-connect/openid-connect#sendauthrequest */
-export async function buildAuthUrl({
-  scope = ["openid", "email", "profile"],
-  redirectUri = "https://localhost:3000/api/v0/login/google-manual/redirect", // TODO Construct this from endpoints? Create client dynamically upon request?
-  includeGrantedScopes = true,
-} = {}) {
+/**
+ * - https://developers.google.com/identity/openid-connect/openid-connect#sendauthrequest
+ * - https://developers.google.com/identity/openid-connect/openid-connect#authenticationuriparameters
+ */
+export async function buildAuthUrl(
+  redirectUri: string,
+  scopes = ["openid", "email", "profile"],
+  includeGrantedScopes = true
+) {
   const { authorization_endpoint } = await fetchDiscoveryDocument();
   const url = new URL(authorization_endpoint);
 
   url.searchParams.set("client_id", env.AUTH_GOOGLE_CLIENT_ID);
   url.searchParams.set("response_type", "code");
-  url.searchParams.set("scope", scope.join(" "));
+  url.searchParams.set("scope", scopes.join(" "));
   url.searchParams.set("redirect_uri", redirectUri);
   // url.searchParams.set("state", ""); // TODO Use? Helps protect against CSRF
   // url.searchParams.set("nonce", ""); // TODO Use? Helps protect against "replay attacks"
   if (includeGrantedScopes) {
-    url.searchParams.set("include_granted_scopes", "true");
+    url.searchParams.set("include_granted_scopes", "true"); // Incremental authorization
   }
 
   return url.href;
 }
 
 /** https://developers.google.com/identity/openid-connect/openid-connect#exchangecode */
-async function exchangeCodeForTokens(args: {
-  code: string;
-  redirectUri?: string;
-}) {
-  const {
-    code,
-    redirectUri = "https://localhost:3000/api/v0/login/google-manual/redirect", // TODO Construct this from endpoints? Create client dynamically upon request?
-  } = args;
-
+async function exchangeCodeForTokens(code: string, redirectUri: string) {
   const { token_endpoint } = await fetchDiscoveryDocument();
   const url = new URL(token_endpoint);
 
@@ -106,9 +101,9 @@ async function extractGoogleInfoFromJwt(jwt: string) {
 
 export async function convertCodeIntoGoogleInfo(
   code: string,
-  redirectUri?: string // TODO Make non-optional after deleting old code
+  redirectUri: string
 ) {
-  const tokens = await exchangeCodeForTokens({ code, redirectUri });
+  const tokens = await exchangeCodeForTokens(code, redirectUri);
   const googleInfo = await extractGoogleInfoFromJwt(tokens.id_token);
   return googleInfo;
 }

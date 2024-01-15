@@ -10,7 +10,7 @@ const redirectUri =
   "https://localhost:3000" + endpoints.try.ui.login.google.redirect;
 
 TryRouter.get(endpoints.try.ui.login.google["/"], async (req, res, next) => {
-  const authUrl = await buildAuthUrl({ redirectUri });
+  const authUrl = await buildAuthUrl(redirectUri);
 
   res.json({ redirect: authUrl });
 });
