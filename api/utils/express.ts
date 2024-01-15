@@ -60,7 +60,7 @@ logger.info(
 
 const mapSchemeZod = {
   SPILLITGOOGLE: z.object({ code: z.string(), redirectedOn: z.string() }),
-  SPILLITSESS: z.object({ id: z.string() }),
+  SPILLITSESS: z.object({ id: z.string().uuid() }),
 };
 type MapSchemeZod = typeof mapSchemeZod;
 type AuthScheme = keyof MapSchemeZod;
