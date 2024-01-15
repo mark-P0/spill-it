@@ -37,6 +37,8 @@ export const endpoints = {
   try: {
     hello: "",
     sample: "",
+    protected: "",
+    unprotected: "",
     "not-found": "",
     error: "",
     ui: {

@@ -6,6 +6,7 @@ import morgan from "morgan";
 import path from "path";
 import { SessionsRouter } from "./routers/sessions";
 import { TryRouter } from "./routers/try";
+import "./routers/try/protected";
 import "./routers/try/ui";
 import { UsersRouter } from "./routers/users";
 import { env } from "./utils/env";
