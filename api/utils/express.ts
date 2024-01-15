@@ -58,7 +58,13 @@ logger.info(
   "Using the following endpoints: " + JSON.stringify(endpoints, undefined, 1)
 );
 
-type AuthScheme = "SPILLITGOOGLE" | "SPILLITSESS";
+const mapSchemeZod = {
+  SPILLITGOOGLE: z.object({ code: z.string(), redirectedOn: z.string() }),
+  SPILLITSESS: z.object({ id: z.string() }),
+};
+type MapSchemeZod = typeof mapSchemeZod;
+type AuthScheme = keyof MapSchemeZod;
+
 /**
  * https://stackoverflow.com/a/43164958
  * - Use standard "Authorization" header instead of custom
@@ -71,10 +77,9 @@ type AuthScheme = "SPILLITGOOGLE" | "SPILLITSESS";
  *
  * Expected `authorization` format is `<scheme> <key>=<value>; <key>=<value>; ... <key>=<value>`
  */
-function parseAuth<TScheme extends AuthScheme, TParams extends z.ZodRawShape>(
-  authHeaderValue: string,
+function parseAuth<TScheme extends AuthScheme>(
   targetScheme: TScheme,
-  zodParams: z.ZodObject<TParams>,
+  authHeaderValue: string,
   sep = { header: " ", params: "; ", paramEntry: "=" }
 ) {
   const parts = splitAtFirstInstance(authHeaderValue, sep.header);
@@ -83,7 +88,7 @@ function parseAuth<TScheme extends AuthScheme, TParams extends z.ZodRawShape>(
     throw new Error("Invalid authorization scheme");
   }
 
-  const parsingParams = zodParams.safeParse(
+  const parsingParams = mapSchemeZod[targetScheme].safeParse(
     Object.fromEntries(
       givenParams
         .split(sep.params)
@@ -94,7 +99,7 @@ function parseAuth<TScheme extends AuthScheme, TParams extends z.ZodRawShape>(
     throw new Error("Invalid authorization parameters");
   }
 
-  const params = parsingParams.data;
+  const params: z.infer<MapSchemeZod[TScheme]> = parsingParams.data;
   return { scheme: targetScheme, params };
 }
 export function parseHeaderAuthGoogle(possibleHeaders: unknown) {
@@ -106,9 +111,16 @@ export function parseHeaderAuthGoogle(possibleHeaders: unknown) {
   }
   const headers = parsingHeaders.data;
 
-  return parseAuth(
-    headers.authorization,
-    "SPILLITGOOGLE",
-    z.object({ code: z.string(), redirectedOn: z.string() })
-  );
+  return parseAuth("SPILLITGOOGLE", headers.authorization);
+}
+export function parseHeaderAuthSession(possibleHeaders: unknown) {
+  const parsingHeaders = z
+    .object({ authorization: z.string() })
+    .safeParse(possibleHeaders);
+  if (!parsingHeaders.success) {
+    throw new Error("Invalid headers");
+  }
+  const headers = parsingHeaders.data;
+
+  return parseAuth("SPILLITSESS", headers.authorization);
 }
