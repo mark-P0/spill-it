@@ -1,7 +1,8 @@
 import { StatusCodes } from "http-status-codes";
+import { z } from "zod";
 import { isSessionExpired, readSessionFromUUID } from "../../data/sessions";
 import { formatError } from "../../utils/errors";
-import { endpoint, parseHeaderAuthSession } from "../../utils/express";
+import { endpoint, parseHeaderAuth } from "../../utils/express";
 import { localizeLogger } from "../../utils/logger";
 import { safe, safeAsync } from "../../utils/try-catch";
 import { TryRouter } from "../try";
@@ -19,14 +20,27 @@ TryRouter.get(endpoint("/try/unprotected"), (req, res, next) => {
 
 TryRouter.get(endpoint("/try/protected"), async (req, res, next) => {
   logger.info("Parsing headers...");
-  const parsingHeaderAuth = safe(() => parseHeaderAuthSession(req.headers));
-  if (!parsingHeaderAuth.success) {
-    logger.error(formatError(parsingHeaderAuth.error));
+  const parsingHeaders = z
+    .object({ authorization: z.string() })
+    .safeParse(req.headers);
+  if (!parsingHeaders.success) {
+    logger.error("Invalid headers");
     return res
       .status(StatusCodes.BAD_REQUEST)
       .json({ error: "Invalid headers" });
   }
-  const headerAuth = parsingHeaderAuth.value;
+  const headers = parsingHeaders.data;
+
+  const resultHeaderAuth = safe(() =>
+    parseHeaderAuth("SPILLITSESS", headers.authorization)
+  );
+  if (!resultHeaderAuth.success) {
+    logger.error(formatError(resultHeaderAuth.error));
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ error: "Invalid headers" });
+  }
+  const headerAuth = resultHeaderAuth.value;
 
   logger.info("Fetching session info...");
   const { id } = headerAuth.params;
