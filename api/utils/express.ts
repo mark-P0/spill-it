@@ -31,7 +31,7 @@ logger.info(
 );
 
 const mapSchemeZod = {
-  SPILLITGOOGLE: z.object({ code: z.string(), redirectedOn: z.string() }),
+  SPILLITGOOGLE: z.object({ code: z.string(), redirectUri: z.string() }),
   SPILLITSESS: z.object({ id: z.string().uuid() }),
 };
 type MapSchemeZod = typeof mapSchemeZod;

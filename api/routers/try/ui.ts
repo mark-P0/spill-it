@@ -69,12 +69,9 @@ TryRouter.get(endpoint("/try/ui/login/google/redirect"), (req, res, next) => {
   const { code } = parsing.data;
 
   res.json({
-    data: { code, redirectedOn: redirectUri },
+    data: { code, redirectUri },
     headers: {
-      Authorization: buildHeaderAuth("SPILLITGOOGLE", {
-        code,
-        redirectedOn: redirectUri,
-      }),
+      Authorization: buildHeaderAuth("SPILLITGOOGLE", { code, redirectUri }),
     },
   });
 });

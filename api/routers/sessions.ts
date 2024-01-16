@@ -43,9 +43,9 @@ SessionsRouter.get(endpoint("/api/v0/sessions"), async (req, res, next) => {
   const headerAuth = resultHeaderAuth.value;
 
   logger.info("Fetching Google info using provided auth params...");
-  const { code, redirectedOn } = headerAuth.params;
+  const { code, redirectUri } = headerAuth.params;
   const resultInfo = await safeAsync(() =>
-    convertCodeIntoGoogleInfo(code, redirectedOn)
+    convertCodeIntoGoogleInfo(code, redirectUri)
   );
   if (!resultInfo.success) {
     logger.error(formatError(resultInfo.error));
