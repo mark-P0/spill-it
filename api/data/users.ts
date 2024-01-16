@@ -16,14 +16,16 @@ export type User = typeof UsersTable.$inferSelect;
 type UserDetails = typeof UsersTable.$inferInsert;
 
 export async function readUser(id: User["id"]): Promise<User | null> {
-  const result = await safeAsync(() =>
-    db.select().from(UsersTable).where(eq(UsersTable.id, id)).limit(1)
+  const result = await safeAsync(
+    () => db.select().from(UsersTable).where(eq(UsersTable.id, id)).limit(2) // There should only be at most 1. If there are 2 (or more), something has gone wrong...
   );
   const users = result.success
     ? result.value
     : raise(`Failed getting user details of ID ${id}`, result.error);
 
+  if (users.length > 1) raise("Multiple users for an ID...?");
   const user = users[0] ?? null;
+
   return user;
 }
 
@@ -33,7 +35,7 @@ export async function readGoogleUser(googleId: string): Promise<User | null> {
       .select()
       .from(UsersTable)
       .where(eq(UsersTable.googleId, googleId))
-      .limit(1)
+      .limit(2)
   );
   const users = result.success
     ? result.value
@@ -42,7 +44,9 @@ export async function readGoogleUser(googleId: string): Promise<User | null> {
         result.error
       );
 
+  if (users.length > 1) raise("Multiple users for an Google ID...?");
   const user = users[0] ?? null;
+
   return user;
 }
 
@@ -70,7 +74,9 @@ export async function createUserFromGoogle(
     ? result.value
     : raise(`Failed creating user from Google ID ${googleId}`, result.error);
 
-  const user = users[0] ?? raise("Inserted user does not exist...?");
+  if (users.length > 1) raise("Multiple Google users inserted...?");
+  const user = users[0] ?? raise("Inserted Google user does not exist...?");
+
   return user;
 }
 

@@ -38,10 +38,19 @@ export async function getAllSamples(): Promise<Sample[]> {
   return samples;
 }
 
-export async function addSample(details: Omit<SampleDetails, "id">) {
+export async function addSample(
+  details: Omit<SampleDetails, "id">
+): Promise<Sample> {
   const { fullName, phone } = details;
   const result = await safeAsync(() =>
     db.insert(SamplesTable).values({ fullName, phone }).returning()
   );
-  if (!result.success) raise("Failed inserting to samples table", result.error);
+  const samples = result.success
+    ? result.value
+    : raise("Failed inserting to samples table", result.error);
+
+  if (samples.length > 1) raise("Multiple samples inserted...?");
+  const sample = samples[0] ?? raise("Inserted sample does not exist...?");
+
+  return sample;
 }
