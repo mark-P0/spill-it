@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
-import { z } from "zod";
 import { convertCodeIntoGoogleInfo } from "../auth/google";
 import {
   createSession,
@@ -9,58 +8,9 @@ import {
   readUserSession,
 } from "../data/sessions";
 import { createUserFromGoogle, readGoogleUser } from "../data/users";
-import { endpoints } from "../utils/express";
+import { endpoints, parseHeaderAuthGoogle } from "../utils/express";
 import { localizeLogger } from "../utils/logger";
 import { safe, safeAsync } from "../utils/try-catch";
-
-function splitAtFirstInstance(str: string, sep: string): [string, string] {
-  const sepIdx = str.indexOf(sep);
-  if (sepIdx === -1) {
-    return [str, ""];
-  }
-
-  return [str.slice(0, sepIdx), str.slice(sepIdx + 1)];
-}
-
-/**
- * https://stackoverflow.com/a/43164958
- * - Use standard "Authorization" header instead of custom
- * - Can use custom authorization scheme
- * - Recommended not to separate parameters with commas
- *
- * https://stackoverflow.com/a/11420667
- * - Parameters follow a `key=value` format
- * - Parameters are separated by comma
- *
- * Expected `authorization` format is `<scheme> <key>=<value>; <key>=<value>; ... <key>=<value>`
- */
-function parseAuthHeaderValue(
-  authorization: string,
-  scheme = "SPILLITGOOGLE" as const,
-  sep = { header: " ", params: "; ", paramEntry: "=" }
-) {
-  const parts = splitAtFirstInstance(authorization, sep.header);
-  const [givenScheme, givenParams] = parts;
-  if (givenScheme !== scheme) {
-    throw new Error("Invalid authorization scheme");
-  }
-
-  const parsingParams = z
-    .object({ code: z.string(), redirectedOn: z.string() })
-    .safeParse(
-      Object.fromEntries(
-        givenParams
-          .split(sep.params)
-          .map((entryStr) => entryStr.split(sep.paramEntry))
-      )
-    );
-  if (!parsingParams.success) {
-    throw new Error("Invalid authorization parameters");
-  }
-
-  const params = parsingParams.data;
-  return { scheme, params };
-}
 
 const logger = localizeLogger(import.meta.url);
 export const SessionsRouter = Router();
@@ -68,30 +18,17 @@ export const SessionsRouter = Router();
 /** Get a session ID using Google authorization code */
 SessionsRouter.get(endpoints.api.v0.sessions.google, async (req, res, next) => {
   logger.info("Parsing headers...");
-  const parsingHeaders = z
-    .object({ authorization: z.string() })
-    .safeParse(req.headers);
-  if (!parsingHeaders.success) {
-    logger.error(parsingHeaders.error.stack);
+  const parsingHeaderAuth = safe(() => parseHeaderAuthGoogle(req.headers));
+  if (!parsingHeaderAuth.success) {
+    logger.error(parsingHeaderAuth.error.stack);
     return res
       .status(StatusCodes.BAD_REQUEST)
       .json({ error: "Invalid headers" });
   }
-  const headers = parsingHeaders.data;
-
-  const resultAuthHeaderValue = safe(() =>
-    parseAuthHeaderValue(headers.authorization)
-  );
-  if (!resultAuthHeaderValue.success) {
-    logger.error(resultAuthHeaderValue.error.stack);
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ error: "Invalid authorization header" });
-  }
-  const authHeaderValue = resultAuthHeaderValue.value;
+  const headerAuth = parsingHeaderAuth.value;
 
   logger.info("Fetching Google info using provided auth params...");
-  const { code, redirectedOn } = authHeaderValue.params;
+  const { code, redirectedOn } = headerAuth.params;
   const resultInfo = await safeAsync(() =>
     convertCodeIntoGoogleInfo(code, redirectedOn)
   );

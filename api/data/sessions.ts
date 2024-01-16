@@ -29,6 +29,20 @@ export async function readUserSession(
   return sessions[0] ?? null;
 }
 
+export async function readSessionFromUUID(
+  uuid: Session["uuid"]
+): Promise<Session | null> {
+  const result = await safeAsync(() =>
+    db.select().from(SessionsTable).where(eq(SessionsTable.uuid, uuid))
+  );
+  if (!result.success) {
+    throw new Error("Failed reading sessions table", { cause: result.error });
+  }
+  const sessions = result.value;
+
+  return sessions[0] ?? null;
+}
+
 const today = () => new Date();
 const tomorrow = () => addDays(today(), 1);
 const after1Min = () => addMinutes(today(), 1);
