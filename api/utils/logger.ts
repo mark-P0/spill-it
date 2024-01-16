@@ -1,6 +1,7 @@
 import winston, { format, transports } from "winston";
 import { getFilenameRelativeToRoot } from "./cjs-vars-in-esm";
 import { env } from "./env";
+import { raise } from "./errors";
 import { isFalseish, removeFalseish } from "./falseish";
 
 /** Can't infer keys even on type level, maybe because it is an interface? */
@@ -14,11 +15,10 @@ const longestLevelStrLen = longestLevelStr.length;
 // TODO Move this to env parser as Zod refinement? https://zod.dev/?id=refine
 /** Ensure provided log level is acceptable */
 {
-  if (!levels.includes(env.LOG_LEVEL)) {
+  const { LOG_LEVEL } = env;
+  if (!levels.includes(LOG_LEVEL)) {
     const levelsStr = levels.join(",");
-    throw new Error(
-      `Unknown log level "${env.LOG_LEVEL}"; must be one of: ${levelsStr}`
-    );
+    raise(`Unknown log level "${LOG_LEVEL}"; must be one of: ${levelsStr}`);
   }
 }
 

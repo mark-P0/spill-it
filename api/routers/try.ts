@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getAllSamples } from "../data/samples";
+import { raise } from "../utils/errors";
 import { endpoint } from "../utils/express";
 import { localizeLogger } from "../utils/logger";
 
@@ -21,5 +22,5 @@ TryRouter.get(endpoint("/try/sample"), async (req, res) => {
 
 TryRouter.get(endpoint("/try/not-found")); // Should not be handled by anything as it shouldn't exist :)
 TryRouter.get(endpoint("/try/error"), () => {
-  throw new Error("Something went horribly wrong");
+  raise("Something went horribly wrong");
 });

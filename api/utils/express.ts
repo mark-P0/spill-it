@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { raise } from "./errors";
 import { localizeLogger } from "./logger";
 import { splitAtFirstInstance } from "./strings";
 
@@ -56,9 +57,7 @@ function parseAuth<TScheme extends AuthScheme>(
 ) {
   const parts = splitAtFirstInstance(authHeaderValue, sep.header);
   const [scheme, givenParams] = parts;
-  if (scheme !== targetScheme) {
-    throw new Error("Invalid authorization scheme");
-  }
+  if (scheme !== targetScheme) raise("Invalid authorization scheme");
 
   const parsingParams = mapSchemeZod[targetScheme].safeParse(
     Object.fromEntries(
@@ -67,21 +66,19 @@ function parseAuth<TScheme extends AuthScheme>(
         .map((entryStr) => entryStr.split(sep.paramEntry))
     )
   );
-  if (!parsingParams.success) {
-    throw new Error("Invalid authorization parameters");
-  }
+  const params: z.infer<MapSchemeZod[TScheme]> = parsingParams.success
+    ? parsingParams.data
+    : raise("Invalid authorization parameters", parsingParams.error);
 
-  const params: z.infer<MapSchemeZod[TScheme]> = parsingParams.data;
   return { scheme: targetScheme, params };
 }
 export function parseHeaderAuthGoogle(possibleHeaders: unknown) {
   const parsingHeaders = z
     .object({ authorization: z.string() })
     .safeParse(possibleHeaders);
-  if (!parsingHeaders.success) {
-    throw new Error("Invalid headers");
-  }
-  const headers = parsingHeaders.data;
+  const headers = parsingHeaders.success
+    ? parsingHeaders.data
+    : raise("Invalid headers", parsingHeaders.error);
 
   return parseAuth("SPILLITGOOGLE", headers.authorization);
 }
@@ -89,10 +86,9 @@ export function parseHeaderAuthSession(possibleHeaders: unknown) {
   const parsingHeaders = z
     .object({ authorization: z.string() })
     .safeParse(possibleHeaders);
-  if (!parsingHeaders.success) {
-    throw new Error("Invalid headers");
-  }
-  const headers = parsingHeaders.data;
+  const headers = parsingHeaders.success
+    ? parsingHeaders.data
+    : raise("Invalid headers", parsingHeaders.error);
 
   return parseAuth("SPILLITSESS", headers.authorization);
 }
