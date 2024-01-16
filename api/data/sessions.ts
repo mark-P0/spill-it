@@ -20,26 +20,42 @@ export async function readUserSession(
   userId: User["id"]
 ): Promise<Session | null> {
   const result = await safeAsync(() =>
-    db.select().from(SessionsTable).where(eq(SessionsTable.userId, userId))
+    db
+      .select()
+      .from(SessionsTable)
+      .where(eq(SessionsTable.userId, userId))
+      .limit(2)
   );
   const sessions = result.success
     ? result.value
     : raise("Failed reading sessions table", result.error);
 
-  return sessions[0] ?? null;
+  /* TODO Should multiple sessions per user be possible? */
+  if (sessions.length > 1) raise("Multiple sessions for a user...?");
+  const session = sessions[0] ?? null;
+
+  return session;
 }
 
 export async function readSessionFromUUID(
   uuid: Session["uuid"]
 ): Promise<Session | null> {
-  const result = await safeAsync(() =>
-    db.select().from(SessionsTable).where(eq(SessionsTable.uuid, uuid))
+  const result = await safeAsync(
+    () =>
+      db
+        .select()
+        .from(SessionsTable)
+        .where(eq(SessionsTable.uuid, uuid))
+        .limit(2) // There should only be at most 1. If there are 2 (or more), something has gone wrong...
   );
   const sessions = result.success
     ? result.value
     : raise("Failed reading sessions table", result.error);
 
-  return sessions[0] ?? null;
+  if (sessions.length > 1) raise("Multiple sessions for a UUID...?");
+  const session = sessions[0] ?? null;
+
+  return session;
 }
 
 const today = () => new Date();
@@ -67,7 +83,9 @@ export async function createSession(userId: User["id"]): Promise<Session> {
     ? result.value
     : raise("Failed inserting to sessions table", result.error);
 
+  if (sessions.length > 1) raise("Multiple sessions inserted...?");
   const session = sessions[0] ?? raise("Inserted session does not exist...?");
+
   return session;
 }
 

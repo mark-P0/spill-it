@@ -1,3 +1,5 @@
+import { raise } from "../utils/errors";
+import { safeAsync } from "../utils/try-catch";
 import { db } from "./db";
 import { SamplesTable } from "./schema";
 
@@ -27,12 +29,28 @@ import { SamplesTable } from "./schema";
 type Sample = typeof SamplesTable.$inferSelect;
 type SampleDetails = typeof SamplesTable.$inferInsert;
 
-export async function getAllSamples() {
-  return await db.select().from(SamplesTable);
+export async function getAllSamples(): Promise<Sample[]> {
+  const result = await safeAsync(() => db.select().from(SamplesTable));
+  const samples = result.success
+    ? result.value
+    : raise("Failed reading samples table", result.error);
+
+  return samples;
 }
 
-export async function addSample(details: Omit<SampleDetails, "id">) {
+export async function addSample(
+  details: Omit<SampleDetails, "id">
+): Promise<Sample> {
   const { fullName, phone } = details;
+  const result = await safeAsync(() =>
+    db.insert(SamplesTable).values({ fullName, phone }).returning()
+  );
+  const samples = result.success
+    ? result.value
+    : raise("Failed inserting to samples table", result.error);
 
-  await db.insert(SamplesTable).values({ fullName, phone });
+  if (samples.length > 1) raise("Multiple samples inserted...?");
+  const sample = samples[0] ?? raise("Inserted sample does not exist...?");
+
+  return sample;
 }
