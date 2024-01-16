@@ -1,3 +1,4 @@
+import { raise } from "./errors";
 import { letters } from "./strings";
 
 export function randomFloat(from: number, to: number): number {
@@ -13,12 +14,7 @@ export function randomNumberByLength(length: number): number {
 
 export function randomChoice<T>(items: ArrayLike<T>): T {
   const idx = randomInteger(0, items.length);
-  const choice = items[idx];
-  if (choice === undefined) {
-    throw new Error("Random choice does not exist...?");
-  }
-
-  return choice;
+  return items[idx] ?? raise("Random choice does not exist...?");
 }
 
 export function randomLetter(): string {

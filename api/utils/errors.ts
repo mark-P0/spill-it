@@ -7,3 +7,7 @@ import util from "node:util";
 export function formatError(error: Error): string {
   return util.format(error);
 }
+
+export function raise(message: string, cause?: Error): never {
+  throw new Error(message, { cause });
+}

@@ -1,4 +1,5 @@
 import { eq, sql } from "drizzle-orm";
+import { raise } from "../utils/errors";
 import { localizeLogger } from "../utils/logger";
 import { safeAsync } from "../utils/try-catch";
 import { db } from "./db";
@@ -54,9 +55,8 @@ export async function createUserFromGoogle(
   handleName: string,
   portraitUrl: string
 ): Promise<User> {
-  if (await isGoogleUserExisting(googleId)) {
-    throw new Error(`User of Google ID ${googleId} already exists`);
-  }
+  if (await isGoogleUserExisting(googleId))
+    raise(`User of Google ID ${googleId} already exists`);
 
   const username = createUsernameFromHandle(handleName);
   const result = await safeAsync(() =>
@@ -65,18 +65,11 @@ export async function createUserFromGoogle(
       .values({ username, handleName, portraitUrl, googleId, loginCt: 0 })
       .returning()
   );
-  if (!result.success) {
-    throw new Error(`Failed creating user from Google ID ${googleId}`, {
-      cause: result.error,
-    });
-  }
-  const users = result.value;
+  const users = result.success
+    ? result.value
+    : raise(`Failed creating user from Google ID ${googleId}`, result.error);
 
-  const user = users[0];
-  if (user === undefined) {
-    throw new Error("Inserted user does not exist...?");
-  }
-
+  const user = users[0] ?? raise("Inserted user does not exist...?");
   return user;
 }
 
@@ -87,9 +80,8 @@ export async function createUserFromGoogle(
  * - https://discord.com/channels/1043890932593987624/1176256065684385922
  */
 export async function updateIncrementGoogleUserLoginCt(googleId: string) {
-  if (!(await isGoogleUserExisting(googleId))) {
-    throw new Error(`User of Google ID ${googleId} does not exist!`);
-  }
+  if (!(await isGoogleUserExisting(googleId)))
+    raise(`User of Google ID ${googleId} does not exist!`);
 
   try {
     await db

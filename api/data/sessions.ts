@@ -1,8 +1,9 @@
 import { addDays, addMinutes, isBefore } from "date-fns";
 import { eq } from "drizzle-orm";
 import { env } from "../utils/env";
+import { raise } from "../utils/errors";
 import { localizeLogger } from "../utils/logger";
-import { ensureError, safeAsync } from "../utils/try-catch";
+import { safeAsync } from "../utils/try-catch";
 import { db } from "./db";
 import { SessionsTable } from "./schema";
 import { User } from "./users";
@@ -21,10 +22,9 @@ export async function readUserSession(
   const result = await safeAsync(() =>
     db.select().from(SessionsTable).where(eq(SessionsTable.userId, userId))
   );
-  if (!result.success) {
-    throw new Error("Failed reading sessions table", { cause: result.error });
-  }
-  const sessions = result.value;
+  const sessions = result.success
+    ? result.value
+    : raise("Failed reading sessions table", result.error);
 
   return sessions[0] ?? null;
 }
@@ -35,10 +35,9 @@ export async function readSessionFromUUID(
   const result = await safeAsync(() =>
     db.select().from(SessionsTable).where(eq(SessionsTable.uuid, uuid))
   );
-  if (!result.success) {
-    throw new Error("Failed reading sessions table", { cause: result.error });
-  }
-  const sessions = result.value;
+  const sessions = result.success
+    ? result.value
+    : raise("Failed reading sessions table", result.error);
 
   return sessions[0] ?? null;
 }
@@ -64,26 +63,17 @@ export async function createSession(userId: User["id"]): Promise<Session> {
       .values({ userId, expiry: defaultExpiry() })
       .returning()
   );
-  if (!result.success) {
-    throw new Error("Failed inserting to sessions table", {
-      cause: result.error,
-    });
-  }
-  const sessions = result.value;
+  const sessions = result.success
+    ? result.value
+    : raise("Failed inserting to sessions table", result.error);
 
-  const session = sessions[0];
-  if (session === undefined) {
-    throw new Error("Inserted session does not exist...?");
-  }
-
+  const session = sessions[0] ?? raise("Inserted session does not exist...?");
   return session;
 }
 
 export async function deleteSession(id: Session["id"]) {
-  try {
-    await db.delete(SessionsTable).where(eq(SessionsTable.id, id));
-  } catch (possibleError) {
-    const error = ensureError(possibleError);
-    throw new Error("Failed deleting on sessions table", { cause: error });
-  }
+  const result = await safeAsync(() =>
+    db.delete(SessionsTable).where(eq(SessionsTable.id, id))
+  );
+  if (!result.success) raise("Failed deleting on sessions table", result.error);
 }
