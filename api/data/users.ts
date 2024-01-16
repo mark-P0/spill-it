@@ -16,33 +16,34 @@ export type User = typeof UsersTable.$inferSelect;
 type UserDetails = typeof UsersTable.$inferInsert;
 
 export async function readUser(id: User["id"]): Promise<User | null> {
-  try {
-    const users = await db
-      .select()
-      .from(UsersTable)
-      .where(eq(UsersTable.id, id))
-      .limit(1);
-    const user = users[0] ?? null;
-    return user;
-  } catch {
-    logger.error(`Failed getting user details of ID ${id}`);
-    return null;
-  }
+  const result = await safeAsync(() =>
+    db.select().from(UsersTable).where(eq(UsersTable.id, id)).limit(1)
+  );
+  const users = result.success
+    ? result.value
+    : raise(`Failed getting user details of ID ${id}`, result.error);
+
+  const user = users[0] ?? null;
+  return user;
 }
 
 export async function readGoogleUser(googleId: string): Promise<User | null> {
-  try {
-    const users = await db
+  const result = await safeAsync(() =>
+    db
       .select()
       .from(UsersTable)
       .where(eq(UsersTable.googleId, googleId))
-      .limit(1);
-    const user = users[0] ?? null;
-    return user;
-  } catch {
-    logger.error(`Failed getting user details of Google ID ${googleId}`);
-    return null;
-  }
+      .limit(1)
+  );
+  const users = result.success
+    ? result.value
+    : raise(
+        `Failed getting user details of Google ID ${googleId}`,
+        result.error
+      );
+
+  const user = users[0] ?? null;
+  return user;
 }
 
 export async function isGoogleUserExisting(googleId: string): Promise<boolean> {
@@ -83,12 +84,15 @@ export async function updateIncrementGoogleUserLoginCt(googleId: string) {
   if (!(await isGoogleUserExisting(googleId)))
     raise(`User of Google ID ${googleId} does not exist!`);
 
-  try {
-    await db
+  const result = await safeAsync(() =>
+    db
       .update(UsersTable)
       .set({ loginCt: sql`${UsersTable.loginCt} + 1` })
-      .where(eq(UsersTable.googleId, googleId));
-  } catch {
-    logger.error(`Failed incrementing login count of Google ID ${googleId}`);
-  }
+      .where(eq(UsersTable.googleId, googleId))
+  );
+  if (!result.success)
+    raise(
+      `Failed incrementing login count of Google ID ${googleId}`,
+      result.error
+    );
 }
