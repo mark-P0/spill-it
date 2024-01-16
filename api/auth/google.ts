@@ -6,6 +6,7 @@
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import { z } from "zod";
 import { env } from "../utils/env";
+import { raise } from "../utils/errors";
 
 // TODO Cache this? Is it cached by default?
 /**
@@ -16,15 +17,20 @@ async function fetchDiscoveryDocument(
   url = "https://accounts.google.com/.well-known/openid-configuration"
 ) {
   const response = await fetch(url);
-  const doc = await response.json();
+  const givenDoc = await response.json();
 
-  return z
+  const parsing = z
     .object({
       authorization_endpoint: z.string(),
       token_endpoint: z.string(),
       jwks_uri: z.string(),
     })
-    .parse(doc);
+    .safeParse(givenDoc);
+  const doc = parsing.success
+    ? parsing.data
+    : raise("Unexpected Google discovery document", parsing.error);
+
+  return doc;
 }
 
 /**
@@ -65,9 +71,9 @@ async function exchangeCodeForTokens(code: string, redirectUri: string) {
   params.set("grant_type", "authorization_code");
 
   const res = await fetch(url, { method: "POST", body: params });
-  const data = await res.json();
+  const givenTokens = await res.json();
 
-  return z
+  const parsing = z
     .object({
       access_token: z.string(),
       expires_in: z.number(),
@@ -76,7 +82,12 @@ async function exchangeCodeForTokens(code: string, redirectUri: string) {
       token_type: z.string(),
       refresh_token: z.string().optional(),
     })
-    .parse(data);
+    .safeParse(givenTokens);
+  const tokens = parsing.success
+    ? parsing.data
+    : raise("Unexpected Google tokens", parsing.error);
+
+  return tokens;
 }
 
 /**
@@ -86,15 +97,18 @@ async function exchangeCodeForTokens(code: string, redirectUri: string) {
 async function extractGoogleInfoFromJwt(jwt: string) {
   const { jwks_uri } = await fetchDiscoveryDocument();
   const jwks = createRemoteJWKSet(new URL(jwks_uri));
-
   const { payload } = await jwtVerify(jwt, jwks); // Also validates the token
-  const { sub, name, picture } = z
+
+  const parsing = z
     .object({
       sub: z.string(),
       name: z.string(), // TODO Make these optional? Strictly speaking they are not always present...
       picture: z.string(), // TODO Make these optional? Strictly speaking they are not always present...
     })
-    .parse(payload);
+    .safeParse(payload);
+  const { sub, name, picture } = parsing.success
+    ? parsing.data
+    : raise("Unexpected Google JWT", parsing.error);
 
   return { googleId: sub, name, picture };
 }
