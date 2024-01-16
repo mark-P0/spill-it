@@ -1,11 +1,8 @@
 import { eq, sql } from "drizzle-orm";
 import { raise } from "../utils/errors";
-import { localizeLogger } from "../utils/logger";
 import { safeAsync } from "../utils/try-catch";
 import { db } from "./db";
 import { UsersTable } from "./schema";
-
-const logger = localizeLogger(import.meta.url);
 
 function createUsernameFromHandle(handleName: string) {
   const tentativeHandle = handleName.toLowerCase().split(/\s/g).join("-"); // TODO Ensure unique from existing database entries!
@@ -21,7 +18,7 @@ export async function readUser(id: User["id"]): Promise<User | null> {
   );
   const users = result.success
     ? result.value
-    : raise(`Failed getting user details of ID ${id}`, result.error);
+    : raise("Failed reading user from ID", result.error);
 
   if (users.length > 1) raise("Multiple users for an ID...?");
   const user = users[0] ?? null;
@@ -39,10 +36,7 @@ export async function readGoogleUser(googleId: string): Promise<User | null> {
   );
   const users = result.success
     ? result.value
-    : raise(
-        `Failed getting user details of Google ID ${googleId}`,
-        result.error
-      );
+    : raise("Failed reading user from Google ID", result.error);
 
   if (users.length > 1) raise("Multiple users for an Google ID...?");
   const user = users[0] ?? null;
@@ -61,7 +55,7 @@ export async function createUserFromGoogle(
   portraitUrl: string
 ): Promise<User> {
   if (await isGoogleUserExisting(googleId))
-    raise(`User of Google ID ${googleId} already exists`);
+    raise("Failed creating user from Google ID as they already exist");
 
   const username = createUsernameFromHandle(handleName);
   const result = await safeAsync(() =>
@@ -72,7 +66,7 @@ export async function createUserFromGoogle(
   );
   const users = result.success
     ? result.value
-    : raise(`Failed creating user from Google ID ${googleId}`, result.error);
+    : raise("Failed creating user from Google ID", result.error);
 
   if (users.length > 1) raise("Multiple Google users inserted...?");
   const user = users[0] ?? raise("Inserted Google user does not exist...?");
@@ -88,7 +82,9 @@ export async function createUserFromGoogle(
  */
 export async function updateIncrementGoogleUserLoginCt(googleId: string) {
   if (!(await isGoogleUserExisting(googleId)))
-    raise(`User of Google ID ${googleId} does not exist!`);
+    raise(
+      "Failed incrementing user login count from Google ID as they do not exist"
+    );
 
   const result = await safeAsync(() =>
     db
@@ -97,8 +93,5 @@ export async function updateIncrementGoogleUserLoginCt(googleId: string) {
       .where(eq(UsersTable.googleId, googleId))
   );
   if (!result.success)
-    raise(
-      `Failed incrementing login count of Google ID ${googleId}`,
-      result.error
-    );
+    raise("Failed incrementing user login count from Google ID", result.error);
 }
