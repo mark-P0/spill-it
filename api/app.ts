@@ -66,10 +66,9 @@ app.use(express.static(path.join(__dirname, "public")));
  * and the handlers (and redirects!) reference a centralized endpoint map for better maintainability.
  */
 {
-  if (env.NODE_ENV === "development") {
-    logger.debug('Using "try" routes...');
-    app.use(TryRouter);
-  }
+  logger.debug('Using "try" routes...');
+  app.use(TryRouter);
+
   app.use(SessionsRouter);
   app.use(UsersRouter);
 }
