@@ -1,14 +1,13 @@
 import { StatusCodes } from "http-status-codes";
-import { z } from "zod";
 import { isSessionExpired, readSessionFromUUID } from "../../data/sessions";
-import { endpoints, parseHeaderAuthSession } from "../../utils/express";
+import { endpoint, parseHeaderAuthSession } from "../../utils/express";
 import { localizeLogger } from "../../utils/logger";
 import { safe, safeAsync } from "../../utils/try-catch";
 import { TryRouter } from "../try";
 
 const logger = localizeLogger(import.meta.url);
 
-TryRouter.get(endpoints.try.unprotected, (req, res, next) => {
+TryRouter.get(endpoint("/try/unprotected"), (req, res, next) => {
   res.json({
     data: {
       resource: "unprotected",
@@ -17,7 +16,7 @@ TryRouter.get(endpoints.try.unprotected, (req, res, next) => {
   });
 });
 
-TryRouter.get(endpoints.try.protected, async (req, res, next) => {
+TryRouter.get(endpoint("/try/protected"), async (req, res, next) => {
   logger.info("Parsing headers...");
   const parsingHeaderAuth = safe(() => parseHeaderAuthSession(req.headers));
   if (!parsingHeaderAuth.success) {

@@ -4,58 +4,30 @@ import { splitAtFirstInstance } from "./strings";
 
 const logger = localizeLogger(import.meta.url);
 
-function buildKeySequence(key: string, parent: string, sep = "/") {
-  if (key === "/" && parent === "") {
-    return "/";
-  }
-  if (key === "/") {
-    return parent;
-  }
-  return `${parent}${sep}${key}`;
+/**
+ * - Try to keep "sorted"
+ * - Group related routes as much as possible
+ */
+const endpoints = [
+  ...["/api/v0/users/me", "/api/v0/sessions/google"],
+  ...[
+    "/try/hello",
+    "/try/sample",
+    "/try/protected",
+    "/try/unprotected",
+    "/try/not-found",
+    "/try/error",
+    "/try/ui/login/google",
+    "/try/ui/login/google/redirect",
+  ],
+] as const;
+type Endpoint = (typeof endpoints)[number];
+export function endpoint<T extends Endpoint>(endpoint: T): T {
+  return endpoint;
 }
 
-type EndpointMap = { [key: string]: EndpointMap | string };
-/** Heavily based on https://stackoverflow.com/a/65883097 */
-function assignEndpoints(obj: EndpointMap, parent = "") {
-  for (const [key, value] of Object.entries(obj)) {
-    const sequence = buildKeySequence(key, parent);
-
-    if (typeof value === "object") {
-      assignEndpoints(value, sequence);
-    } else {
-      obj[key] = sequence;
-    }
-  }
-}
-
-export const endpoints = {
-  "/": "",
-  api: {
-    v0: {
-      users: { me: "" },
-      sessions: { google: "" },
-    },
-  },
-  try: {
-    hello: "",
-    sample: "",
-    protected: "",
-    unprotected: "",
-    "not-found": "",
-    error: "",
-    ui: {
-      login: {
-        google: {
-          "/": "",
-          redirect: "",
-        },
-      },
-    },
-  },
-};
-assignEndpoints(endpoints);
 logger.info(
-  "Using the following endpoints: " + JSON.stringify(endpoints, undefined, 1)
+  "Using the following endpoints: " + endpoints.map((ep) => `"${ep}"`).join(" ")
 );
 
 const mapSchemeZod = {

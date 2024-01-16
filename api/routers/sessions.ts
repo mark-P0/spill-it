@@ -8,7 +8,7 @@ import {
   readUserSession,
 } from "../data/sessions";
 import { createUserFromGoogle, readGoogleUser } from "../data/users";
-import { endpoints, parseHeaderAuthGoogle } from "../utils/express";
+import { endpoint, parseHeaderAuthGoogle } from "../utils/express";
 import { localizeLogger } from "../utils/logger";
 import { safe, safeAsync } from "../utils/try-catch";
 
@@ -16,7 +16,8 @@ const logger = localizeLogger(import.meta.url);
 export const SessionsRouter = Router();
 
 /** Get a session ID using Google authorization code */
-SessionsRouter.get(endpoints.api.v0.sessions.google, async (req, res, next) => {
+const epGoogle = endpoint("/api/v0/sessions/google");
+SessionsRouter.get(epGoogle, async (req, res, next) => {
   logger.info("Parsing headers...");
   const parsingHeaderAuth = safe(() => parseHeaderAuthGoogle(req.headers));
   if (!parsingHeaderAuth.success) {
