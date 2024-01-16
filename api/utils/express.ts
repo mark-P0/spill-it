@@ -68,7 +68,9 @@ function parseAuth<TScheme extends AuthScheme>(
     )
   );
   if (!parsingParams.success) {
-    throw new Error("Invalid authorization parameters");
+    throw new Error("Invalid authorization parameters", {
+      cause: parsingParams.error,
+    });
   }
 
   const params: z.infer<MapSchemeZod[TScheme]> = parsingParams.data;
@@ -79,7 +81,7 @@ export function parseHeaderAuthGoogle(possibleHeaders: unknown) {
     .object({ authorization: z.string() })
     .safeParse(possibleHeaders);
   if (!parsingHeaders.success) {
-    throw new Error("Invalid headers");
+    throw new Error("Invalid headers", { cause: parsingHeaders.error });
   }
   const headers = parsingHeaders.data;
 
@@ -90,7 +92,7 @@ export function parseHeaderAuthSession(possibleHeaders: unknown) {
     .object({ authorization: z.string() })
     .safeParse(possibleHeaders);
   if (!parsingHeaders.success) {
-    throw new Error("Invalid headers");
+    throw new Error("Invalid headers", { cause: parsingHeaders.error });
   }
   const headers = parsingHeaders.data;
 

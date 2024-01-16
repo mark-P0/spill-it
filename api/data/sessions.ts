@@ -22,7 +22,7 @@ export async function readUserSession(
     db.select().from(SessionsTable).where(eq(SessionsTable.userId, userId))
   );
   if (!result.success) {
-    throw new Error("Failed reading sessions table");
+    throw new Error("Failed reading sessions table", { cause: result.error });
   }
   const sessions = result.value;
 
@@ -65,7 +65,9 @@ export async function createSession(userId: User["id"]): Promise<Session> {
       .returning()
   );
   if (!result.success) {
-    throw new Error("Failed inserting to sessions table");
+    throw new Error("Failed inserting to sessions table", {
+      cause: result.error,
+    });
   }
   const sessions = result.value;
 

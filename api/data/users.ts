@@ -1,5 +1,6 @@
 import { eq, sql } from "drizzle-orm";
 import { localizeLogger } from "../utils/logger";
+import { safeAsync } from "../utils/try-catch";
 import { db } from "./db";
 import { UsersTable } from "./schema";
 
@@ -57,17 +58,21 @@ export async function createUserFromGoogle(
     throw new Error(`User of Google ID ${googleId} already exists`);
   }
 
-  let user: User | undefined; // TODO Extract into function?
-  try {
-    const username = createUsernameFromHandle(handleName);
-    const users = await db
+  const username = createUsernameFromHandle(handleName);
+  const result = await safeAsync(() =>
+    db
       .insert(UsersTable)
       .values({ username, handleName, portraitUrl, googleId, loginCt: 0 })
-      .returning();
-    user = users[0];
-  } catch {
-    throw new Error(`Failed creating user from Google ID ${googleId}`);
+      .returning()
+  );
+  if (!result.success) {
+    throw new Error(`Failed creating user from Google ID ${googleId}`, {
+      cause: result.error,
+    });
   }
+  const users = result.value;
+
+  const user = users[0];
   if (user === undefined) {
     throw new Error("Inserted user does not exist...?");
   }
