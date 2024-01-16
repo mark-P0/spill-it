@@ -8,6 +8,7 @@ import {
   readUserSession,
 } from "../data/sessions";
 import { createUserFromGoogle, readGoogleUser } from "../data/users";
+import { formatError } from "../utils/errors";
 import { endpoint, parseHeaderAuthGoogle } from "../utils/express";
 import { localizeLogger } from "../utils/logger";
 import { safe, safeAsync } from "../utils/try-catch";
@@ -21,7 +22,7 @@ SessionsRouter.get(epGoogle, async (req, res, next) => {
   logger.info("Parsing headers...");
   const parsingHeaderAuth = safe(() => parseHeaderAuthGoogle(req.headers));
   if (!parsingHeaderAuth.success) {
-    logger.error(parsingHeaderAuth.error.stack);
+    logger.error(formatError(parsingHeaderAuth.error));
     return res
       .status(StatusCodes.BAD_REQUEST)
       .json({ error: "Invalid headers" });
@@ -34,7 +35,7 @@ SessionsRouter.get(epGoogle, async (req, res, next) => {
     convertCodeIntoGoogleInfo(code, redirectedOn)
   );
   if (!resultInfo.success) {
-    logger.error(resultInfo.error.stack);
+    logger.error(formatError(resultInfo.error));
     return res
       .status(StatusCodes.UNAUTHORIZED)
       .json({ error: "Invalid authorization code" });
@@ -45,7 +46,7 @@ SessionsRouter.get(epGoogle, async (req, res, next) => {
   const { googleId } = info;
   const resultUser = await safeAsync(() => readGoogleUser(googleId));
   if (!resultUser.success) {
-    logger.error(resultUser.error.stack);
+    logger.error(formatError(resultUser.error));
     return res
       .status(StatusCodes.BAD_GATEWAY)
       .json({ error: "Read user failed" });
@@ -59,7 +60,7 @@ SessionsRouter.get(epGoogle, async (req, res, next) => {
       createUserFromGoogle(googleId, name, picture)
     );
     if (!resultUser.success) {
-      logger.error(resultUser.error.stack);
+      logger.error(formatError(resultUser.error));
       return res
         .status(StatusCodes.BAD_GATEWAY)
         .json({ error: "Create user failed" });
@@ -72,7 +73,7 @@ SessionsRouter.get(epGoogle, async (req, res, next) => {
   const userId = user.id; // For some reason TS will not accept nesting this in below
   const resultSession = await safeAsync(() => readUserSession(userId));
   if (!resultSession.success) {
-    logger.error(resultSession.error.stack);
+    logger.error(formatError(resultSession.error));
     return res
       .status(StatusCodes.BAD_GATEWAY)
       .json({ error: "Read session failed" });
@@ -86,7 +87,7 @@ SessionsRouter.get(epGoogle, async (req, res, next) => {
     const sessionId = session.id;
     const resultDelete = await safeAsync(() => deleteSession(sessionId));
     if (!resultDelete.success) {
-      logger.error(resultDelete.error.stack);
+      logger.error(formatError(resultDelete.error));
       return res
         .status(StatusCodes.BAD_GATEWAY)
         .json({ error: "Delete expired session failed" });
@@ -97,7 +98,7 @@ SessionsRouter.get(epGoogle, async (req, res, next) => {
     logger.info("Session does not exist; creating...");
     const resultSession = await safeAsync(() => createSession(userId));
     if (!resultSession.success) {
-      logger.error(resultSession.error.stack);
+      logger.error(formatError(resultSession.error));
       return res
         .status(StatusCodes.BAD_GATEWAY)
         .json({ error: "Create session failed" });

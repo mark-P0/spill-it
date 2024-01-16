@@ -10,6 +10,7 @@ import "./routers/try/protected";
 import "./routers/try/ui";
 import { UsersRouter } from "./routers/users";
 import { env } from "./utils/env";
+import { formatError } from "./utils/errors";
 import { logger as directLogger, localizeLogger } from "./utils/logger";
 
 const logger = localizeLogger(import.meta.url);
@@ -91,7 +92,7 @@ app.use(express.static(path.join(__dirname, "public")));
    * - https://github.com/DefinitelyTyped/DefinitelyTyped/issues/4212
    */
   app.use(((err: Error, req, res, next) => {
-    logger.error(err?.stack ?? `${err}`);
+    logger.error(formatError(err));
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ error: ReasonPhrases.INTERNAL_SERVER_ERROR });
