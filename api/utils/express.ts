@@ -10,7 +10,7 @@ const logger = localizeLogger(import.meta.url);
  * - Group related routes as much as possible
  */
 const endpoints = [
-  ...["/api/v0/users/me", "/api/v0/sessions/google"],
+  ...["/api/v0/users/me", "/api/v0/sessions"],
   ...[
     "/try/hello",
     "/try/sample",
