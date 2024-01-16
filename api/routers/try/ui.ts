@@ -5,7 +5,7 @@ import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { buildAuthUrl } from "../../auth/google";
 import { raise } from "../../utils/errors";
-import { endpoint } from "../../utils/express";
+import { buildHeaderAuth, endpoint } from "../../utils/express";
 import { localizeLogger } from "../../utils/logger";
 import { TryRouter } from "../try";
 
@@ -69,9 +69,9 @@ TryRouter.get(endpoint("/try/ui/login/google/redirect"), (req, res, next) => {
   const { code } = parsing.data;
 
   res.json({
-    data: { code, redirectedOn: redirectUri },
+    data: { code, redirectUri },
     headers: {
-      Authorization: `SPILLITGOOGLE code=${code}; redirectedOn=${redirectUri}`,
+      Authorization: buildHeaderAuth("SPILLITGOOGLE", { code, redirectUri }),
     },
   });
 });

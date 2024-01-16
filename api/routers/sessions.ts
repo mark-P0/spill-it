@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
+import { z } from "zod";
 import { convertCodeIntoGoogleInfo } from "../auth/google";
 import {
   createSession,
@@ -9,7 +10,7 @@ import {
 } from "../data/sessions";
 import { createUserFromGoogle, readGoogleUser } from "../data/users";
 import { formatError } from "../utils/errors";
-import { endpoint, parseHeaderAuthGoogle } from "../utils/express";
+import { endpoint, parseHeaderAuth } from "../utils/express";
 import { localizeLogger } from "../utils/logger";
 import { safe, safeAsync } from "../utils/try-catch";
 
@@ -19,19 +20,32 @@ export const SessionsRouter = Router();
 /** Get a session ID using Google authorization code */
 SessionsRouter.get(endpoint("/api/v0/sessions"), async (req, res, next) => {
   logger.info("Parsing headers...");
-  const parsingHeaderAuth = safe(() => parseHeaderAuthGoogle(req.headers));
-  if (!parsingHeaderAuth.success) {
-    logger.error(formatError(parsingHeaderAuth.error));
+  const parsingHeaders = z
+    .object({ authorization: z.string() })
+    .safeParse(req.headers);
+  if (!parsingHeaders.success) {
+    logger.error("Invalid headers");
     return res
       .status(StatusCodes.BAD_REQUEST)
       .json({ error: "Invalid headers" });
   }
-  const headerAuth = parsingHeaderAuth.value;
+  const headers = parsingHeaders.data;
+
+  const resultHeaderAuth = safe(() =>
+    parseHeaderAuth("SPILLITGOOGLE", headers.authorization)
+  );
+  if (!resultHeaderAuth.success) {
+    logger.error(formatError(resultHeaderAuth.error));
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ error: "Invalid headers" });
+  }
+  const headerAuth = resultHeaderAuth.value;
 
   logger.info("Fetching Google info using provided auth params...");
-  const { code, redirectedOn } = headerAuth.params;
+  const { code, redirectUri } = headerAuth.params;
   const resultInfo = await safeAsync(() =>
-    convertCodeIntoGoogleInfo(code, redirectedOn)
+    convertCodeIntoGoogleInfo(code, redirectUri)
   );
   if (!resultInfo.success) {
     logger.error(formatError(resultInfo.error));

@@ -26,17 +26,25 @@ type Endpoint = (typeof endpoints)[number];
 export function endpoint<T extends Endpoint>(endpoint: T): T {
   return endpoint;
 }
-
 logger.info(
   "Using the following endpoints: " + endpoints.map((ep) => `"${ep}"`).join(" ")
 );
 
 const mapSchemeZod = {
-  SPILLITGOOGLE: z.object({ code: z.string(), redirectedOn: z.string() }),
+  SPILLITGOOGLE: z.object({ code: z.string(), redirectUri: z.string() }),
   SPILLITSESS: z.object({ id: z.string().uuid() }),
 };
 type MapSchemeZod = typeof mapSchemeZod;
 type AuthScheme = keyof MapSchemeZod;
+type SchemeParams<T extends AuthScheme> = z.infer<MapSchemeZod[T]>;
+
+export function buildHeaderAuth<TScheme extends AuthScheme>(
+  scheme: TScheme,
+  params: SchemeParams<TScheme>
+) {
+  const paramsEncoded = new URLSearchParams(params);
+  return `${scheme} ${paramsEncoded}`;
+}
 
 /**
  * https://stackoverflow.com/a/43164958
@@ -48,47 +56,21 @@ type AuthScheme = keyof MapSchemeZod;
  * - Parameters follow a `key=value` format
  * - Parameters are separated by comma
  *
- * Expected `authorization` format is `<scheme> <key>=<value>; <key>=<value>; ... <key>=<value>`
+ * Expected `authorization` format is `<scheme> URLSearchParams({key: value}).toString()`
  */
-function parseAuth<TScheme extends AuthScheme>(
+export function parseHeaderAuth<TScheme extends AuthScheme>(
   targetScheme: TScheme,
-  authHeaderValue: string,
-  sep = { header: " ", params: "; ", paramEntry: "=" }
+  value: string
 ) {
-  const parts = splitAtFirstInstance(authHeaderValue, sep.header);
-  const [scheme, givenParams] = parts;
+  const [scheme, paramsEncoded] = splitAtFirstInstance(value, " ");
   if (scheme !== targetScheme) raise("Invalid authorization scheme");
 
-  const parsingParams = mapSchemeZod[targetScheme].safeParse(
-    Object.fromEntries(
-      givenParams
-        .split(sep.params)
-        .map((entryStr) => entryStr.split(sep.paramEntry))
-    )
+  const parsing = mapSchemeZod[targetScheme].safeParse(
+    Object.fromEntries(new URLSearchParams(paramsEncoded))
   );
-  const params: z.infer<MapSchemeZod[TScheme]> = parsingParams.success
-    ? parsingParams.data
-    : raise("Invalid authorization parameters", parsingParams.error);
+  const params: SchemeParams<TScheme> = parsing.success
+    ? parsing.data
+    : raise("Invalid authorization parameters", parsing.error);
 
   return { scheme: targetScheme, params };
-}
-export function parseHeaderAuthGoogle(possibleHeaders: unknown) {
-  const parsingHeaders = z
-    .object({ authorization: z.string() })
-    .safeParse(possibleHeaders);
-  const headers = parsingHeaders.success
-    ? parsingHeaders.data
-    : raise("Invalid headers", parsingHeaders.error);
-
-  return parseAuth("SPILLITGOOGLE", headers.authorization);
-}
-export function parseHeaderAuthSession(possibleHeaders: unknown) {
-  const parsingHeaders = z
-    .object({ authorization: z.string() })
-    .safeParse(possibleHeaders);
-  const headers = parsingHeaders.success
-    ? parsingHeaders.data
-    : raise("Invalid headers", parsingHeaders.error);
-
-  return parseAuth("SPILLITSESS", headers.authorization);
 }
