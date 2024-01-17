@@ -1,5 +1,5 @@
 {
-  "name": "spill-it",
+  "name": "@spill-it/api",
   "version": "0.0.0",
   "private": true,
   "scripts": {
