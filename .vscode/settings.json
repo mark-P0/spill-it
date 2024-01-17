@@ -4,12 +4,16 @@
       "source.sortImports": true
     }
   },
-  "[json][jsonc][javascript][typescript][javascriptreact][typescriptreact][html]": {
+  "[json][jsonc][javascript][typescript][javascriptreact][typescriptreact][html][css]": {
     "editor.tabSize": 2,
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
 
   "cSpell.allowCompoundWords": true,
-  "cSpell.words": ["jwks", "falseish", "strat"]
+  "cSpell.words": ["jwks", "falseish", "strat"],
+
+  "files.associations": {
+    "*.css": "tailwindcss"
+  }
 }

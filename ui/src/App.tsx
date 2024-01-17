@@ -1,3 +1,7 @@
 export function App() {
-  return <div>Hello, world!</div>;
+  return (
+    <main className="h-screen w-screen grid place-items-center bg-fuchsia-950 text-rose-400">
+      Hello, world!
+    </main>
+  );
 }
