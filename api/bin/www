@@ -3,12 +3,12 @@
 /**
  * Module dependencies.
  */
-var { app } = require("../app");
+var { app } = require("../src/app");
 var http = require("http");
 var https = require("https");
 var fs = require("fs");
-var { env } = require("../utils/env");
-const { logger } = require("../utils/logger");
+var { env } = require("../src/utils/env");
+const { logger } = require("../src/utils/logger");
 
 /**
  * Get port from environment and store in Express.

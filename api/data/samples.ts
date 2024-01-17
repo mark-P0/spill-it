@@ -1,10 +1,13 @@
-import { raise } from "../utils/errors";
-import { safeAsync } from "../utils/try-catch";
+import { raise } from "../src/utils/errors";
+import { safeAsync } from "../src/utils/try-catch";
 import { db } from "./db";
 import { SamplesTable } from "./schema";
 
 // /* DELETEME */
 // (async () => {
+//   const { localizeLogger } = await import("../src/utils/logger");
+//   const logger = localizeLogger(import.meta.url);
+//
 //   const samples = await getAllSamples();
 //
 //   /* Only add sample data when nothing exists */
@@ -14,7 +17,7 @@ import { SamplesTable } from "./schema";
 //   }
 //
 //   const { randomInteger, randomNumberByLength, randomString } = await import(
-//     "../utils/random"
+//     "../src/utils/random"
 //   );
 //
 //   logger.warn("Adding sample data...", { file: import.meta.url });

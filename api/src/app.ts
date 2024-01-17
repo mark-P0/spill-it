@@ -9,12 +9,10 @@ import { TryRouter } from "./routers/try";
 import "./routers/try/protected";
 import "./routers/try/ui";
 import { UsersRouter } from "./routers/users";
-import { env } from "./utils/env";
 import { formatError } from "./utils/errors";
 import { logger as directLogger, localizeLogger } from "./utils/logger";
 
 const logger = localizeLogger(import.meta.url);
-
 export const app = express();
 
 {

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAllSamples } from "../data/samples";
+import { getAllSamples } from "../../data/samples";
 import { raise } from "../utils/errors";
 import { endpoint } from "../utils/express";
 import { localizeLogger } from "../utils/logger";
