@@ -1,10 +1,10 @@
 {
-  "[javascript][typescript]": {
+  "[javascript][typescript][javascriptreact][typescriptreact]": {
     "editor.codeActionsOnSave": {
       "source.sortImports": true
     }
   },
-  "[json][jsonc][javascript][typescript]": {
+  "[json][jsonc][javascript][typescript][javascriptreact][typescriptreact][html]": {
     "editor.tabSize": 2,
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
