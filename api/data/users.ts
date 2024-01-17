@@ -1,6 +1,6 @@
 import { eq, sql } from "drizzle-orm";
-import { raise } from "../utils/errors";
-import { safeAsync } from "../utils/try-catch";
+import { raise } from "../src/utils/errors";
+import { safeAsync } from "../src/utils/try-catch";
 import { db } from "./db";
 import { UsersTable } from "./schema";
 

@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { isSessionExpired, readSessionFromUUID } from "../../data/sessions";
+import { isSessionExpired, readSessionFromUUID } from "../../../data/sessions";
 import { formatError } from "../../utils/errors";
 import { endpoint, parseHeaderAuth } from "../../utils/express";
 import { localizeLogger } from "../../utils/logger";
