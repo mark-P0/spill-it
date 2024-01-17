@@ -5,7 +5,7 @@
   "scripts": {
     "db:migrate": "npm run db:generate-migrations && npm run db:execute-migrations",
     "db:generate-migrations": "cross-env NODE_ENV=development drizzle-kit generate:pg",
-    "db:execute-migrations": "cross-env NODE_ENV=development tsx --env-file=.env ./api/data/migrate.ts",
+    "db:execute-migrations": "cross-env NODE_ENV=development tsx --env-file=.env ./data/migrate.ts",
     "api:start": "npm run api:check && npm run api:preview",
     "api:check": "tsc",
     "api:preview": "cross-env NODE_ENV=production tsx --env-file=.env ./api/bin/www",
