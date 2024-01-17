@@ -71,12 +71,12 @@ export const logger = winston.createLogger({
     }),
     env.NODE_ENV === "development" &&
       new transports.File({
-        filename: `api/logs/console/${logFileId}.log`,
+        filename: `./logs/console/${logFileId}.log`,
         format: getConsoleFormat(false), // Save the same output as the Console transport
       }),
     env.NODE_ENV === "development" &&
       new transports.File({
-        filename: `api/logs/json/${logFileId}.log`,
+        filename: `./logs/json/${logFileId}.log`,
         format: format.combine(format.timestamp(), format.json()),
       }),
   ]),
