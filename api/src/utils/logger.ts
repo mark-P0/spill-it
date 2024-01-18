@@ -1,6 +1,6 @@
+import { env } from "@spill-it/env";
 import winston, { format, transports } from "winston";
 import { getFilenameRelativeToRoot } from "./cjs-vars-in-esm";
-import { env } from "./env";
 import { raise } from "./errors";
 import { isFalseish, removeFalseish } from "./falseish";
 

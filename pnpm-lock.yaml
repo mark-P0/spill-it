@@ -11,6 +11,9 @@ importers:
       '@spill-it/endpoints':
         specifier: workspace:^
         version: link:../shared/endpoints
+      '@spill-it/env':
+        specifier: workspace:^
+        version: link:../shared/env
       cookie-parser:
         specifier: ~1.4.4
         version: 1.4.6
@@ -94,6 +97,15 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
+
+  shared/env:
+    dependencies:
+      dotenv:
+        specifier: ^16.3.1
+        version: 16.3.1
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
 
   ui:
     dependencies:
