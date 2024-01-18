@@ -1,3 +1,4 @@
+import { endpoints } from "@spill-it/endpoints";
 import cookieParser from "cookie-parser";
 import express, { ErrorRequestHandler } from "express";
 import helmet from "helmet";
@@ -64,6 +65,11 @@ app.use(express.static(path.join(__dirname, "public")));
  * and the handlers (and redirects!) reference a centralized endpoint map for better maintainability.
  */
 {
+  logger.info(
+    "Using the following endpoints: " +
+      endpoints.map((ep) => `"${ep}"`).join(" ")
+  );
+
   logger.debug('Using "try" routes...');
   app.use(TryRouter);
 

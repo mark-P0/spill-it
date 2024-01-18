@@ -2,7 +2,7 @@
  * - Try to keep "sorted"
  * - Group related routes as much as possible
  */
-const endpoints = [
+export const endpoints = [
   ...["/api/v0/users/me", "/api/v0/sessions"],
   ...[
     "/try/hello",

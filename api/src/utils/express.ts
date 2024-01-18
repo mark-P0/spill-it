@@ -1,35 +1,6 @@
 import { z } from "zod";
 import { raise } from "./errors";
-import { localizeLogger } from "./logger";
 import { splitAtFirstInstance } from "./strings";
-
-const logger = localizeLogger(import.meta.url);
-
-// DELETEME Move to shared package
-/**
- * - Try to keep "sorted"
- * - Group related routes as much as possible
- */
-const endpoints = [
-  ...["/api/v0/users/me", "/api/v0/sessions"],
-  ...[
-    "/try/hello",
-    "/try/sample",
-    "/try/protected",
-    "/try/unprotected",
-    "/try/not-found",
-    "/try/error",
-    "/try/ui/login/google",
-    "/try/ui/login/google/redirect",
-  ],
-] as const;
-type Endpoint = (typeof endpoints)[number];
-export function endpoint<T extends Endpoint>(endpoint: T): T {
-  return endpoint;
-}
-logger.info(
-  "Using the following endpoints: " + endpoints.map((ep) => `"${ep}"`).join(" ")
-);
 
 const mapSchemeZod = {
   SPILLITGOOGLE: z.object({ code: z.string(), redirectUri: z.string() }),
