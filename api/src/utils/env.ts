@@ -1,5 +1,8 @@
+import dotenv from "dotenv";
 import { z } from "zod";
 import { raise } from "./errors";
+
+dotenv.config({ path: "../.env" }); // Relative to project root...
 
 const parsing = z
   .object({

@@ -4,7 +4,7 @@ import { env } from "./src/utils/env";
 /**
  * https://orm.drizzle.team/docs/migrations
  *
- * Uses implied `.env` file in the same directory as this file.
+ * Drizzle Kit implicitly uses an `.env` file in the same directory as this file (?)
  */
 export default {
   schema: "./data/schema.ts",
