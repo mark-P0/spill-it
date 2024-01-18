@@ -1,11 +1,12 @@
 /* TODO Do this on UI */
 
+import { endpoint } from "@spill-it/endpoints";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { buildAuthUrl } from "../../auth/google";
 import { env } from "../../utils/env";
 import { raise } from "../../utils/errors";
-import { buildHeaderAuth, endpoint } from "../../utils/express";
+import { buildHeaderAuth } from "../../utils/express";
 import { TryRouter } from "../try";
 
 const baseUrl =

@@ -1,3 +1,4 @@
+import { endpoint } from "@spill-it/endpoints";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
@@ -10,7 +11,7 @@ import {
 import { createUserFromGoogle, readGoogleUser } from "../../data/users";
 import { convertCodeIntoGoogleInfo } from "../auth/google";
 import { formatError } from "../utils/errors";
-import { endpoint, parseHeaderAuth } from "../utils/express";
+import { parseHeaderAuth } from "../utils/express";
 import { localizeLogger } from "../utils/logger";
 import { safe, safeAsync } from "../utils/try-catch";
 

@@ -1,6 +1,6 @@
+import { endpoint } from "@spill-it/endpoints";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
-import { endpoint } from "../utils/express";
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(import.meta.url);
