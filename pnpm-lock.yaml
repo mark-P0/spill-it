@@ -8,6 +8,9 @@ importers:
 
   api:
     dependencies:
+      '@spill-it/endpoints':
+        specifier: workspace:^
+        version: link:../shared/endpoints
       cookie-parser:
         specifier: ~1.4.4
         version: 1.4.6
@@ -78,6 +81,8 @@ importers:
       prettier:
         specifier: ^3.1.1
         version: 3.2.4
+
+  shared/endpoints: {}
 
   ui:
     dependencies:
