@@ -1,4 +1,4 @@
-import { endpoint } from "@spill-it/endpoints";
+import { endpoint2, endpointHandler } from "@spill-it/endpoints";
 import { Router } from "express";
 import { getAllSamples } from "../../data/samples";
 import { raise } from "../utils/errors";
@@ -7,20 +7,24 @@ import { localizeLogger } from "../utils/logger";
 const logger = localizeLogger(import.meta.url);
 export const TryRouter = Router();
 
-TryRouter.get(endpoint("/try/hello"), (req, res) => {
-  const { who = "world" } = req.query;
+TryRouter.get(
+  ...endpointHandler("/try/hello", (req, res) => {
+    const { who = "world" } = req.query;
 
-  res.json({ hello: `${who}!` });
-});
+    res.json({ hello: `${who}!` });
+  })
+);
 
-TryRouter.get(endpoint("/try/sample"), async (req, res) => {
-  const data = await getAllSamples();
-  logger.debug("Data: " + JSON.stringify(data, undefined, 1));
+TryRouter.get(
+  ...endpointHandler("/try/sample", async (req, res) => {
+    const data = await getAllSamples();
+    logger.debug("Data: " + JSON.stringify(data, undefined, 1));
 
-  res.json({ data });
-});
+    res.json({ data });
+  })
+);
 
-TryRouter.get(endpoint("/try/not-found")); // Should not be handled by anything as it shouldn't exist :)
-TryRouter.get(endpoint("/try/error"), () => {
+TryRouter.get(endpoint2("/try/not-found")); // Should not be handled by anything as it shouldn't exist :)
+TryRouter.get(endpoint2("/try/error"), () => {
   raise("Something went horribly wrong");
 });

@@ -31,27 +31,57 @@ function objectKeys<T extends Record<string, unknown>, Key = keyof T>(
   return Object.keys(object) as Key[]; // TYPE ASSERTION Object.keys returns a non-specific type because of heavily contested reasons
 }
 
+// TODO Use common error "shape"?
+// TODO Use "standard"? e.g. JSON:API, JSend
+// TODO Boolean discriminator only provides 2 possibilities...
 // TODO Map each possible response to a status code?
 const mapEndpointResponse = {
-  "/try/unprotected": z.discriminatedUnion("success", [
+  "/api/v0/sessions": z.discriminatedUnion("success", [
+    z.object({ success: z.literal(false), error: z.string() }),
     z.object({
       success: z.literal(true),
       data: z.object({
-        resource: z.string(),
-        access: z.literal(true),
+        scheme: z.string(),
+        id: z.string(),
       }),
     }),
   ]),
-  "/try/protected": z.discriminatedUnion("success", [
-    z.object({
-      success: z.literal(false),
-      error: z.string(),
+  "/api/v0/users/me": z.discriminatedUnion("success", [
+    z.object({ success: z.literal(false), error: z.string() }),
+  ]),
+  "/try/hello": z.object({ hello: z.string() }),
+  "/try/sample": z.object({ data: z.any() }),
+  "/try/not-found": z.never(),
+  "/try/error": z.never(),
+  "/try/unprotected": z.object({
+    data: z.object({
+      resource: z.string(),
+      access: z.literal(true),
     }),
+  }),
+  "/try/protected": z.discriminatedUnion("success", [
+    z.object({ success: z.literal(false), error: z.string() }),
     z.object({
       success: z.literal(true),
       data: z.object({
         resource: z.string(),
         access: z.string(),
+      }),
+    }),
+  ]),
+  "/try/ui/login/google": z.object({
+    redirect: z.string().url(),
+  }),
+  "/try/ui/login/google/redirect": z.discriminatedUnion("success", [
+    z.object({ success: z.literal(false), error: z.string() }),
+    z.object({
+      success: z.literal(true),
+      data: z.object({
+        code: z.string(),
+        redirectUri: z.string(),
+      }),
+      headers: z.object({
+        Authorization: z.string(),
       }),
     }),
   ]),
@@ -69,6 +99,10 @@ type EndpointHandler<T extends Endpoint2> = RequestHandler<
 export const endpoints2 = objectKeys(mapEndpointResponse);
 
 // TODO Replace the original above
+export function endpoint2<T extends Endpoint2>(endpoint: T): T {
+  return endpoint;
+}
+
 export function endpointHandler<T extends Endpoint2, U = EndpointHandler<T>>(
   endpoint: T,
   handler: U

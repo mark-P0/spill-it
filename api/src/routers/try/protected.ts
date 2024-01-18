@@ -1,4 +1,4 @@
-import { endpoint, endpointHandler } from "@spill-it/endpoints";
+import { endpointHandler } from "@spill-it/endpoints";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { isSessionExpired, readSessionFromUUID } from "../../../data/sessions";
@@ -13,7 +13,6 @@ const logger = localizeLogger(import.meta.url);
 TryRouter.get(
   ...endpointHandler("/try/unprotected", (req, res, next) => {
     res.json({
-      success: true,
       data: {
         resource: "unprotected",
         access: true,
@@ -30,10 +29,9 @@ TryRouter.get(
       .safeParse(req.headers);
     if (!parsingHeaders.success) {
       logger.error("Invalid headers");
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        success: false,
-        error: "Invalid headers",
-      });
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ success: false, error: "Invalid headers" });
     }
     const headers = parsingHeaders.data;
 
@@ -42,10 +40,9 @@ TryRouter.get(
     );
     if (!resultHeaderAuth.success) {
       logger.error(formatError(resultHeaderAuth.error));
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        success: false,
-        error: "Invalid headers",
-      });
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ success: false, error: "Invalid headers" });
     }
     const headerAuth = resultHeaderAuth.value;
 
@@ -54,26 +51,23 @@ TryRouter.get(
     const resultSession = await safeAsync(() => readSessionFromUUID(id));
     if (!resultSession.success) {
       logger.error(formatError(resultSession.error));
-      return res.status(StatusCodes.BAD_GATEWAY).json({
-        success: false,
-        error: "Read session failed",
-      });
+      return res
+        .status(StatusCodes.BAD_GATEWAY)
+        .json({ success: false, error: "Read session failed" });
     }
 
     const session = resultSession.value;
     if (session === null) {
       logger.info("Session does not exist");
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        success: false,
-        error: "Session not found",
-      });
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ success: false, error: "Session not found" });
     }
     if (isSessionExpired(session)) {
       logger.info("Session is expired");
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        success: false,
-        error: "Session expired",
-      });
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ success: false, error: "Session expired" });
     }
 
     logger.info("Session verified; providing requested resource...");
