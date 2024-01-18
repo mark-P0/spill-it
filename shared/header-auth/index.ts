@@ -1,6 +1,13 @@
 import { z } from "zod";
-import { raise } from "./errors";
-import { splitAtFirstInstance } from "./strings";
+
+function splitAtFirstInstance(str: string, sep: string): [string, string] {
+  const sepIdx = str.indexOf(sep);
+  if (sepIdx === -1) {
+    return [str, ""];
+  }
+
+  return [str.slice(0, sepIdx), str.slice(sepIdx + 1)];
+}
 
 const mapSchemeZod = {
   SPILLITGOOGLE: z.object({ code: z.string(), redirectUri: z.string() }),
@@ -35,14 +42,17 @@ export function parseHeaderAuth<TScheme extends AuthScheme>(
   value: string
 ) {
   const [scheme, paramsEncoded] = splitAtFirstInstance(value, " ");
-  if (scheme !== targetScheme) raise("Invalid authorization scheme");
+  if (scheme !== targetScheme) {
+    throw new Error("Invalid authorization scheme");
+  }
 
   const parsing = mapSchemeZod[targetScheme].safeParse(
     Object.fromEntries(new URLSearchParams(paramsEncoded))
   );
-  const params: SchemeParams<TScheme> = parsing.success
-    ? parsing.data
-    : raise("Invalid authorization parameters", parsing.error);
+  if (!parsing.success) {
+    throw new Error("Invalid authorization parameters");
+  }
 
+  const params: SchemeParams<TScheme> = parsing.data;
   return { scheme: targetScheme, params };
 }
