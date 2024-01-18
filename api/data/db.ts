@@ -1,6 +1,6 @@
+import { env } from "@spill-it/env";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { env } from "../src/utils/env";
 
 const pool = new Pool({
   connectionString: env.SUPABASE_POSTGRES_URI_POOLING,
