@@ -1,9 +1,9 @@
 import { endpointHandler } from "@spill-it/endpoints";
+import { parseHeaderAuth } from "@spill-it/header-auth";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { isSessionExpired, readSessionFromUUID } from "../../../data/sessions";
 import { formatError } from "../../utils/errors";
-import { parseHeaderAuth } from "../../utils/express";
 import { localizeLogger } from "../../utils/logger";
 import { safe, safeAsync } from "../../utils/try-catch";
 import { TryRouter } from "../try";

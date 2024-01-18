@@ -1,0 +1,6 @@
+{
+  "name": "@spill-it/header-auth",
+  "dependencies": {
+    "zod": "^3.22.4"
+  }
+}

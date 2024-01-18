@@ -1,14 +1,21 @@
 import { z } from "zod";
-import { raise } from "./errors";
-import { splitAtFirstInstance } from "./strings";
 
-const mapSchemeZod = {
+function splitAtFirstInstance(str: string, sep: string): [string, string] {
+  const sepIdx = str.indexOf(sep);
+  if (sepIdx === -1) {
+    return [str, ""];
+  }
+
+  return [str.slice(0, sepIdx), str.slice(sepIdx + 1)];
+}
+
+const mapSchemeParams = {
   SPILLITGOOGLE: z.object({ code: z.string(), redirectUri: z.string() }),
   SPILLITSESS: z.object({ id: z.string().uuid() }),
 };
-type MapSchemeZod = typeof mapSchemeZod;
-type AuthScheme = keyof MapSchemeZod;
-type SchemeParams<T extends AuthScheme> = z.infer<MapSchemeZod[T]>;
+type MapSchemeParams = typeof mapSchemeParams;
+type AuthScheme = keyof MapSchemeParams;
+type SchemeParams<T extends AuthScheme> = z.infer<MapSchemeParams[T]>;
 
 export function buildHeaderAuth<TScheme extends AuthScheme>(
   scheme: TScheme,
@@ -35,14 +42,17 @@ export function parseHeaderAuth<TScheme extends AuthScheme>(
   value: string
 ) {
   const [scheme, paramsEncoded] = splitAtFirstInstance(value, " ");
-  if (scheme !== targetScheme) raise("Invalid authorization scheme");
+  if (scheme !== targetScheme) {
+    throw new Error("Invalid authorization scheme");
+  }
 
-  const parsing = mapSchemeZod[targetScheme].safeParse(
+  const parsing = mapSchemeParams[targetScheme].safeParse(
     Object.fromEntries(new URLSearchParams(paramsEncoded))
   );
-  const params: SchemeParams<TScheme> = parsing.success
-    ? parsing.data
-    : raise("Invalid authorization parameters", parsing.error);
+  if (!parsing.success) {
+    throw new Error("Invalid authorization parameters");
+  }
 
+  const params: SchemeParams<TScheme> = parsing.data;
   return { scheme: targetScheme, params };
 }
