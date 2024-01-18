@@ -1,6 +1,6 @@
 /* TODO Do this on UI */
 
-import { endpoint2, endpointHandler } from "@spill-it/endpoints";
+import { endpoint, endpointHandler } from "@spill-it/endpoints";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { buildAuthUrl } from "../../auth/google";
@@ -15,7 +15,7 @@ const baseUrl =
     : env.NODE_ENV === "production"
       ? env.API_BASE_URL_PROD
       : raise("Unknown environment for redirect URI base");
-const redirectUri = new URL(endpoint2("/try/ui/login/google/redirect"), baseUrl)
+const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), baseUrl)
   .href;
 
 TryRouter.get(
