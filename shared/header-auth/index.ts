@@ -9,13 +9,13 @@ function splitAtFirstInstance(str: string, sep: string): [string, string] {
   return [str.slice(0, sepIdx), str.slice(sepIdx + 1)];
 }
 
-const mapSchemeZod = {
+const mapSchemeParams = {
   SPILLITGOOGLE: z.object({ code: z.string(), redirectUri: z.string() }),
   SPILLITSESS: z.object({ id: z.string().uuid() }),
 };
-type MapSchemeZod = typeof mapSchemeZod;
-type AuthScheme = keyof MapSchemeZod;
-type SchemeParams<T extends AuthScheme> = z.infer<MapSchemeZod[T]>;
+type MapSchemeParams = typeof mapSchemeParams;
+type AuthScheme = keyof MapSchemeParams;
+type SchemeParams<T extends AuthScheme> = z.infer<MapSchemeParams[T]>;
 
 export function buildHeaderAuth<TScheme extends AuthScheme>(
   scheme: TScheme,
@@ -46,7 +46,7 @@ export function parseHeaderAuth<TScheme extends AuthScheme>(
     throw new Error("Invalid authorization scheme");
   }
 
-  const parsing = mapSchemeZod[targetScheme].safeParse(
+  const parsing = mapSchemeParams[targetScheme].safeParse(
     Object.fromEntries(new URLSearchParams(paramsEncoded))
   );
   if (!parsing.success) {
