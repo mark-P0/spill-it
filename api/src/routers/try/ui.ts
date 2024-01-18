@@ -1,6 +1,6 @@
 /* TODO Do this on UI */
 
-import { endpoint } from "@spill-it/endpoints";
+import { endpoint, endpointHandler } from "@spill-it/endpoints";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { buildAuthUrl } from "../../auth/google";
@@ -18,24 +18,31 @@ const baseUrl =
 const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), baseUrl)
   .href;
 
-TryRouter.get(endpoint("/try/ui/login/google"), async (req, res, next) => {
-  const authUrl = await buildAuthUrl(redirectUri);
+TryRouter.get(
+  ...endpointHandler("/try/ui/login/google", async (req, res, next) => {
+    const authUrl = await buildAuthUrl(redirectUri);
 
-  res.json({ redirect: authUrl });
-});
+    res.json({ redirect: authUrl });
+  })
+);
 
-TryRouter.get(endpoint("/try/ui/login/google/redirect"), (req, res, next) => {
-  const parsing = z.object({ code: z.string() }).safeParse(req.query);
-  if (!parsing.success) {
-    res.status(StatusCodes.BAD_REQUEST).json({ error: "Invalid query params" });
-    return;
-  }
-  const { code } = parsing.data;
+TryRouter.get(
+  ...endpointHandler("/try/ui/login/google/redirect", (req, res, next) => {
+    const parsing = z.object({ code: z.string() }).safeParse(req.query);
+    if (!parsing.success) {
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ success: false, error: "Invalid query params" });
+      return;
+    }
+    const { code } = parsing.data;
 
-  res.json({
-    data: { code, redirectUri },
-    headers: {
-      Authorization: buildHeaderAuth("SPILLITGOOGLE", { code, redirectUri }),
-    },
-  });
-});
+    res.json({
+      success: true,
+      data: { code, redirectUri },
+      headers: {
+        Authorization: buildHeaderAuth("SPILLITGOOGLE", { code, redirectUri }),
+      },
+    });
+  })
+);
