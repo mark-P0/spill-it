@@ -1,11 +1,11 @@
 import { endpointHandler } from "@spill-it/endpoints";
 import { parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
+import { safe, safeAsync } from "@spill-it/utils/safe";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { isSessionExpired, readSessionFromUUID } from "../../../data/sessions";
 import { localizeLogger } from "../../utils/logger";
-import { safe, safeAsync } from "../../utils/safe";
 import { TryRouter } from "../try";
 
 const logger = localizeLogger(import.meta.url);
