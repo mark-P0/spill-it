@@ -1,4 +1,5 @@
-type Nullish = null | undefined;
+const nullish = [null, undefined] as const;
+type Nullish = (typeof nullish)[number];
 
 /**
  * false-ish, combination of "false" and "nullish"?
@@ -6,8 +7,8 @@ type Nullish = null | undefined;
  * Not really "falsy" because that includes a lot of other values
  * - https://developer.mozilla.org/en-US/docs/Glossary/Falsy
  */
-type Falseish = false | Nullish;
-const falseishArr: Falseish[] = [false, null, undefined];
+const falseish = [false, ...nullish] as const;
+type Falseish = (typeof falseish)[number];
 
 /**
  * A set membership check would be faster, but the default typings are too narrow...
@@ -17,8 +18,8 @@ const falseishArr: Falseish[] = [false, null, undefined];
  * - https://stackoverflow.com/a/53035048
  * - https://github.com/microsoft/TypeScript/issues/26255#issuecomment-458013731
  */
-export function isFalseish<T>(value: T | Falseish): value is Falseish {
-  return falseishArr.some((falseish) => value === falseish);
+export function isFalseish(value: unknown): value is Falseish {
+  return falseish.some((falseish) => value === falseish);
 }
 
 export function removeFalseish<T>(items: Array<T | Falseish>): T[] {
