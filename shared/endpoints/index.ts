@@ -3,7 +3,7 @@ import { RouteParameters } from "express-serve-static-core";
 import { z } from "zod";
 
 function objectKeys<T extends Record<string, unknown>, Key = keyof T>(
-  object: T
+  object: T,
 ): Key[] {
   return Object.keys(object) as Key[]; // TYPE ASSERTION Object.keys returns a non-specific type because of heavily contested reasons
 }
@@ -98,7 +98,7 @@ export function endpoint<T extends Endpoint>(endpoint: T): T {
 
 export function endpointHandler<T extends Endpoint, U = EndpointHandler<T>>(
   endpoint: T,
-  handler: U
+  handler: U,
 ): [T, U] {
   return [endpoint, handler];
 }

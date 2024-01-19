@@ -34,7 +34,7 @@ SessionsRouter.get(
     const headers = parsingHeaders.data;
 
     const resultHeaderAuth = safe(() =>
-      parseHeaderAuth("SPILLITGOOGLE", headers.authorization)
+      parseHeaderAuth("SPILLITGOOGLE", headers.authorization),
     );
     if (!resultHeaderAuth.success) {
       logger.error(formatError(resultHeaderAuth.error));
@@ -47,7 +47,7 @@ SessionsRouter.get(
     logger.info("Fetching Google info using provided auth params...");
     const { code, redirectUri } = headerAuth.params;
     const resultInfo = await safeAsync(() =>
-      convertCodeIntoGoogleInfo(code, redirectUri)
+      convertCodeIntoGoogleInfo(code, redirectUri),
     );
     if (!resultInfo.success) {
       logger.error(formatError(resultInfo.error));
@@ -72,7 +72,7 @@ SessionsRouter.get(
       logger.info("User does not exist; creating...");
       const { name, picture } = info;
       const resultUser = await safeAsync(() =>
-        createUserFromGoogle(googleId, name, picture)
+        createUserFromGoogle(googleId, name, picture),
       );
       if (!resultUser.success) {
         logger.error(formatError(resultUser.error));
@@ -130,5 +130,5 @@ SessionsRouter.get(
         id: session.uuid,
       },
     });
-  })
+  }),
 );

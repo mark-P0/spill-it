@@ -39,7 +39,7 @@ export function safe<T>(action: () => T): Result<T> {
 
 /** Async version of {@link safe()} */
 export async function safeAsync<T>(
-  action: () => Promise<T>
+  action: () => Promise<T>,
 ): Promise<Result<T>> {
   try {
     const value = await action();

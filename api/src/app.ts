@@ -67,7 +67,7 @@ app.use(express.static(path.join(__dirname, "public")));
 {
   logger.info(
     "Using the following endpoints: " +
-      endpoints.map((ep) => `"${ep}"`).join(" ")
+      endpoints.map((ep) => `"${ep}"`).join(" "),
   );
 
   logger.debug('Using "try" routes...');

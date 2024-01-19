@@ -17,14 +17,14 @@ export function isSessionExpired(session: Session) {
 }
 
 export async function readUserSession(
-  userId: User["id"]
+  userId: User["id"],
 ): Promise<Session | null> {
   const result = await safeAsync(() =>
     db
       .select()
       .from(SessionsTable)
       .where(eq(SessionsTable.userId, userId))
-      .limit(2)
+      .limit(2),
   );
   const sessions = result.success
     ? result.value
@@ -38,7 +38,7 @@ export async function readUserSession(
 }
 
 export async function readSessionFromUUID(
-  uuid: Session["uuid"]
+  uuid: Session["uuid"],
 ): Promise<Session | null> {
   const result = await safeAsync(
     () =>
@@ -46,7 +46,7 @@ export async function readSessionFromUUID(
         .select()
         .from(SessionsTable)
         .where(eq(SessionsTable.uuid, uuid))
-        .limit(2) // There should only be at most 1. If there are 2 (or more), something has gone wrong...
+        .limit(2), // There should only be at most 1. If there are 2 (or more), something has gone wrong...
   );
   const sessions = result.success
     ? result.value
@@ -77,7 +77,7 @@ export async function createSession(userId: User["id"]): Promise<Session> {
     db
       .insert(SessionsTable)
       .values({ userId, expiry: defaultExpiry() })
-      .returning()
+      .returning(),
   );
   const sessions = result.success
     ? result.value
@@ -91,7 +91,7 @@ export async function createSession(userId: User["id"]): Promise<Session> {
 
 export async function deleteSession(id: Session["id"]) {
   const result = await safeAsync(() =>
-    db.delete(SessionsTable).where(eq(SessionsTable.id, id))
+    db.delete(SessionsTable).where(eq(SessionsTable.id, id)),
   );
   if (!result.success) raise("Failed deleting on sessions table", result.error);
 }

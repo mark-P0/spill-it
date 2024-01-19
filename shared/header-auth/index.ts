@@ -19,7 +19,7 @@ type SchemeParams<T extends AuthScheme> = z.infer<MapSchemeParams[T]>;
 
 export function buildHeaderAuth<TScheme extends AuthScheme>(
   scheme: TScheme,
-  params: SchemeParams<TScheme>
+  params: SchemeParams<TScheme>,
 ) {
   const paramsEncoded = new URLSearchParams(params);
   return `${scheme} ${paramsEncoded}`;
@@ -39,7 +39,7 @@ export function buildHeaderAuth<TScheme extends AuthScheme>(
  */
 export function parseHeaderAuth<TScheme extends AuthScheme>(
   targetScheme: TScheme,
-  value: string
+  value: string,
 ) {
   const [scheme, paramsEncoded] = splitAtFirstInstance(value, " ");
   if (scheme !== targetScheme) {
@@ -47,7 +47,7 @@ export function parseHeaderAuth<TScheme extends AuthScheme>(
   }
 
   const parsing = mapSchemeParams[targetScheme].safeParse(
-    Object.fromEntries(new URLSearchParams(paramsEncoded))
+    Object.fromEntries(new URLSearchParams(paramsEncoded)),
   );
   if (!parsing.success) {
     throw new Error("Invalid authorization parameters");

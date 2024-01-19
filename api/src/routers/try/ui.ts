@@ -23,7 +23,7 @@ TryRouter.get(
     const authUrl = await buildAuthUrl(redirectUri);
 
     res.json({ redirect: authUrl });
-  })
+  }),
 );
 
 TryRouter.get(
@@ -44,5 +44,5 @@ TryRouter.get(
         Authorization: buildHeaderAuth("SPILLITGOOGLE", { code, redirectUri }),
       },
     });
-  })
+  }),
 );
