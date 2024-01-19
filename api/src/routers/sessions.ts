@@ -26,7 +26,7 @@ SessionsRouter.get(
       .object({ authorization: z.string() })
       .safeParse(req.headers);
     if (!parsingHeaders.success) {
-      logger.error("Invalid headers");
+      logger.error(formatError(parsingHeaders.error));
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ success: false, error: "Invalid headers" });
