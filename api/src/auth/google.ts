@@ -14,7 +14,7 @@ import { z } from "zod";
  * - https://developers.google.com/identity/openid-connect/openid-connect#discovery
  */
 async function fetchDiscoveryDocument(
-  url = "https://accounts.google.com/.well-known/openid-configuration"
+  url = "https://accounts.google.com/.well-known/openid-configuration",
 ) {
   const response = await fetch(url);
   const givenDoc = await response.json();
@@ -40,7 +40,7 @@ async function fetchDiscoveryDocument(
 export async function buildAuthUrl(
   redirectUri: string,
   scopes = ["openid", "email", "profile"],
-  includeGrantedScopes = true
+  includeGrantedScopes = true,
 ) {
   const { authorization_endpoint } = await fetchDiscoveryDocument();
   const url = new URL(authorization_endpoint);
@@ -115,7 +115,7 @@ async function extractGoogleInfoFromJwt(jwt: string) {
 
 export async function convertCodeIntoGoogleInfo(
   code: string,
-  redirectUri: string
+  redirectUri: string,
 ) {
   const tokens = await exchangeCodeForTokens(code, redirectUri);
   const googleInfo = await extractGoogleInfoFromJwt(tokens.id_token);

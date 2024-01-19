@@ -42,11 +42,11 @@ export async function getAllSamples(): Promise<Sample[]> {
 }
 
 export async function addSample(
-  details: Omit<SampleDetails, "id">
+  details: Omit<SampleDetails, "id">,
 ): Promise<Sample> {
   const { fullName, phone } = details;
   const result = await safeAsync(() =>
-    db.insert(SamplesTable).values({ fullName, phone }).returning()
+    db.insert(SamplesTable).values({ fullName, phone }).returning(),
   );
   const samples = result.success
     ? result.value

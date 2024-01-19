@@ -12,7 +12,7 @@ TryRouter.get(
     const { who = "world" } = req.query;
 
     res.json({ hello: `${who}!` });
-  })
+  }),
 );
 
 TryRouter.get(
@@ -21,7 +21,7 @@ TryRouter.get(
     logger.debug("Data: " + JSON.stringify(data, undefined, 1));
 
     res.json({ data });
-  })
+  }),
 );
 
 TryRouter.get(endpoint("/try/not-found")); // Should not be handled by anything as it shouldn't exist :)

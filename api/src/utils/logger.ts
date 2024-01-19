@@ -8,7 +8,7 @@ import { getFilenameRelativeToRoot } from "./cjs-vars-in-esm";
 const levels = Object.keys(winston.config.npm.levels);
 const longestLevelStr = levels.reduce(
   (running, current) => (current.length > running.length ? current : running),
-  ""
+  "",
 );
 const longestLevelStrLen = longestLevelStr.length;
 
@@ -29,7 +29,7 @@ function getConsoleFormat(withColors = true) {
       function padUppercaseLevels(info) {
         info.level = info.level.padEnd(longestLevelStrLen, " ").toUpperCase();
         return info;
-      }
+      },
     )(),
     withColors && format.colorize({ all: true }),
     format.timestamp(),

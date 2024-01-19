@@ -18,7 +18,7 @@ TryRouter.get(
         access: true,
       },
     });
-  })
+  }),
 );
 
 TryRouter.get(
@@ -36,7 +36,7 @@ TryRouter.get(
     const headers = parsingHeaders.data;
 
     const resultHeaderAuth = safe(() =>
-      parseHeaderAuth("SPILLITSESS", headers.authorization)
+      parseHeaderAuth("SPILLITSESS", headers.authorization),
     );
     if (!resultHeaderAuth.success) {
       logger.error(formatError(resultHeaderAuth.error));
@@ -78,5 +78,5 @@ TryRouter.get(
         access: id,
       },
     });
-  })
+  }),
 );

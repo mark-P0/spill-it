@@ -30,7 +30,7 @@ function createServer() {
           key: fs.readFileSync(".exclude/ssl/localhost-key.pem"),
           cert: fs.readFileSync(".exclude/ssl/localhost.pem"),
         },
-        app
+        app,
       );
     }
     case "production": {

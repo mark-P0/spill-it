@@ -10,10 +10,10 @@ UsersRouter.get(
   ...endpointHandler("/api/v0/users/me", (req, res, next) => {
     // TODO Use session ID in authorization header to determine user info
     logger.warn(
-      "Use session ID in authorization header to determine user info"
+      "Use session ID in authorization header to determine user info",
     );
     res
       .status(StatusCodes.NOT_IMPLEMENTED)
       .json({ success: false, error: "todo" });
-  })
+  }),
 );
