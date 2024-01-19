@@ -5,7 +5,7 @@ import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { isSessionExpired, readSessionFromUUID } from "../../../data/sessions";
 import { localizeLogger } from "../../utils/logger";
-import { safe, safeAsync } from "../../utils/try-catch";
+import { safe, safeAsync } from "../../utils/safe";
 import { TryRouter } from "../try";
 
 const logger = localizeLogger(import.meta.url);

@@ -13,7 +13,7 @@ import {
 import { createUserFromGoogle, readGoogleUser } from "../../data/users";
 import { convertCodeIntoGoogleInfo } from "../auth/google";
 import { localizeLogger } from "../utils/logger";
-import { safe, safeAsync } from "../utils/try-catch";
+import { safe, safeAsync } from "../utils/safe";
 
 const logger = localizeLogger(import.meta.url);
 export const SessionsRouter = Router();

@@ -3,7 +3,7 @@ import { raise } from "@spill-it/utils/errors";
 import { addDays, addMinutes, isBefore } from "date-fns";
 import { eq } from "drizzle-orm";
 import { localizeLogger } from "../src/utils/logger";
-import { safeAsync } from "../src/utils/try-catch";
+import { safeAsync } from "../src/utils/safe";
 import { db } from "./db";
 import { SessionsTable } from "./schema";
 import { User } from "./users";
