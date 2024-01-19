@@ -30,6 +30,10 @@ const mapEndpointResponse = {
   "/api/v0/users/me": z.discriminatedUnion("success", [
     z.object({ success: z.literal(false), error: z.string() }),
   ]),
+  "/api/v0/links/google": z.discriminatedUnion("success", [
+    z.object({ success: z.literal(false), error: z.string() }),
+    z.object({ success: z.literal(true), link: z.string().url() }),
+  ]),
   "/try/hello": z.object({ hello: z.string() }),
   "/try/sample": z.object({ data: z.any() }),
   "/try/not-found": z.never(),
