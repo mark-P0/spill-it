@@ -121,6 +121,9 @@ importers:
 
   shared/env:
     dependencies:
+      '@spill-it/utils':
+        specifier: workspace:^
+        version: link:../utils
       dotenv:
         specifier: ^16.3.1
         version: 16.3.1
@@ -130,15 +133,14 @@ importers:
 
   shared/header-auth:
     dependencies:
+      '@spill-it/utils':
+        specifier: workspace:^
+        version: link:../utils
       zod:
         specifier: ^3.22.4
         version: 3.22.4
 
-  shared/utils:
-    devDependencies:
-      '@types/node':
-        specifier: ^20.10.6
-        version: 20.11.5
+  shared/utils: {}
 
   ui:
     dependencies:

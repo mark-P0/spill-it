@@ -1,3 +1,4 @@
+import { raise } from "@spill-it/utils/errors";
 import dotenv from "dotenv";
 import path from "node:path";
 import { z } from "zod";
@@ -15,8 +16,6 @@ const parsing = z
     API_BASE_URL_PROD: z.string().url(),
   })
   .safeParse(process.env);
-if (!parsing.success) {
-  throw new Error("Unsatisfactory environment variables");
-}
-
-export const env = parsing.data;
+export const env = parsing.success
+  ? parsing.data
+  : raise("Unsatisfactory environment variables");

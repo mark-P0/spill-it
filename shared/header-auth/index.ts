@@ -1,3 +1,4 @@
+import { raise } from "@spill-it/utils/errors";
 import { z } from "zod";
 
 function splitAtFirstInstance(str: string, sep: string): [string, string] {
@@ -43,16 +44,15 @@ export function parseHeaderAuth<TScheme extends AuthScheme>(
 ) {
   const [scheme, paramsEncoded] = splitAtFirstInstance(value, " ");
   if (scheme !== targetScheme) {
-    throw new Error("Invalid authorization scheme");
+    raise("Invalid authorization scheme");
   }
 
   const parsing = mapSchemeParams[targetScheme].safeParse(
     Object.fromEntries(new URLSearchParams(paramsEncoded)),
   );
-  if (!parsing.success) {
-    throw new Error("Invalid authorization parameters");
-  }
+  const params: SchemeParams<TScheme> = parsing.success
+    ? parsing.data
+    : raise("Invalid authorization parameters");
 
-  const params: SchemeParams<TScheme> = parsing.data;
   return { scheme: targetScheme, params };
 }
