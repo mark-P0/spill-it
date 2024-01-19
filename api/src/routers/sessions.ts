@@ -1,3 +1,4 @@
+import { convertCodeIntoGoogleInfo } from "@spill-it/auth/google";
 import { endpointHandler } from "@spill-it/endpoints";
 import { parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
@@ -12,7 +13,6 @@ import {
   readUserSession,
 } from "../../data/sessions";
 import { createUserFromGoogle, readGoogleUser } from "../../data/users";
-import { convertCodeIntoGoogleInfo } from "../auth/google";
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(import.meta.url);

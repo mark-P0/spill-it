@@ -8,6 +8,9 @@ importers:
 
   api:
     dependencies:
+      '@spill-it/auth':
+        specifier: workspace:^
+        version: link:../shared/auth
       '@spill-it/endpoints':
         specifier: workspace:^
         version: link:../shared/endpoints
@@ -44,9 +47,6 @@ importers:
       http-status-codes:
         specifier: ^2.3.0
         version: 2.3.0
-      jose:
-        specifier: ^5.2.0
-        version: 5.2.0
       morgan:
         specifier: ~1.9.1
         version: 1.9.1
@@ -90,6 +90,21 @@ importers:
       prettier:
         specifier: ^3.1.1
         version: 3.2.4
+
+  shared/auth:
+    dependencies:
+      '@spill-it/env':
+        specifier: workspace:^
+        version: link:../env
+      '@spill-it/utils':
+        specifier: workspace:^
+        version: link:../utils
+      jose:
+        specifier: ^5.2.0
+        version: 5.2.0
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
 
   shared/endpoints:
     dependencies:
