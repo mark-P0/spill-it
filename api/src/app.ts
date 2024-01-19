@@ -1,4 +1,5 @@
 import { endpoints } from "@spill-it/endpoints";
+import { formatError } from "@spill-it/utils/errors";
 import cookieParser from "cookie-parser";
 import express, { ErrorRequestHandler } from "express";
 import helmet from "helmet";
@@ -10,7 +11,6 @@ import { TryRouter } from "./routers/try";
 import "./routers/try/protected";
 import "./routers/try/ui";
 import { UsersRouter } from "./routers/users";
-import { formatError } from "./utils/errors";
 import { logger as directLogger, localizeLogger } from "./utils/logger";
 
 const logger = localizeLogger(import.meta.url);

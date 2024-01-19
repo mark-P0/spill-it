@@ -4,9 +4,9 @@
  */
 
 import { env } from "@spill-it/env";
+import { raise } from "@spill-it/utils/errors";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import { z } from "zod";
-import { raise } from "../utils/errors";
 
 // TODO Cache this? Is it cached by default?
 /**

@@ -1,5 +1,5 @@
+import { raise } from "@spill-it/utils/errors";
 import { eq, sql } from "drizzle-orm";
-import { raise } from "../src/utils/errors";
 import { safeAsync } from "../src/utils/try-catch";
 import { db } from "./db";
 import { UsersTable } from "./schema";
