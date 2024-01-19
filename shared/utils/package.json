@@ -1,0 +1,6 @@
+{
+  "name": "@spill-it/utils",
+  "devDependencies": {
+    "@types/node": "^20.10.6"
+  }
+}

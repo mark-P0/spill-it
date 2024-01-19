@@ -17,6 +17,9 @@ importers:
       '@spill-it/header-auth':
         specifier: workspace:^
         version: link:../shared/header-auth
+      '@spill-it/utils':
+        specifier: workspace:^
+        version: link:../shared/utils
       cookie-parser:
         specifier: ~1.4.4
         version: 1.4.6
@@ -115,6 +118,12 @@ importers:
       zod:
         specifier: ^3.22.4
         version: 3.22.4
+
+  shared/utils:
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.6
+        version: 20.11.5
 
   ui:
     dependencies:

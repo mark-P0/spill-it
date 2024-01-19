@@ -1,5 +1,5 @@
-import { raise } from "../src/utils/errors";
-import { safeAsync } from "../src/utils/try-catch";
+import { raise } from "@spill-it/utils/errors";
+import { safeAsync } from "@spill-it/utils/safe";
 import { db } from "./db";
 import { SamplesTable } from "./schema";
 

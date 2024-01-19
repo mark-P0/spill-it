@@ -3,10 +3,10 @@
 import { endpoint, endpointHandler } from "@spill-it/endpoints";
 import { env } from "@spill-it/env";
 import { buildHeaderAuth } from "@spill-it/header-auth";
+import { raise } from "@spill-it/utils/errors";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { buildAuthUrl } from "../../auth/google";
-import { raise } from "../../utils/errors";
 import { TryRouter } from "../try";
 
 const baseUrl =

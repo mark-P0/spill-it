@@ -15,6 +15,7 @@
     "@spill-it/endpoints": "workspace:^",
     "@spill-it/env": "workspace:^",
     "@spill-it/header-auth": "workspace:^",
+    "@spill-it/utils": "workspace:^",
     "cookie-parser": "~1.4.4",
     "cross-env": "^7.0.3",
     "date-fns": "^3.2.0",
