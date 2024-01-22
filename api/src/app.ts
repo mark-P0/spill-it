@@ -1,6 +1,8 @@
 import { endpoints } from "@spill-it/endpoints";
+import { env } from "@spill-it/env";
 import { formatError } from "@spill-it/utils/errors";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import express, { ErrorRequestHandler } from "express";
 import helmet from "helmet";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
@@ -54,6 +56,14 @@ app.use(express.static(path.join(__dirname, "public")));
 {
   app.use(helmet());
   app.disable("x-powered-by"); // Should be disabled by `helmet` already... (https://www.npmjs.com/package/helmet#x-powered-by)
+}
+
+{
+  app.use(
+    cors({
+      origin: [env.HOST_UI_DEV, env.HOST_UI_PROD], // TODO Extract from env?
+    }),
+  );
 }
 
 /**

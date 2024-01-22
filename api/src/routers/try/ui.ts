@@ -11,9 +11,9 @@ import { TryRouter } from "../try";
 
 const baseUrl =
   env.NODE_ENV === "development"
-    ? env.API_BASE_URL_DEV
+    ? env.HOST_API_DEV
     : env.NODE_ENV === "production"
-      ? env.API_BASE_URL_PROD
+      ? env.HOST_API_PROD
       : raise("Unknown environment for redirect URI base");
 const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), baseUrl)
   .href;
