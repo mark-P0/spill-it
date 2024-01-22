@@ -1,5 +1,6 @@
 import { buildHeaderAuth } from "@spill-it/header-auth";
 import { Route, redirect } from "react-router-dom";
+import { endpoint } from "./utils/endpoints";
 import { fetchAPI } from "./utils/fetch-api";
 
 async function isSessionValid(): Promise<boolean> {
@@ -18,11 +19,11 @@ async function isSessionValid(): Promise<boolean> {
 
 export const RootRoute = (
   <Route
-    path="/"
+    path={endpoint("/")}
     loader={async () => {
       const isValid = await isSessionValid();
-      if (isValid) return redirect("/home");
-      return redirect("/welcome");
+      if (isValid) return redirect(endpoint("/home"));
+      return redirect(endpoint("/welcome"));
     }}
     element={null}
   />

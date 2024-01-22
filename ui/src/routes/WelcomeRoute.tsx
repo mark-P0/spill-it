@@ -3,6 +3,7 @@ import { raise } from "@spill-it/utils/errors";
 import { useEffect, useState } from "react";
 import { Route, redirect } from "react-router-dom";
 import { z } from "zod";
+import { endpoint } from "../utils/endpoints";
 import { env } from "../utils/env";
 import { fetchAPI } from "../utils/fetch-api";
 
@@ -13,7 +14,7 @@ const hostUI = env.DEV
     : raise("Impossible situation for UI host URL");
 
 // TODO Centralize definitions for UI endpoints? Like in the API
-const redirectUri = new URL("/login/google/redirect", hostUI).href;
+const redirectUri = new URL(endpoint("/login/google/redirect"), hostUI).href;
 
 function GoogleLoginButtonLink() {
   const [link, setLink] = useState<string | null>(null);
@@ -46,12 +47,12 @@ function WelcomeScreen() {
 }
 
 export const WelcomeRoute = (
-  <Route path="/welcome" element={<WelcomeScreen />} />
+  <Route path={endpoint("/welcome")} element={<WelcomeScreen />} />
 );
 
 export const LoginGoogleRedirectRoute = (
   <Route
-    path="/login/google/redirect"
+    path={endpoint("/login/google/redirect")}
     loader={async ({ request }) => {
       /** https://github.com/remix-run/react-router/issues/9171#issuecomment-1220717197 */
       const query = Object.fromEntries(new URL(request.url).searchParams);
@@ -83,7 +84,7 @@ export const LoginGoogleRedirectRoute = (
         }
       }
 
-      return redirect("/");
+      return redirect(endpoint("/"));
     }}
     element={null}
   />

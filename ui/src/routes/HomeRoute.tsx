@@ -1,4 +1,5 @@
 import { Route } from "react-router-dom";
+import { endpoint } from "../utils/endpoints";
 
 function HomeScreen() {
   return (
@@ -7,4 +8,7 @@ function HomeScreen() {
     </main>
   );
 }
-export const HomeRoute = <Route path="/home" element={<HomeScreen />} />;
+
+export const HomeRoute = (
+  <Route path={endpoint("/home")} element={<HomeScreen />} />
+);
