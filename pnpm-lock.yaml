@@ -153,6 +153,9 @@ importers:
       '@spill-it/endpoints':
         specifier: workspace:^
         version: link:../shared/endpoints
+      '@spill-it/header-auth':
+        specifier: workspace:^
+        version: link:../shared/header-auth
       '@spill-it/utils':
         specifier: workspace:^
         version: link:../shared/utils

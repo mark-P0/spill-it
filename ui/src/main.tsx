@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 import { App } from "./App.tsx";
 import "./assets/tailwind.css";
+import { LoginGoogleRedirectRoute } from "./components/WelcomeScreen.tsx";
 
 async function sleep(seconds: number) {
   return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
@@ -36,6 +37,7 @@ const loadError: LoaderFunction = () => {
 const routes = createRoutesFromElements(
   <>
     <Route path="/" element={<App />} />
+    {LoginGoogleRedirectRoute}
     <Route path="/query" element={null} loader={loadSearchParamsFromUrl} />
     <Route path="/sleep" element={null} loader={loadSleep} />
     <Route path="/error" element={null} loader={loadError} />

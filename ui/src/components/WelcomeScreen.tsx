@@ -1,5 +1,8 @@
+import { buildHeaderAuth } from "@spill-it/header-auth";
 import { raise } from "@spill-it/utils/errors";
 import { useEffect, useState } from "react";
+import { Route, redirect } from "react-router-dom";
+import { z } from "zod";
 import { env } from "../utils/env";
 import { fetchAPI } from "../utils/fetch-api";
 
@@ -41,3 +44,43 @@ export function WelcomeScreen() {
     </main>
   );
 }
+
+export const LoginGoogleRedirectRoute = (
+  <Route
+    path="/login/google/redirect"
+    loader={async ({ request }) => {
+      /** https://github.com/remix-run/react-router/issues/9171#issuecomment-1220717197 */
+      const query = Object.fromEntries(new URL(request.url).searchParams);
+      const parsing = z.object({ code: z.string() }).safeParse(query);
+      const { code } = parsing.success
+        ? parsing.data
+        : raise(
+            "Unexpected query params received on Google login redirect route",
+            parsing.error,
+          );
+
+      /** Convert authorization code to session ID */
+      {
+        const res = await fetchAPI("/api/v0/sessions", {
+          headers: {
+            Authorization: buildHeaderAuth("SPILLITGOOGLE", {
+              code,
+              redirectUri,
+            }),
+          },
+        });
+
+        // TODO What if this failed?
+        if (res.success) {
+          const { scheme, id } = res.data;
+          // TODO Create util wrapper for local storage, also using Zod?
+          // TODO Find better alternative to local storage...
+          localStorage.setItem(scheme, id);
+        }
+      }
+
+      return redirect("/");
+    }}
+    element={null}
+  />
+);
