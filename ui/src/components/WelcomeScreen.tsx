@@ -37,13 +37,17 @@ function GoogleLoginButtonLink() {
   );
 }
 
-export function WelcomeScreen() {
+function WelcomeScreen() {
   return (
     <main className="h-screen w-screen grid place-items-center bg-stone-700 text-white">
       <GoogleLoginButtonLink />
     </main>
   );
 }
+
+export const WelcomeRoute = (
+  <Route path="/welcome" element={<WelcomeScreen />} />
+);
 
 export const LoginGoogleRedirectRoute = (
   <Route
