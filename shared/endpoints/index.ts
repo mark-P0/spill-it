@@ -29,6 +29,9 @@ const mapEndpointResponse = {
   ]),
   "/api/v0/users/me": z.discriminatedUnion("success", [
     z.object({ success: z.literal(false), error: z.string() }),
+    // TODO Move database fetching to shared package?
+    // TODO Get type from database schema?
+    z.object({ success: z.literal(true), data: z.any() }),
   ]),
   "/api/v0/links/google": z.discriminatedUnion("success", [
     z.object({ success: z.literal(false), error: z.string() }),
