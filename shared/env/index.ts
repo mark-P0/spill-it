@@ -12,8 +12,10 @@ const parsing = z
     AUTH_GOOGLE_CLIENT_ID: z.string(),
     AUTH_GOOGLE_CLIENT_SECRET: z.string(),
     LOG_LEVEL: z.string(),
-    API_BASE_URL_DEV: z.string().url(),
-    API_BASE_URL_PROD: z.string().url(),
+    HOST_API_DEV: z.string().url(),
+    HOST_API_PROD: z.string().url(),
+    HOST_UI_DEV: z.string().url(),
+    HOST_UI_PROD: z.string().url(),
   })
   .safeParse(process.env);
 export const env = parsing.success
