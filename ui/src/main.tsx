@@ -8,7 +8,7 @@ import {
   createRoutesFromElements,
   redirect,
 } from "react-router-dom";
-import { App } from "./App.tsx";
+import { App, LoginGoogleRedirectRoute } from "./App.tsx";
 import "./assets/tailwind.css";
 
 async function sleep(seconds: number) {
@@ -36,6 +36,7 @@ const loadError: LoaderFunction = () => {
 const routes = createRoutesFromElements(
   <>
     <Route path="/" element={<App />} />
+    {LoginGoogleRedirectRoute}
     <Route path="/query" element={null} loader={loadSearchParamsFromUrl} />
     <Route path="/sleep" element={null} loader={loadSleep} />
     <Route path="/error" element={null} loader={loadError} />

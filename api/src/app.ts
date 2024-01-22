@@ -61,7 +61,7 @@ app.use(express.static(path.join(__dirname, "public")));
 {
   app.use(
     cors({
-      origin: [env.HOST_UI_DEV, env.HOST_UI_PROD], // TODO Extract from env?
+      origin: [env.HOST_UI_DEV, env.HOST_UI_PROD],
     }),
   );
 }
