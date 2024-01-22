@@ -8,12 +8,13 @@ import {
   createRoutesFromElements,
   redirect,
 } from "react-router-dom";
-import { HomeRoute, RootRoute } from "./App.tsx";
+import { RootRoute } from "./App.tsx";
 import "./assets/tailwind.css";
+import { HomeRoute } from "./routes/HomeRoute.tsx";
 import {
   LoginGoogleRedirectRoute,
   WelcomeRoute,
-} from "./components/WelcomeScreen.tsx";
+} from "./routes/WelcomeRoute.tsx";
 
 async function sleep(seconds: number) {
   return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
