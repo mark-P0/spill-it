@@ -150,6 +150,9 @@ importers:
 
   ui:
     dependencies:
+      '@spill-it/endpoints':
+        specifier: workspace:^
+        version: link:../shared/endpoints
       '@spill-it/utils':
         specifier: workspace:^
         version: link:../shared/utils

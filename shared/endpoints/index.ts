@@ -16,7 +16,7 @@ function objectKeys<T extends Record<string, unknown>, Key = keyof T>(
  * - Try to keep "sorted"
  * - Group related routes as much as possible
  */
-const mapEndpointResponse = {
+export const mapEndpointResponse = {
   "/api/v0/sessions": z.discriminatedUnion("success", [
     z.object({ success: z.literal(false), error: z.string() }),
     z.object({
@@ -75,8 +75,10 @@ const mapEndpointResponse = {
   ]),
 } as const;
 type MapEndpointResponse = typeof mapEndpointResponse;
-type Endpoint = keyof MapEndpointResponse;
-type EndpointResponse<T extends Endpoint> = z.infer<MapEndpointResponse[T]>;
+export type Endpoint = keyof MapEndpointResponse;
+export type EndpointResponse<T extends Endpoint> = z.infer<
+  MapEndpointResponse[T]
+>;
 
 /**
  * - Response type can be provided on `RequestHandler` via the second generic parameter `ResBody`
