@@ -20,7 +20,7 @@ const longestLevelStrLen = longestLevelStr.length;
   }
 }
 
-function getConsoleFormat(withColors = true) {
+const consoleFormat = (withColors = true) => {
   const formats = removeFalseish([
     format(
       /** Seemed like what `winston.format.padLevels()` would do but does not seem like it...? */
@@ -42,7 +42,7 @@ function getConsoleFormat(withColors = true) {
     }),
   ]);
   return format.combine(...formats);
-}
+};
 
 /**
  * Naive
@@ -61,12 +61,12 @@ export const logger = winston.createLogger({
   level: env.LOG_LEVEL,
   transports: removeFalseish([
     new transports.Console({
-      format: getConsoleFormat(),
+      format: consoleFormat(),
     }),
     env.NODE_ENV === "development" &&
       new transports.File({
         filename: `./logs/console/${logFileId}.log`,
-        format: getConsoleFormat(false), // Save the same output as the Console transport
+        format: consoleFormat(false), // Save the same output as the Console transport
       }),
     env.NODE_ENV === "development" &&
       new transports.File({
