@@ -36,11 +36,8 @@ function getConsoleFormat(withColors = true) {
       const { level, message } = info; // Known
       const {
         timestamp, // Provided above
-        file: importMetaUrl, // Provided on logger call
+        file, // Provided on logger call
       } = info; // Unknown
-      const file = isFalseish(importMetaUrl)
-        ? null
-        : getFilenameRelativeToRoot(importMetaUrl);
 
       return removeFalseish([timestamp, level, file, message]).join(" | ");
     }),
@@ -83,5 +80,6 @@ export const logger = winston.createLogger({
 logger.info(`Logging at "${env.LOG_LEVEL}" level`);
 
 export function localizeLogger(importMetaUrl: string) {
-  return logger.child({ file: importMetaUrl });
+  const file = getFilenameRelativeToRoot(importMetaUrl);
+  return logger.child({ file });
 }
