@@ -49,13 +49,13 @@ UsersRouter.get(
 
     const session = resultSession.value;
     if (session === null) {
-      logger.info("Session does not exist");
+      logger.error("Session does not exist");
       return res
         .status(StatusCodes.UNAUTHORIZED)
         .json({ success: false, error: "Session not found" });
     }
     if (isSessionExpired(session)) {
-      logger.info("Session is expired");
+      logger.error("Session is expired");
       return res
         .status(StatusCodes.UNAUTHORIZED)
         .json({ success: false, error: "Session expired" });
@@ -69,6 +69,8 @@ UsersRouter.get(
         .json({ success: false, error: "Read user failed" });
     }
     const user = resultUser.value;
+
+    logger.info("Providing user information...");
     res.json({ success: true, data: user });
   }),
 );
