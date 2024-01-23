@@ -20,7 +20,7 @@ const longestLevelStrLen = longestLevelStr.length;
   }
 }
 
-function getConsoleFormat(withColors = true) {
+const consoleFormat = (withColors = true) => {
   const formats = removeFalseish([
     format(
       /** Seemed like what `winston.format.padLevels()` would do but does not seem like it...? */
@@ -42,17 +42,16 @@ function getConsoleFormat(withColors = true) {
     }),
   ]);
   return format.combine(...formats);
-}
+};
 
 /**
  * Naive
  *
  * https://stackoverflow.com/a/29774197/11389648
  */
-function createDailyLogFileId() {
-  return new Date().toISOString().split("T")[0] ?? "";
-}
-const logFileId = createDailyLogFileId();
+const logFileId =
+  new Date().toISOString().split("T")[0] ??
+  raise("Date part does not exist...?");
 
 /**
  * - https://betterstack.com/community/guides/logging/how-to-install-setup-and-use-winston-and-morgan-to-log-node-js-applications/
@@ -62,12 +61,12 @@ export const logger = winston.createLogger({
   level: env.LOG_LEVEL,
   transports: removeFalseish([
     new transports.Console({
-      format: getConsoleFormat(),
+      format: consoleFormat(),
     }),
     env.NODE_ENV === "development" &&
       new transports.File({
         filename: `./logs/console/${logFileId}.log`,
-        format: getConsoleFormat(false), // Save the same output as the Console transport
+        format: consoleFormat(false), // Save the same output as the Console transport
       }),
     env.NODE_ENV === "development" &&
       new transports.File({
