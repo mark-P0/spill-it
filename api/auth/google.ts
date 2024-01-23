@@ -4,6 +4,7 @@
  */
 
 import { raise } from "@spill-it/utils/errors";
+import { safeAsync } from "@spill-it/utils/safe";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import { z } from "zod";
 import { env } from "../src/utils/env";
@@ -16,8 +17,13 @@ import { env } from "../src/utils/env";
 async function fetchDiscoveryDocument(
   url = "https://accounts.google.com/.well-known/openid-configuration",
 ) {
-  const response = await fetch(url);
-  const givenDoc = await response.json();
+  const result = await safeAsync(async () => {
+    const res = await fetch(url);
+    return await res.json();
+  });
+  const receivedDoc = result.success
+    ? result.value
+    : raise("Failed fetching Google discovery document", result.error);
 
   const parsing = z
     .object({
@@ -25,7 +31,7 @@ async function fetchDiscoveryDocument(
       token_endpoint: z.string(),
       jwks_uri: z.string(),
     })
-    .safeParse(givenDoc);
+    .safeParse(receivedDoc);
   const doc = parsing.success
     ? parsing.data
     : raise("Unexpected Google discovery document", parsing.error);
@@ -70,8 +76,13 @@ async function exchangeCodeForTokens(code: string, redirectUri: string) {
   params.set("redirect_uri", redirectUri);
   params.set("grant_type", "authorization_code");
 
-  const res = await fetch(url, { method: "POST", body: params });
-  const givenTokens = await res.json();
+  const result = await safeAsync(async () => {
+    const res = await fetch(url, { method: "POST", body: params });
+    return await res.json();
+  });
+  const receivedTokens = result.success
+    ? result.value
+    : raise("Failed code-token exchange with Google", result.error);
 
   const parsing = z
     .object({
@@ -82,7 +93,7 @@ async function exchangeCodeForTokens(code: string, redirectUri: string) {
       token_type: z.string(),
       refresh_token: z.string().optional(),
     })
-    .safeParse(givenTokens);
+    .safeParse(receivedTokens);
   const tokens = parsing.success
     ? parsing.data
     : raise("Unexpected Google tokens", parsing.error);
@@ -96,8 +107,12 @@ async function exchangeCodeForTokens(code: string, redirectUri: string) {
  */
 async function extractGoogleInfoFromJwt(jwt: string) {
   const { jwks_uri } = await fetchDiscoveryDocument();
+
   const jwks = createRemoteJWKSet(new URL(jwks_uri));
-  const { payload } = await jwtVerify(jwt, jwks); // Also validates the token
+  const result = await safeAsync(() => jwtVerify(jwt, jwks)); // Also validates the token
+  const { payload } = result.success
+    ? result.value
+    : raise("Failed verifying Google JWT", result.error);
 
   const parsing = z
     .object({

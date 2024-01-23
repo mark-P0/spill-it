@@ -4,6 +4,7 @@ import {
   mapEndpointResponse,
 } from "@spill-it/endpoints";
 import { raise } from "@spill-it/utils/errors";
+import { safeAsync } from "@spill-it/utils/safe";
 import { env } from "./env";
 
 const hostAPI = env.DEV
@@ -36,8 +37,14 @@ export async function fetchAPI<T extends Endpoint>(
     return new Request(url);
   })();
 
-  const res = await fetch(req);
-  const receivedData = await res.json();
+  const result = await safeAsync(async () => {
+    const res = await fetch(req);
+    return await res.json();
+  });
+  const receivedData = result.success
+    ? result.value
+    : raise("Failed fetching endpoint", result.error);
+
   const parsing = mapEndpointResponse[endpoint].safeParse(receivedData);
   const data = parsing.success
     ? parsing.data

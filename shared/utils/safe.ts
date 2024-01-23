@@ -1,5 +1,3 @@
-import { ensureError } from "./errors";
-
 /**
  * - https://old.reddit.com/r/reactjs/comments/dvpdgc/how_to_avoid_trycatch_statements_nestingchaining/
  * - https://fsharpforfunandprofit.com/posts/recipe-part2/
@@ -7,7 +5,8 @@ import { ensureError } from "./errors";
  * - https://medium.com/with-orus/the-5-commandments-of-clean-error-handling-in-typescript-93a9cbdf1af5
  * - https://www.youtube.com/watch?v=J-HWmoTKhC8
  */
-null;
+
+import { ensureError } from "./errors";
 
 // type Result<T> = [T, null] | [null, Error]; // Monadic-ish?
 type Result<T> = { success: true; value: T } | { success: false; error: Error }; // Same format as Zod...? Or is it from another source?
