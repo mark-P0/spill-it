@@ -1,4 +1,3 @@
-import { convertCodeIntoGoogleInfo } from "@spill-it/auth/google";
 import { endpointHandler } from "@spill-it/endpoints";
 import { parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
@@ -6,6 +5,7 @@ import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
+import { convertCodeIntoGoogleInfo } from "../../auth/google";
 import {
   createSession,
   deleteSession,

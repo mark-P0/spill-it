@@ -1,9 +1,9 @@
-import { buildAuthUrl } from "@spill-it/auth/google";
 import { endpointHandler } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
+import { buildAuthUrl } from "../../auth/google";
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(import.meta.url);

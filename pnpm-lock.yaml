@@ -8,9 +8,6 @@ importers:
 
   api:
     dependencies:
-      '@spill-it/auth':
-        specifier: workspace:^
-        version: link:../shared/auth
       '@spill-it/endpoints':
         specifier: workspace:^
         version: link:../shared/endpoints
@@ -47,6 +44,9 @@ importers:
       http-status-codes:
         specifier: ^2.3.0
         version: 2.3.0
+      jose:
+        specifier: ^5.2.0
+        version: 5.2.0
       morgan:
         specifier: ~1.9.1
         version: 1.9.1

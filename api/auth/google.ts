@@ -3,10 +3,10 @@
  * - https://developers.google.com/identity/protocols/oauth2/web-server
  */
 
-import { env } from "@spill-it/env";
 import { raise } from "@spill-it/utils/errors";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import { z } from "zod";
+import { env } from "../src/utils/env";
 
 // TODO Cache this? Is it cached by default?
 /**
