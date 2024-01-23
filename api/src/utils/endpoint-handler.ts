@@ -1,5 +1,3 @@
-// TODO Delete source from shared endpoints package
-
 import { Endpoint, EndpointResponse } from "@spill-it/endpoints";
 import { RequestHandler } from "express";
 import { RouteParameters } from "express-serve-static-core";
