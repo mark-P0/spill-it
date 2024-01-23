@@ -1,5 +1,4 @@
 import { endpoints } from "@spill-it/endpoints";
-import { env } from "@spill-it/env";
 import { formatError } from "@spill-it/utils/errors";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -14,6 +13,7 @@ import { TryRouter } from "./routers/try";
 import "./routers/try/protected";
 import "./routers/try/ui";
 import { UsersRouter } from "./routers/users";
+import { env } from "./utils/env";
 import { logger as directLogger, localizeLogger } from "./utils/logger";
 
 const logger = localizeLogger(import.meta.url);

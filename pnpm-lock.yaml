@@ -14,9 +14,6 @@ importers:
       '@spill-it/endpoints':
         specifier: workspace:^
         version: link:../shared/endpoints
-      '@spill-it/env':
-        specifier: workspace:^
-        version: link:../shared/env
       '@spill-it/header-auth':
         specifier: workspace:^
         version: link:../shared/header-auth

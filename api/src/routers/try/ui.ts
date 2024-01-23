@@ -2,11 +2,11 @@
 
 import { buildAuthUrl } from "@spill-it/auth/google";
 import { endpoint, endpointHandler } from "@spill-it/endpoints";
-import { env } from "@spill-it/env";
 import { buildHeaderAuth } from "@spill-it/header-auth";
 import { raise } from "@spill-it/utils/errors";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
+import { env } from "../../utils/env";
 import { TryRouter } from "../try";
 
 const baseUrl =
