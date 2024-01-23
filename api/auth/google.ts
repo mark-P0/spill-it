@@ -107,8 +107,12 @@ async function exchangeCodeForTokens(code: string, redirectUri: string) {
  */
 async function extractGoogleInfoFromJwt(jwt: string) {
   const { jwks_uri } = await fetchDiscoveryDocument();
+
   const jwks = createRemoteJWKSet(new URL(jwks_uri));
-  const { payload } = await jwtVerify(jwt, jwks); // Also validates the token
+  const result = await safeAsync(() => jwtVerify(jwt, jwks)); // Also validates the token
+  const { payload } = result.success
+    ? result.value
+    : raise("Failed verifying Google JWT", result.error);
 
   const parsing = z
     .object({
