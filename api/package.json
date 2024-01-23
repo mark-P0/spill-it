@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "db:migrate": "npm run db:generate-migrations && npm run db:execute-migrations",
+    "db:migrate": "pnpm db:generate-migrations && pnpm db:execute-migrations",
     "db:generate-migrations": "cross-env NODE_ENV=development drizzle-kit generate:pg",
     "db:execute-migrations": "cross-env NODE_ENV=development tsx ./data/migrate.ts",
-    "start": "npm run check && npm run preview",
+    "start": "pnpm check && pnpm preview",
     "check": "tsc",
     "preview": "cross-env NODE_ENV=production tsx ./bin/www",
     "dev": "cross-env NODE_ENV=development tsx --watch ./bin/www"
