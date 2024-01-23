@@ -96,9 +96,6 @@ importers:
 
   shared/auth:
     dependencies:
-      '@spill-it/env':
-        specifier: workspace:^
-        version: link:../env
       '@spill-it/utils':
         specifier: workspace:^
         version: link:../utils
@@ -121,18 +118,6 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
-
-  shared/env:
-    dependencies:
-      '@spill-it/utils':
-        specifier: workspace:^
-        version: link:../utils
-      dotenv:
-        specifier: ^16.3.1
-        version: 16.3.1
-      zod:
-        specifier: ^3.22.4
-        version: 3.22.4
 
   shared/header-auth:
     dependencies:
