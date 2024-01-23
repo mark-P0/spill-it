@@ -1,4 +1,3 @@
-import { endpointHandler } from "@spill-it/endpoints";
 import { parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
 import { safe, safeAsync } from "@spill-it/utils/safe";
@@ -13,6 +12,7 @@ import {
   readUserSession,
 } from "../../data/sessions";
 import { createUserFromGoogle, readGoogleUser } from "../../data/users";
+import { endpointHandler } from "../utils/endpoint-handler";
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(import.meta.url);

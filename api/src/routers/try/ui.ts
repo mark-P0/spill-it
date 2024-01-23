@@ -1,11 +1,12 @@
 /* TODO Do this on UI */
 
-import { endpoint, endpointHandler } from "@spill-it/endpoints";
+import { endpoint } from "@spill-it/endpoints";
 import { buildHeaderAuth } from "@spill-it/header-auth";
 import { raise } from "@spill-it/utils/errors";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { buildAuthUrl } from "../../../auth/google";
+import { endpointHandler } from "../../utils/endpoint-handler";
 import { env } from "../../utils/env";
 import { TryRouter } from "../try";
 
