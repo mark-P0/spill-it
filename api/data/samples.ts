@@ -6,7 +6,7 @@ import { SamplesTable } from "./schema";
 // /* DELETEME */
 // (async () => {
 //   const { localizeLogger } = await import("../src/utils/logger");
-//   const logger = localizeLogger(import.meta.url);
+//   const logger = localizeLogger(__filename);
 //
 //   const samples = await getAllSamples();
 //

@@ -8,7 +8,7 @@ import { db } from "./db";
 import { SessionsTable } from "./schema";
 import { User } from "./users";
 
-const logger = localizeLogger(import.meta.url);
+const logger = localizeLogger(__filename);
 type Session = typeof SessionsTable.$inferSelect;
 type SessionDetails = typeof SessionsTable.$inferInsert;
 

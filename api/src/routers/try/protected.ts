@@ -8,7 +8,7 @@ import { endpointHandler } from "../../utils/endpoint-handler";
 import { localizeLogger } from "../../utils/logger";
 import { TryRouter } from "../try";
 
-const logger = localizeLogger(import.meta.url);
+const logger = localizeLogger(__filename);
 
 TryRouter.get(
   ...endpointHandler("/try/unprotected", (req, res, next) => {

@@ -9,7 +9,7 @@ import { readUser } from "../../data/users";
 import { endpointHandler } from "../utils/endpoint-handler";
 import { localizeLogger } from "../utils/logger";
 
-const logger = localizeLogger(import.meta.url);
+const logger = localizeLogger(__filename);
 export const UsersRouter = Router();
 
 UsersRouter.get(
