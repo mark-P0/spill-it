@@ -1,7 +1,6 @@
 import { raise } from "@spill-it/utils/errors";
-import { isFalseish, removeFalseish } from "@spill-it/utils/falseish";
+import { removeFalseish } from "@spill-it/utils/falseish";
 import winston, { format, transports } from "winston";
-import { getFilenameRelativeToRoot } from "./cjs-vars-in-esm";
 import { env } from "./env";
 
 /** Can't infer keys even on type level, maybe because it is an interface? */
@@ -36,11 +35,8 @@ function getConsoleFormat(withColors = true) {
       const { level, message } = info; // Known
       const {
         timestamp, // Provided above
-        file: importMetaUrl, // Provided on logger call
+        file, // Provided on logger call
       } = info; // Unknown
-      const file = isFalseish(importMetaUrl)
-        ? null
-        : getFilenameRelativeToRoot(importMetaUrl);
 
       return removeFalseish([timestamp, level, file, message]).join(" | ");
     }),
@@ -82,6 +78,12 @@ export const logger = winston.createLogger({
 });
 logger.info(`Logging at "${env.LOG_LEVEL}" level`);
 
-export function localizeLogger(importMetaUrl: string) {
-  return logger.child({ file: importMetaUrl });
+/**
+ * - Assumes Node was invoked at the "project root"!
+ * - Node.js `__filename` available in TS even in ESM.
+ *   It is to be passed from each file on which the logger will be localized.
+ */
+export function localizeLogger(__filename: string) {
+  const file = __filename.replace(process.cwd(), "").replace(/\\/g, "/");
+  return logger.child({ file });
 }

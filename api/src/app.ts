@@ -16,7 +16,7 @@ import { UsersRouter } from "./routers/users";
 import { env } from "./utils/env";
 import { logger as directLogger, localizeLogger } from "./utils/logger";
 
-const logger = localizeLogger(import.meta.url);
+const logger = localizeLogger(__filename);
 export const app = express();
 
 {
