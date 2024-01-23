@@ -1,9 +1,0 @@
-{
-  "name": "@spill-it/auth",
-  "dependencies": {
-    "@spill-it/env": "workspace:^",
-    "@spill-it/utils": "workspace:^",
-    "jose": "^5.2.0",
-    "zod": "^3.22.4"
-  }
-}

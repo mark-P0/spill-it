@@ -1,9 +1,5 @@
 import { raise } from "@spill-it/utils/errors";
-import dotenv from "dotenv";
-import path from "node:path";
 import { z } from "zod";
-
-dotenv.config({ path: path.join(__dirname, "./.env") });
 
 const parsing = z
   .object({
@@ -20,4 +16,4 @@ const parsing = z
   .safeParse(process.env);
 export const env = parsing.success
   ? parsing.data
-  : raise("Unsatisfactory environment variables");
+  : raise("Unexpected environment variables", parsing.error);

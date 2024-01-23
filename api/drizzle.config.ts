@@ -1,5 +1,5 @@
-import { env } from "@spill-it/env";
 import type { Config } from "drizzle-kit";
+import { env } from "./src/utils/env";
 
 /**
  * https://orm.drizzle.team/docs/migrations

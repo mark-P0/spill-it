@@ -1,8 +1,8 @@
-import { env } from "@spill-it/env";
 import { raise } from "@spill-it/utils/errors";
 import { isFalseish, removeFalseish } from "@spill-it/utils/falseish";
 import winston, { format, transports } from "winston";
 import { getFilenameRelativeToRoot } from "./cjs-vars-in-esm";
+import { env } from "./env";
 
 /** Can't infer keys even on type level, maybe because it is an interface? */
 const levels = Object.keys(winston.config.npm.levels);
@@ -15,10 +15,9 @@ const longestLevelStrLen = longestLevelStr.length;
 // TODO Move this to env parser as Zod refinement? https://zod.dev/?id=refine
 /** Ensure provided log level is acceptable */
 {
-  const { LOG_LEVEL } = env;
-  if (!levels.includes(LOG_LEVEL)) {
+  if (!levels.includes(env.LOG_LEVEL)) {
     const levelsStr = levels.join(",");
-    raise(`Unknown log level "${LOG_LEVEL}"; must be one of: ${levelsStr}`);
+    raise(`Unknown log level "${env.LOG_LEVEL}"; must be one of: ${levelsStr}`);
   }
 }
 

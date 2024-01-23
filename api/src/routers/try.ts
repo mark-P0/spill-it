@@ -1,7 +1,8 @@
-import { endpoint, endpointHandler } from "@spill-it/endpoints";
+import { endpoint } from "@spill-it/endpoints";
 import { raise } from "@spill-it/utils/errors";
 import { Router } from "express";
 import { getAllSamples } from "../../data/samples";
+import { endpointHandler } from "../utils/endpoint-handler";
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(import.meta.url);
