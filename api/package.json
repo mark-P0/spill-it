@@ -6,10 +6,10 @@
     "db:migrate": "npm run db:generate-migrations && npm run db:execute-migrations",
     "db:generate-migrations": "cross-env NODE_ENV=development drizzle-kit generate:pg",
     "db:execute-migrations": "cross-env NODE_ENV=development tsx ./data/migrate.ts",
-    "api:start": "npm run api:check && npm run api:preview",
-    "api:check": "tsc",
-    "api:preview": "cross-env NODE_ENV=production tsx ./bin/www",
-    "api:dev": "cross-env NODE_ENV=development tsx --watch ./bin/www"
+    "start": "npm run check && npm run preview",
+    "check": "tsc",
+    "preview": "cross-env NODE_ENV=production tsx ./bin/www",
+    "dev": "cross-env NODE_ENV=development tsx --watch ./bin/www"
   },
   "dependencies": {
     "@spill-it/auth": "workspace:^",
