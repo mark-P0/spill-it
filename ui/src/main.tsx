@@ -40,10 +40,10 @@ const loadError: LoaderFunction = () => {
 /** https://reactrouter.com/en/main/utils/create-routes-from-elements */
 const routes = createRoutesFromElements(
   <>
-    {RootRoute}
-    {WelcomeRoute}
-    {LoginGoogleRedirectRoute}
-    {HomeRoute}
+    {RootRoute()}
+    {WelcomeRoute()}
+    {LoginGoogleRedirectRoute()}
+    {HomeRoute()}
     <Route path="/query" element={null} loader={loadSearchParamsFromUrl} />
     <Route path="/sleep" element={null} loader={loadSleep} />
     <Route path="/error" element={null} loader={loadError} />
