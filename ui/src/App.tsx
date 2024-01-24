@@ -17,7 +17,7 @@ async function isSessionValid(): Promise<boolean> {
   return true;
 }
 
-export const RootRoute = (
+export const RootRoute = () => (
   <Route
     path={endpoint("/")}
     loader={async () => {

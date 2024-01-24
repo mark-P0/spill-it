@@ -46,11 +46,11 @@ function WelcomeScreen() {
   );
 }
 
-export const WelcomeRoute = (
+export const WelcomeRoute = () => (
   <Route path={endpoint("/welcome")} element={<WelcomeScreen />} />
 );
 
-export const LoginGoogleRedirectRoute = (
+export const LoginGoogleRedirectRoute = () => (
   <Route
     path={endpoint("/login/google/redirect")}
     loader={async ({ request }) => {

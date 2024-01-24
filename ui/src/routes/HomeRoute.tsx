@@ -9,6 +9,6 @@ function HomeScreen() {
   );
 }
 
-export const HomeRoute = (
+export const HomeRoute = () => (
   <Route path={endpoint("/home")} element={<HomeScreen />} />
 );
