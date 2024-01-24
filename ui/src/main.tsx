@@ -8,7 +8,7 @@ import {
   createRoutesFromElements,
   redirect,
 } from "react-router-dom";
-import { RootRoute } from "./App.tsx";
+import { ErrorScreen, RootRoute } from "./App.tsx";
 import "./assets/tailwind.css";
 import { HomeRoute } from "./routes/HomeRoute.tsx";
 import {
@@ -39,7 +39,7 @@ const loadError: LoaderFunction = () => {
 
 /** https://reactrouter.com/en/main/utils/create-routes-from-elements */
 const routes = createRoutesFromElements(
-  <>
+  <Route errorElement={<ErrorScreen />}>
     {RootRoute()}
     {WelcomeRoute()}
     {LoginGoogleRedirectRoute()}
@@ -47,7 +47,7 @@ const routes = createRoutesFromElements(
     <Route path="/query" element={null} loader={loadSearchParamsFromUrl} />
     <Route path="/sleep" element={null} loader={loadSleep} />
     <Route path="/error" element={null} loader={loadError} />
-  </>,
+  </Route>,
 );
 
 /** https://reactrouter.com/en/main/start/tutorial#adding-a-router */
