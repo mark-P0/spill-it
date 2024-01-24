@@ -6,6 +6,7 @@ import { z } from "zod";
 import { endpoint } from "../utils/endpoints";
 import { env } from "../utils/env";
 import { fetchAPI } from "../utils/fetch-api";
+import { isLoggedIn } from "../utils/is-logged-in";
 
 const hostUI = env.DEV
   ? env.VITE_HOST_UI_DEV
@@ -47,7 +48,14 @@ function WelcomeScreen() {
 }
 
 export const WelcomeRoute = () => (
-  <Route path={endpoint("/welcome")} element={<WelcomeScreen />} />
+  <Route
+    path={endpoint("/welcome")}
+    loader={async () => {
+      if (await isLoggedIn()) return redirect(endpoint("/home"));
+      return null;
+    }}
+    element={<WelcomeScreen />}
+  />
 );
 
 export const LoginGoogleRedirectRoute = () => (
