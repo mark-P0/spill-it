@@ -1,14 +1,11 @@
 import { raise } from "@spill-it/utils/errors";
 import { safeAsync } from "@spill-it/utils/safe";
-import { addDays, addMinutes, isBefore } from "date-fns";
+import { addDays, isBefore } from "date-fns";
 import { eq } from "drizzle-orm";
-import { env } from "../src/utils/env";
-import { localizeLogger } from "../src/utils/logger";
-import { db } from "./db";
-import { SessionsTable } from "./schema";
+import { db } from "../db";
+import { SessionsTable } from "../schema";
 import { User } from "./users";
 
-const logger = localizeLogger(__filename);
 type Session = typeof SessionsTable.$inferSelect;
 type SessionDetails = typeof SessionsTable.$inferInsert;
 
@@ -60,18 +57,7 @@ export async function readSessionFromUUID(
 
 const today = () => new Date();
 const tomorrow = () => addDays(today(), 1);
-const after1Min = () => addMinutes(today(), 1);
-const defaultExpiry = () => {
-  switch (env.NODE_ENV) {
-    case "development": {
-      logger.warn("Using development default session expiry");
-      return after1Min();
-    }
-    case "production":
-      return tomorrow();
-  }
-  env.NODE_ENV satisfies never;
-};
+const defaultExpiry = () => tomorrow();
 export async function createSession(userId: User["id"]): Promise<Session> {
   const result = await safeAsync(() =>
     db

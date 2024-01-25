@@ -1,7 +1,7 @@
+import { getAllSamples } from "@spill-it/db/tables/samples";
 import { endpoint } from "@spill-it/endpoints";
 import { raise } from "@spill-it/utils/errors";
 import { Router } from "express";
-import { getAllSamples } from "../../data/samples";
 import { endpointHandler } from "../utils/endpoint-handler";
 import { localizeLogger } from "../utils/logger";
 

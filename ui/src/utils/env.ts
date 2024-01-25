@@ -13,13 +13,19 @@ const parsing = z
     },
 
     // TODO Hide dev hosts? e.g. by removing prefixes?
-    /** Prefix with `VITE` to be included in the build */
-    VITE_HOST_UI_DEV: z.string().url(),
-    VITE_HOST_UI_PROD: z.string().url(),
-    VITE_HOST_API_DEV: z.string().url(),
-    VITE_HOST_API_PROD: z.string().url(),
+    /**
+     * Also in `@spill-it/api`
+     *
+     * Prefixed with `VITE` to be included in the build
+     */
+    ...{
+      VITE_HOST_API_DEV: z.string().url(),
+      VITE_HOST_API_PROD: z.string().url(),
+      VITE_HOST_UI_DEV: z.string().url(),
+      VITE_HOST_UI_PROD: z.string().url(),
+    },
   })
   .safeParse(import.meta.env);
 export const env = parsing.success
   ? parsing.data
-  : raise("Unexpected environment variables", parsing.error);
+  : raise("Unexpected UI environment variables", parsing.error);

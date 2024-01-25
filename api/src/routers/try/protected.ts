@@ -1,9 +1,12 @@
+import {
+  isSessionExpired,
+  readSessionFromUUID,
+} from "@spill-it/db/tables/sessions";
 import { parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
 import { safe, safeAsync } from "@spill-it/utils/safe";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { isSessionExpired, readSessionFromUUID } from "../../../data/sessions";
 import { endpointHandler } from "../../utils/endpoint-handler";
 import { localizeLogger } from "../../utils/logger";
 import { TryRouter } from "../try";
