@@ -71,7 +71,14 @@ UsersRouter.get(
         .status(StatusCodes.BAD_GATEWAY)
         .json({ success: false, error: "Read user failed" });
     }
+
     const user = resultUser.value;
+    if (user === null) {
+      logger.error("User of given session does not exist...?");
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ success: false, error: "Invalid session" });
+    }
 
     logger.info("Providing user information...");
     res.json({ success: true, data: user });
