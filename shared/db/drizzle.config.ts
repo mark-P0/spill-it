@@ -1,5 +1,5 @@
 import type { Config } from "drizzle-kit";
-import { env } from "./src/utils/env";
+import { env } from "./utils/env";
 
 /**
  * https://orm.drizzle.team/docs/migrations
@@ -7,8 +7,8 @@ import { env } from "./src/utils/env";
  * Drizzle Kit implicitly uses an `.env` file in the same directory as this file (?)
  */
 export default {
-  schema: "./data/schema.ts",
-  out: "./data/migrations",
+  schema: "./schema.ts",
+  out: "./migrations/",
   driver: "pg",
   dbCredentials: {
     connectionString: env.SUPABASE_POSTGRES_URI_POOLING,
