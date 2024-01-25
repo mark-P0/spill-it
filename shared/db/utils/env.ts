@@ -3,12 +3,10 @@ import { z } from "zod";
 
 const parsing = z
   .object({
-    SUPABASE_POSTGRES_URI_POOLING: z.string(), // Also defined on API
+    /** Also in `@spill-it/api` */
+    ...{ SUPABASE_POSTGRES_URI_POOLING: z.string() },
   })
   .safeParse(process.env);
 export const env = parsing.success
   ? parsing.data
-  : raise(
-      "Unexpected environment variables for database functions",
-      parsing.error,
-    );
+  : raise("Unexpected DB environment variables", parsing.error);
