@@ -12,6 +12,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { createSelectSchema } from "drizzle-zod";
 
 /** https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle */
 export const SamplesTable = pgTable("samples", {
@@ -19,6 +20,7 @@ export const SamplesTable = pgTable("samples", {
   fullName: text("fullName"),
   phone: varchar("phone", { length: 256 }),
 });
+export const zodSample = createSelectSchema(SamplesTable);
 
 export const UsersTable = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -28,6 +30,7 @@ export const UsersTable = pgTable("users", {
   googleId: text("googleId"),
   loginCt: integer("loginCt").notNull(),
 });
+export const zodUser = createSelectSchema(UsersTable);
 
 export const SessionsTable = pgTable("sessions", {
   id: serial("id").primaryKey(),
