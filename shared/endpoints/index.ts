@@ -1,3 +1,4 @@
+import { zodSample, zodUser } from "@spill-it/db/schema";
 import { z } from "zod";
 
 function objectKeys<T extends Record<string, unknown>, Key = keyof T>(
@@ -29,14 +30,14 @@ export const mapEndpointResponse = {
     z.object({ success: z.literal(false), error: z.string() }),
     // TODO Move database fetching to shared package?
     // TODO Get type from database schema?
-    z.object({ success: z.literal(true), data: z.any() }),
+    z.object({ success: z.literal(true), data: zodUser }),
   ]),
   "/api/v0/links/google": z.discriminatedUnion("success", [
     z.object({ success: z.literal(false), error: z.string() }),
     z.object({ success: z.literal(true), link: z.string().url() }),
   ]),
   "/try/hello": z.object({ hello: z.string() }),
-  "/try/sample": z.object({ data: z.any() }),
+  "/try/sample": z.object({ data: z.array(zodSample) }),
   "/try/not-found": z.never(),
   "/try/error": z.never(),
   "/try/unprotected": z.object({
