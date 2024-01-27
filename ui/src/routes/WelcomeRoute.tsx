@@ -1,7 +1,7 @@
 import { buildHeaderAuth } from "@spill-it/header-auth";
 import { raise } from "@spill-it/utils/errors";
 import { useEffect, useState } from "react";
-import { Route, redirect } from "react-router-dom";
+import { LoaderFunction, Route, redirect } from "react-router-dom";
 import { z } from "zod";
 import { endpoint } from "../utils/endpoints";
 import { env } from "../utils/env";
@@ -47,17 +47,19 @@ function WelcomeScreen() {
   );
 }
 
+loadWelcomeRoute satisfies LoaderFunction;
+async function loadWelcomeRoute() {
+  const canShowHome = await isLoggedIn();
+  if (canShowHome) {
+    return redirect(endpoint("/home"));
+  }
+
+  return null;
+}
 export const WelcomeRoute = () => (
   <Route
     path={endpoint("/welcome")}
-    loader={async () => {
-      const canShowHome = await isLoggedIn();
-      if (canShowHome) {
-        return redirect(endpoint("/home"));
-      }
-
-      return null;
-    }}
+    loader={loadWelcomeRoute}
     element={<WelcomeScreen />}
   />
 );
