@@ -51,7 +51,11 @@ export const WelcomeRoute = () => (
   <Route
     path={endpoint("/welcome")}
     loader={async () => {
-      if (await isLoggedIn()) return redirect(endpoint("/home"));
+      const canShowHome = await isLoggedIn();
+      if (canShowHome) {
+        return redirect(endpoint("/home"));
+      }
+
       return null;
     }}
     element={<WelcomeScreen />}

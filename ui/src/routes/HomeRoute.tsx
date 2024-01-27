@@ -1,5 +1,6 @@
-import { Route } from "react-router-dom";
+import { Route, redirect } from "react-router-dom";
 import { endpoint } from "../utils/endpoints";
+import { isLoggedIn } from "../utils/is-logged-in";
 
 function HomeScreen() {
   return (
@@ -10,5 +11,16 @@ function HomeScreen() {
 }
 
 export const HomeRoute = () => (
-  <Route path={endpoint("/home")} element={<HomeScreen />} />
+  <Route
+    path={endpoint("/home")}
+    loader={async () => {
+      const canShowHome = await isLoggedIn();
+      if (!canShowHome) {
+        return redirect(endpoint("/welcome"));
+      }
+
+      return null;
+    }}
+    element={<HomeScreen />}
+  />
 );
