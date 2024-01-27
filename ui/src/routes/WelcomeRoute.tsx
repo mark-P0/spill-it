@@ -1,12 +1,26 @@
 import { buildHeaderAuth } from "@spill-it/header-auth";
 import { raise } from "@spill-it/utils/errors";
-import { useEffect, useState } from "react";
-import { Route, redirect } from "react-router-dom";
+import {
+  LoaderFunction,
+  Route,
+  redirect,
+  useLoaderData,
+} from "react-router-dom";
 import { z } from "zod";
 import { endpoint } from "../utils/endpoints";
 import { env } from "../utils/env";
 import { fetchAPI } from "../utils/fetch-api";
 import { isLoggedIn } from "../utils/is-logged-in";
+
+/**
+ * - https://stackoverflow.com/q/74877170
+ * - https://github.com/remix-run/react-router/discussions/9792
+ */
+type LoaderData<TLoader extends LoaderFunction> =
+  Awaited<ReturnType<TLoader>> extends Response | infer D ? D : never;
+function useTypedLoaderData<TLoader extends LoaderFunction>() {
+  return useLoaderData() as LoaderData<TLoader>;
+}
 
 const hostUI = env.DEV
   ? env.VITE_HOST_UI_DEV
@@ -14,24 +28,11 @@ const hostUI = env.DEV
     ? env.VITE_HOST_UI_PROD
     : raise("Impossible situation for UI host URL");
 
-// TODO Centralize definitions for UI endpoints? Like in the API
 const redirectUri = new URL(endpoint("/login/google/redirect"), hostUI).href;
 
 function GoogleLoginButtonLink() {
-  const [link, setLink] = useState<string | null>(null);
-  useEffect(() => {
-    (async () => {
-      const res = await fetchAPI("/api/v0/links/google", {
-        query: { redirectUri },
-      });
-      // TODO What if this failed?
-      if (res.success) {
-        setLink(res.link);
-      }
-    })();
-  }, []);
+  const { link } = useTypedLoaderData<WelcomeRouteLoader>();
 
-  if (link === null) return null;
   return (
     <a href={link} className="bg-white text-black px-3 py-2 rounded">
       Login with Google
@@ -47,17 +48,32 @@ function WelcomeScreen() {
   );
 }
 
+type WelcomeRouteLoader = typeof loadWelcomeRoute;
+async function loadWelcomeRoute() {
+  /** Redirect if already logged in */
+  {
+    const canShowHome = await isLoggedIn();
+    if (canShowHome) {
+      return redirect(endpoint("/home"));
+    }
+  }
+
+  /** Fetch login link from API */
+  {
+    const res = await fetchAPI("/api/v0/links/google", {
+      query: { redirectUri },
+    });
+    const link = res.success
+      ? res.link
+      : raise("API did not provide login link");
+
+    return { link };
+  }
+}
 export const WelcomeRoute = () => (
   <Route
     path={endpoint("/welcome")}
-    loader={async () => {
-      const canShowHome = await isLoggedIn();
-      if (canShowHome) {
-        return redirect(endpoint("/home"));
-      }
-
-      return null;
-    }}
+    loader={loadWelcomeRoute}
     element={<WelcomeScreen />}
   />
 );
