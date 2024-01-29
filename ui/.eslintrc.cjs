@@ -1,6 +1,15 @@
+/** @type {import('eslint').Linter.Config} */
 module.exports = {
   root: true,
-  env: { browser: true, es2020: true },
+  env: {
+    browser: true,
+
+    /**
+     * Set as same as `tsconfig.json` target
+     * (Mainly for `Error.cause`)
+     */
+    es2022: true,
+  },
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
@@ -15,4 +24,6 @@ module.exports = {
       { allowConstantExport: true },
     ],
   },
+
+  reportUnusedDisableDirectives: true,
 };

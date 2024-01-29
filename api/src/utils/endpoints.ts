@@ -13,7 +13,8 @@ export function parseInputFromRequest<
   U extends EndpointMethod<T>,
 >(endpoint: T, method: U, req: Request): Result<EndpointInput<T, U>> {
   try {
-    const signature = endpointMap[endpoint][method] as any; // TYPE ASSERTION Something about TypeScript does not work after 2 indices...
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Something about TypeScript does not work after 2 indices...
+    const signature = endpointMap[endpoint][method] as any;
 
     const rawInput = {
       headers: req.headers,
