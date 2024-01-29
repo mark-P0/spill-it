@@ -16,7 +16,7 @@ const mapSchemeParams = {
   SPILLITSESS: z.object({ id: z.string().uuid() }),
 };
 type MapSchemeParams = typeof mapSchemeParams;
-type AuthScheme = keyof MapSchemeParams;
+export type AuthScheme = keyof MapSchemeParams;
 type SchemeParams<T extends AuthScheme> = z.infer<MapSchemeParams[T]>;
 
 export function buildHeaderAuth<TScheme extends AuthScheme>(

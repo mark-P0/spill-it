@@ -8,66 +8,64 @@ import {
   createUserFromGoogle,
   readGoogleUser,
 } from "@spill-it/db/tables/users";
-import { parseHeaderAuth } from "@spill-it/header-auth";
+import { endpointDetails } from "@spill-it/endpoints/index2";
+import { AuthScheme, parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
 import { safe, safeAsync } from "@spill-it/utils/safe";
-import { Router } from "express";
+import { Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { convertCodeIntoGoogleInfo } from "../../auth/google";
-import { endpointHandler } from "../utils/endpoint-handler";
+import { parseInputFromRequest } from "../utils/endpoints";
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(__filename);
 export const SessionsRouter = Router();
 
 /** Get a session ID using Google authorization code */
-SessionsRouter.get(
-  ...endpointHandler("/api/v0/sessions", async (req, res, next) => {
-    logger.info("Parsing headers...");
-    const parsingHeaders = z
-      .object({ authorization: z.string() })
-      .safeParse(req.headers);
-    if (!parsingHeaders.success) {
-      logger.error(formatError(parsingHeaders.error));
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ success: false, error: "Invalid headers" });
-    }
-    const headers = parsingHeaders.data;
+{
+  const details = endpointDetails("/api/v0/sessions", "GET");
+  const [ep, method, signature, methodLower] = details;
+  type Input = z.infer<typeof signature.input>;
+  type Output = z.infer<typeof signature.output>;
 
+  type Res = Response<Output>;
+  SessionsRouter[methodLower](ep, async (req, res: Res, next) => {
+    logger.info("Parsing input...");
+    const parsingInput = parseInputFromRequest(ep, method, req);
+    if (!parsingInput.success) {
+      logger.error(formatError(parsingInput.error));
+      return res.sendStatus(StatusCodes.BAD_REQUEST);
+    }
+    const input = parsingInput.value;
+
+    const { headers } = input;
     const resultHeaderAuth = safe(() =>
-      parseHeaderAuth("SPILLITGOOGLE", headers.authorization),
+      parseHeaderAuth("SPILLITGOOGLE", headers.Authorization),
     );
     if (!resultHeaderAuth.success) {
       logger.error(formatError(resultHeaderAuth.error));
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ success: false, error: "Invalid headers" });
+      return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
     const headerAuth = resultHeaderAuth.value;
 
-    logger.info("Fetching Google info using provided auth params...");
+    logger.info("Fetching Google info...");
     const { code, redirectUri } = headerAuth.params;
     const resultInfo = await safeAsync(() =>
       convertCodeIntoGoogleInfo(code, redirectUri),
     );
     if (!resultInfo.success) {
       logger.error(formatError(resultInfo.error));
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ success: false, error: "Invalid authorization code" });
+      return res.sendStatus(StatusCodes.UNAUTHORIZED);
     }
     const info = resultInfo.value;
 
-    logger.info("Querying user info on database...");
+    logger.info("Fetching user info...");
     const { googleId } = info;
     const resultUser = await safeAsync(() => readGoogleUser(googleId));
     if (!resultUser.success) {
       logger.error(formatError(resultUser.error));
-      return res
-        .status(StatusCodes.BAD_GATEWAY)
-        .json({ success: false, error: "Read user failed" });
+      return res.sendStatus(StatusCodes.BAD_GATEWAY);
     }
     let user = resultUser.value;
 
@@ -79,22 +77,18 @@ SessionsRouter.get(
       );
       if (!resultUser.success) {
         logger.error(formatError(resultUser.error));
-        return res
-          .status(StatusCodes.BAD_GATEWAY)
-          .json({ success: false, error: "Create user failed" });
+        return res.sendStatus(StatusCodes.BAD_GATEWAY);
       }
       user = resultUser.value;
     }
     user satisfies NonNullable<typeof user>;
 
-    logger.info("Querying user session on database...");
+    logger.info("Fetching user session...");
     const userId = user.id; // For some reason TS will not accept nesting this in below
     const resultSession = await safeAsync(() => readUserSession(userId));
     if (!resultSession.success) {
       logger.error(formatError(resultSession.error));
-      return res
-        .status(StatusCodes.BAD_GATEWAY)
-        .json({ success: false, error: "Read session failed" });
+      return res.sendStatus(StatusCodes.BAD_GATEWAY);
     }
     let session = resultSession.value;
 
@@ -106,9 +100,7 @@ SessionsRouter.get(
       const resultDelete = await safeAsync(() => deleteSession(sessionId));
       if (!resultDelete.success) {
         logger.error(formatError(resultDelete.error));
-        return res
-          .status(StatusCodes.BAD_GATEWAY)
-          .json({ success: false, error: "Delete expired session failed" });
+        return res.sendStatus(StatusCodes.BAD_GATEWAY);
       }
     }
 
@@ -117,21 +109,15 @@ SessionsRouter.get(
       const resultSession = await safeAsync(() => createSession(userId));
       if (!resultSession.success) {
         logger.error(formatError(resultSession.error));
-        return res
-          .status(StatusCodes.BAD_GATEWAY)
-          .json({ success: false, error: "Create session failed" });
+        return res.sendStatus(StatusCodes.BAD_GATEWAY);
       }
       session = resultSession.value;
     }
     session satisfies NonNullable<typeof session>;
 
-    logger.info("Providing session effective ID...");
-    return res.json({
-      success: true,
-      data: {
-        scheme: "SPILLITSESS",
-        id: session.uuid,
-      },
-    });
-  }),
-);
+    logger.info("Sending session ID...");
+    const scheme: AuthScheme = "SPILLITSESS";
+    const id = session.uuid;
+    res.json({ data: { scheme, id } });
+  });
+}

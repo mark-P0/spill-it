@@ -4,7 +4,25 @@ import { z } from "zod";
 export const endpointMap = {
   "/api/v0/sessions": {
     GET: {
-      input: z.object({}),
+      input: z.object({
+        headers: z.preprocess(
+          (value) => {
+            const isObjectWithLowercaseAuth =
+              typeof value === "object" &&
+              value !== null &&
+              "authorization" in value;
+            if (isObjectWithLowercaseAuth) {
+              return {
+                Authorization: value.authorization,
+              };
+            }
+            return value;
+          },
+          z.object({
+            Authorization: z.string(),
+          }),
+        ),
+      }),
       output: z.object({
         data: z.object({
           scheme: z.string(),
