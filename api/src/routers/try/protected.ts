@@ -9,7 +9,7 @@ import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { endpointHandler } from "../../utils/endpoint-handler";
+import { parseInputFromRequest } from "../../utils/endpoints";
 import { localizeLogger } from "../../utils/logger";
 import { TryRouter } from "../try";
 
@@ -32,28 +32,28 @@ const logger = localizeLogger(__filename);
   });
 }
 
-TryRouter.get(
-  ...endpointHandler("/try/protected", async (req, res, next) => {
-    logger.info("Parsing headers...");
-    const parsingHeaders = z
-      .object({ authorization: z.string() })
-      .safeParse(req.headers);
-    if (!parsingHeaders.success) {
-      logger.error(formatError(parsingHeaders.error));
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ success: false, error: "Invalid headers" });
-    }
-    const headers = parsingHeaders.data;
+{
+  const details = endpointDetails("/try/protected", "GET");
+  const [ep, method, signature, methodLower] = details;
+  type Input = z.infer<typeof signature.input>;
+  type Output = z.infer<typeof signature.output>;
 
+  TryRouter[methodLower](ep, async (req, res: Response<Output>, next) => {
+    logger.info("Parsing input...");
+    const parsingInput = parseInputFromRequest(ep, method, req);
+    if (!parsingInput.success) {
+      logger.error(formatError(parsingInput.error));
+      return res.sendStatus(StatusCodes.BAD_REQUEST);
+    }
+    const input = parsingInput.value;
+
+    const { headers } = input;
     const resultHeaderAuth = safe(() =>
-      parseHeaderAuth("SPILLITSESS", headers.authorization),
+      parseHeaderAuth("SPILLITSESS", headers.Authorization),
     );
     if (!resultHeaderAuth.success) {
       logger.error(formatError(resultHeaderAuth.error));
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ success: false, error: "Invalid headers" });
+      return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
     const headerAuth = resultHeaderAuth.value;
 
@@ -62,32 +62,23 @@ TryRouter.get(
     const resultSession = await safeAsync(() => readSessionFromUUID(id));
     if (!resultSession.success) {
       logger.error(formatError(resultSession.error));
-      return res
-        .status(StatusCodes.BAD_GATEWAY)
-        .json({ success: false, error: "Read session failed" });
+      return res.sendStatus(StatusCodes.BAD_GATEWAY);
     }
-
     const session = resultSession.value;
+
+    logger.info("Verifying session...");
     if (session === null) {
-      logger.info("Session does not exist");
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ success: false, error: "Session not found" });
+      logger.error("Session does not exist");
+      return res.sendStatus(StatusCodes.UNAUTHORIZED);
     }
     if (isSessionExpired(session)) {
-      logger.info("Session is expired");
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ success: false, error: "Session expired" });
+      logger.error("Session is expired");
+      return res.sendStatus(StatusCodes.UNAUTHORIZED);
     }
 
-    logger.info("Session verified; providing requested resource...");
+    logger.info("Sending protected resource...");
     res.json({
-      success: true,
-      data: {
-        resource: "protected",
-        access: id,
-      },
+      data: { resource: "protected", access: id },
     });
-  }),
-);
+  });
+}

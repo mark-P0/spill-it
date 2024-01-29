@@ -74,7 +74,25 @@ export const endpointMap = {
   },
   "/try/protected": {
     GET: {
-      input: z.object({}),
+      input: z.object({
+        headers: z.preprocess(
+          (value) => {
+            const isObjectWithLowercaseAuth =
+              typeof value === "object" &&
+              value !== null &&
+              "authorization" in value;
+            if (isObjectWithLowercaseAuth) {
+              return {
+                Authorization: value.authorization,
+              };
+            }
+            return {};
+          },
+          z.object({
+            Authorization: z.string(),
+          }),
+        ),
+      }),
       output: z.object({
         data: z.object({
           resource: z.string(),
