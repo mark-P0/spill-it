@@ -4,7 +4,7 @@ import {
   EndpointMethod,
   EndpointOutput,
   endpointMap,
-} from "@spill-it/endpoints/index2";
+} from "@spill-it/endpoints";
 import { ensureError, raise } from "@spill-it/utils/errors";
 import { Result } from "@spill-it/utils/safe";
 import { env } from "./env";

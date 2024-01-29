@@ -2,7 +2,7 @@ import {
   isSessionExpired,
   readSessionFromUUID,
 } from "@spill-it/db/tables/sessions";
-import { endpointDetails } from "@spill-it/endpoints/index2";
+import { endpointDetails } from "@spill-it/endpoints";
 import { parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
 import { safe, safeAsync } from "@spill-it/utils/safe";

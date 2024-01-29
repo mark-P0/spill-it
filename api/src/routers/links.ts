@@ -1,4 +1,4 @@
-import { endpointDetails } from "@spill-it/endpoints/index2";
+import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
 import { safeAsync } from "@spill-it/utils/safe";
 import { Response, Router } from "express";

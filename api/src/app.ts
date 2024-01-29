@@ -1,4 +1,4 @@
-import { endpoints } from "@spill-it/endpoints/index2";
+import { endpoints } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
 import cookieParser from "cookie-parser";
 import cors from "cors";

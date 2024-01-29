@@ -1,5 +1,5 @@
 import { getAllSamples } from "@spill-it/db/tables/samples";
-import { endpoint, endpointDetails } from "@spill-it/endpoints/index2";
+import { endpoint, endpointDetails } from "@spill-it/endpoints";
 import { formatError, raise } from "@spill-it/utils/errors";
 import { safeAsync } from "@spill-it/utils/safe";
 import { Response, Router } from "express";

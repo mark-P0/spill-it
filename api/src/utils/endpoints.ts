@@ -3,7 +3,7 @@ import {
   EndpointInput,
   EndpointMethod,
   endpointMap,
-} from "@spill-it/endpoints/index2";
+} from "@spill-it/endpoints";
 import { ensureError } from "@spill-it/utils/errors";
 import { Result } from "@spill-it/utils/safe";
 import { Request } from "express";
