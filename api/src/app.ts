@@ -14,7 +14,7 @@ import { TryRouter } from "./routers/try";
 import "./routers/try/protected";
 import "./routers/try/ui";
 import { UsersRouter } from "./routers/users";
-import { env } from "./utils/env";
+import { uiHost } from "./utils/hosts";
 import { logger as directLogger, localizeLogger } from "./utils/logger";
 
 const logger = localizeLogger(__filename);
@@ -62,7 +62,7 @@ app.use(express.static(path.join(__dirname, "public")));
 {
   app.use(
     cors({
-      origin: [env.HOST_UI_DEV, env.HOST_UI_PROD],
+      origin: uiHost,
     }),
   );
 }

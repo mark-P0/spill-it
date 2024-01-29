@@ -1,25 +1,19 @@
 import { endpoint, endpointDetails } from "@spill-it/endpoints";
 import { buildHeaderAuth } from "@spill-it/header-auth";
-import { formatError, raise } from "@spill-it/utils/errors";
+import { formatError } from "@spill-it/utils/errors";
 import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { buildAuthUrl } from "../../auth/google";
 import { parseInputFromRequest } from "../../utils/endpoints";
-import { env } from "../../utils/env";
+import { apiHost } from "../../utils/hosts";
 import { localizeLogger } from "../../utils/logger";
 import { TryRouter } from "../try";
 
 const logger = localizeLogger(__filename);
 
-const baseUrl =
-  env.NODE_ENV === "development"
-    ? env.HOST_API_DEV
-    : env.NODE_ENV === "production"
-      ? env.HOST_API_PROD
-      : raise("Unknown environment for redirect URI base");
-const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), baseUrl)
+const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
   .href;
 
 {
