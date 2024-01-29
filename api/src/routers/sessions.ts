@@ -95,7 +95,7 @@ export const SessionsRouter = Router();
     const hasSessionButExpired = session !== null && isSessionExpired(session);
     if (session !== null && hasSessionButExpired) {
       logger.info("Session expired; deleting...");
-      /* TODO Have a background task that regularly deletes expired sessions? */
+      // TODO Have a background task that regularly deletes expired sessions?
       const sessionId = session.id;
       const resultDelete = await safeAsync(() => deleteSession(sessionId));
       if (!resultDelete.success) {

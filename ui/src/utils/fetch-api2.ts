@@ -52,7 +52,7 @@ export async function fetchAPI2<
   rawInput: EndpointInput<T, U>,
 ): Promise<Result<EndpointOutput<T, U>>> {
   try {
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- Something about TypeScript does not work after 2 indices... */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Something about TypeScript does not work after 2 indices...
     const signature = endpointMap[endpoint][method] as any;
 
     const input = signature.input.parse(rawInput);
