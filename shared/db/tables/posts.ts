@@ -34,3 +34,14 @@ export async function readPost(id: Post["id"]): Promise<Post | null> {
 
   return post;
 }
+
+export async function readPostsOfUser(userId: Post["userId"]): Promise<Post[]> {
+  const result = await safeAsync(() =>
+    db.select().from(PostsTable).where(eq(PostsTable.userId, userId)),
+  );
+  const posts = result.success
+    ? result.value
+    : raise("Failed reading posts of user", result.error);
+
+  return posts;
+}

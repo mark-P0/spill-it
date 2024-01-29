@@ -100,6 +100,30 @@ export const endpointMap = {
         }),
       }),
     },
+    GET: {
+      input: z.object({
+        headers: z.preprocess(
+          (value) => {
+            const isObjectWithLowercaseAuth =
+              typeof value === "object" &&
+              value !== null &&
+              "authorization" in value;
+            if (isObjectWithLowercaseAuth) {
+              return {
+                Authorization: value.authorization,
+              };
+            }
+            return value;
+          },
+          z.object({
+            Authorization: z.string(),
+          }),
+        ),
+      }),
+      output: z.object({
+        data: z.array(zodPost),
+      }),
+    },
   },
   "/api/v0/posts/:postId": {
     GET: {
