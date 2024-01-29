@@ -23,7 +23,11 @@ export const endpointMap = {
   },
   "/api/v0/links/google": {
     GET: {
-      input: z.object({}),
+      input: z.object({
+        query: z.object({
+          redirectUri: z.string().url(),
+        }),
+      }),
       output: z.object({
         link: z.string().url(),
       }),
