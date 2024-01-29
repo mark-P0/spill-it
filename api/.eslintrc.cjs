@@ -27,10 +27,19 @@ module.exports = {
     // "react-refresh",
     "@typescript-eslint",
   ],
-  // rules: {
-  //   "react-refresh/only-export-components": [
-  //     "warn",
-  //     { allowConstantExport: true },
-  //   ],
-  // },
+  rules: {
+    // "react-refresh/only-export-components": [
+    //   "warn",
+    //   { allowConstantExport: true },
+    // ],
+
+    /**
+     * Because of the way Express midlewares are defined,
+     * it is possible for some arguments to be unused.
+     *
+     * However this can be useful for finding unused imports,
+     * in which case this rule can be manually enabled, e.g. via the CLI.
+     */
+    "@typescript-eslint/no-unused-vars": "off",
+  },
 };
