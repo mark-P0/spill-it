@@ -1,5 +1,5 @@
 import { buildHeaderAuth } from "@spill-it/header-auth";
-import { fetchAPI } from "./fetch-api2";
+import { fetchAPI } from "./fetch-api";
 
 export async function isLoggedIn(): Promise<boolean> {
   const id = localStorage.getItem("SPILLITSESS");

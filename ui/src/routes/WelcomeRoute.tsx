@@ -9,7 +9,7 @@ import {
 import { z } from "zod";
 import { endpoint } from "../utils/endpoints";
 import { env } from "../utils/env";
-import { fetchAPI } from "../utils/fetch-api2";
+import { fetchAPI } from "../utils/fetch-api";
 import { isLoggedIn } from "../utils/is-logged-in";
 
 /**
