@@ -1,86 +1,230 @@
 import { zodSample, zodUser } from "@spill-it/db/schema";
 import { z } from "zod";
 
-function objectKeys<T extends Record<string, unknown>, Key = keyof T>(
-  object: T,
-): Key[] {
-  return Object.keys(object) as Key[]; // TYPE ASSERTION Object.keys returns a non-specific type because of heavily contested reasons
+export const endpointMap = {
+  "/api/v0/sessions": {
+    GET: {
+      input: z.object({
+        headers: z.preprocess(
+          (value) => {
+            const isObjectWithLowercaseAuth =
+              typeof value === "object" &&
+              value !== null &&
+              "authorization" in value;
+            if (isObjectWithLowercaseAuth) {
+              return {
+                Authorization: value.authorization,
+              };
+            }
+            return value;
+          },
+          z.object({
+            Authorization: z.string(),
+          }),
+        ),
+      }),
+      output: z.object({
+        data: z.object({
+          scheme: z.string(),
+          id: z.string(),
+        }),
+      }),
+    },
+  },
+  "/api/v0/users/me": {
+    GET: {
+      input: z.object({
+        headers: z.preprocess(
+          (value) => {
+            const isObjectWithLowercaseAuth =
+              typeof value === "object" &&
+              value !== null &&
+              "authorization" in value;
+            if (isObjectWithLowercaseAuth) {
+              return {
+                Authorization: value.authorization,
+              };
+            }
+            return value;
+          },
+          z.object({
+            Authorization: z.string(),
+          }),
+        ),
+      }),
+      output: z.object({
+        data: zodUser,
+      }),
+    },
+  },
+  "/api/v0/links/google": {
+    GET: {
+      input: z.object({
+        query: z.object({
+          redirectUri: z.string().url(),
+        }),
+      }),
+      output: z.object({
+        link: z.string().url(),
+      }),
+    },
+  },
+  "/try/hello": {
+    GET: {
+      input: z.object({
+        query: z.object({
+          who: z.string().optional(),
+        }),
+      }),
+      output: z.object({
+        hello: z.string(),
+      }),
+    },
+  },
+  "/try/samples": {
+    GET: {
+      input: z.object({}),
+      output: z.object({
+        data: z.array(zodSample),
+      }),
+    },
+  },
+  "/try/not-found": {
+    GET: {
+      input: z.object({}),
+      output: z.object({}),
+    },
+  },
+  "/try/error": {
+    GET: {
+      input: z.object({}),
+      output: z.object({}),
+    },
+  },
+  "/try/unprotected": {
+    GET: {
+      input: z.object({}),
+      output: z.object({
+        data: z.object({
+          resource: z.string(),
+          access: z.literal(true),
+        }),
+      }),
+    },
+  },
+  "/try/protected": {
+    GET: {
+      input: z.object({
+        headers: z.preprocess(
+          (value) => {
+            const isObjectWithLowercaseAuth =
+              typeof value === "object" &&
+              value !== null &&
+              "authorization" in value;
+            if (isObjectWithLowercaseAuth) {
+              return {
+                Authorization: value.authorization,
+              };
+            }
+            return value;
+          },
+          z.object({
+            Authorization: z.string(),
+          }),
+        ),
+      }),
+      output: z.object({
+        data: z.object({
+          resource: z.string(),
+          access: z.string(),
+        }),
+      }),
+    },
+  },
+  "/try/ui/login/google": {
+    GET: {
+      input: z.object({}),
+      output: z.object({
+        redirect: z.string().url(),
+      }),
+    },
+  },
+  "/try/ui/login/google/redirect": {
+    GET: {
+      input: z.object({
+        query: z.object({
+          code: z.string(),
+        }),
+      }),
+      output: z.object({
+        data: z.object({
+          code: z.string(),
+          redirectUri: z.string(),
+        }),
+        headers: z.object({
+          Authorization: z.string(),
+        }),
+      }),
+    },
+  },
+};
+
+// TODO Type endpoint map statically? Would lose information about the schema...
+/** Check endpoint map via types */
+{
+  type Method = "GET" | "POST" | "PUT" | "DELETE"; // Add more types here to be checked
+  type Signature = {
+    input: z.AnyZodObject;
+    output: z.AnyZodObject;
+  };
+
+  endpointMap satisfies Record<
+    string, // Endpoints refer to a string path
+    Partial<
+      // Endpoints can have a subset of the specified methods
+      Record<Method, Signature> // Methods must follow the signature
+    >
+  >;
 }
 
-// TODO Use common error "shape"?
-// TODO Use "standard"? e.g. JSON:API, JSend
-// TODO Boolean discriminator only provides 2 possibilities...
-// TODO Map each possible response to a status code?
+type EndpointMap = typeof endpointMap;
+export type Endpoint = keyof EndpointMap;
+export type EndpointMethod<T extends Endpoint> = keyof EndpointMap[T];
+
 /**
- * - Try to keep "sorted"
- * - Group related routes as much as possible
+ * - https://github.com/microsoft/TypeScript/issues/54289
+ * - https://github.com/microsoft/TypeScript/issues/21760
  */
-export const mapEndpointResponse = {
-  "/api/v0/sessions": z.discriminatedUnion("success", [
-    z.object({ success: z.literal(false), error: z.string() }),
-    z.object({
-      success: z.literal(true),
-      data: z.object({
-        scheme: z.string(),
-        id: z.string(),
-      }),
-    }),
-  ]),
-  "/api/v0/users/me": z.discriminatedUnion("success", [
-    z.object({ success: z.literal(false), error: z.string() }),
-    // TODO Move database fetching to shared package?
-    // TODO Get type from database schema?
-    z.object({ success: z.literal(true), data: zodUser }),
-  ]),
-  "/api/v0/links/google": z.discriminatedUnion("success", [
-    z.object({ success: z.literal(false), error: z.string() }),
-    z.object({ success: z.literal(true), link: z.string().url() }),
-  ]),
-  "/try/hello": z.object({ hello: z.string() }),
-  "/try/sample": z.object({ data: z.array(zodSample) }),
-  "/try/not-found": z.never(),
-  "/try/error": z.never(),
-  "/try/unprotected": z.object({
-    data: z.object({
-      resource: z.string(),
-      access: z.literal(true),
-    }),
-  }),
-  "/try/protected": z.discriminatedUnion("success", [
-    z.object({ success: z.literal(false), error: z.string() }),
-    z.object({
-      success: z.literal(true),
-      data: z.object({
-        resource: z.string(),
-        access: z.string(),
-      }),
-    }),
-  ]),
-  "/try/ui/login/google": z.object({
-    redirect: z.string().url(),
-  }),
-  "/try/ui/login/google/redirect": z.discriminatedUnion("success", [
-    z.object({ success: z.literal(false), error: z.string() }),
-    z.object({
-      success: z.literal(true),
-      data: z.object({
-        code: z.string(),
-        redirectUri: z.string(),
-      }),
-      headers: z.object({
-        Authorization: z.string(),
-      }),
-    }),
-  ]),
-} as const;
-type MapEndpointResponse = typeof mapEndpointResponse;
-export type Endpoint = keyof MapEndpointResponse;
-export type EndpointResponse<T extends Endpoint> = z.infer<
-  MapEndpointResponse[T]
+export type EndpointOutput<
+  T extends Endpoint,
+  U extends EndpointMethod<T>,
+> = z.infer<
+  EndpointMap[T][U] extends infer TSignature
+    ? TSignature extends { output: infer TOutput }
+      ? TOutput
+      : never
+    : never
+>;
+export type EndpointInput<
+  T extends Endpoint,
+  U extends EndpointMethod<T>,
+> = z.infer<
+  EndpointMap[T][U] extends infer TSignature
+    ? TSignature extends { input: infer TInput }
+      ? TInput
+      : never
+    : never
 >;
 
-export const endpoints = objectKeys(mapEndpointResponse);
+export const endpoints = Object.keys(endpointMap) as Endpoint[];
 
-export function endpoint<T extends Endpoint>(endpoint: T): T {
-  return endpoint;
+export const endpoint = <T extends Endpoint>(endpoint: T): T => endpoint;
+
+export function endpointDetails<
+  T extends Endpoint,
+  U extends EndpointMethod<T> & string,
+>(endpoint: T, method: U) {
+  const signature = endpointMap[endpoint][method];
+  const methodLowercase = method.toLowerCase() as Lowercase<U>;
+  return [endpoint, method, signature, methodLowercase] as const;
 }

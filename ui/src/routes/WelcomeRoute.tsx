@@ -60,12 +60,14 @@ async function loadWelcomeRoute() {
 
   /** Fetch login link from API */
   {
-    const res = await fetchAPI("/api/v0/links/google", {
+    const result = await fetchAPI("/api/v0/links/google", "GET", {
       query: { redirectUri },
     });
-    const link = res.success
-      ? res.link
-      : raise("API did not provide login link");
+    const output = result.success
+      ? result.value
+      : raise("Failed fetching login link", result.error);
+
+    const link = output.link;
 
     return { link };
   }
@@ -94,7 +96,7 @@ export const LoginGoogleRedirectRoute = () => (
 
       /** Convert authorization code to session ID */
       {
-        const res = await fetchAPI("/api/v0/sessions", {
+        const result = await fetchAPI("/api/v0/sessions", "GET", {
           headers: {
             Authorization: buildHeaderAuth("SPILLITGOOGLE", {
               code,
@@ -102,14 +104,14 @@ export const LoginGoogleRedirectRoute = () => (
             }),
           },
         });
+        const { data } = result.success
+          ? result.value
+          : raise("Failed retrieving session ID", result.error);
+        const { scheme, id } = data;
 
-        // TODO What if this failed?
-        if (res.success) {
-          const { scheme, id } = res.data;
-          // TODO Create util wrapper for local storage, also using Zod?
-          // TODO Find better alternative to local storage...
-          localStorage.setItem(scheme, id);
-        }
+        // TODO Create util wrapper for local storage, also using Zod?
+        // TODO Find better alternative to local storage...
+        localStorage.setItem(scheme, id);
       }
 
       return redirect(endpoint("/"));

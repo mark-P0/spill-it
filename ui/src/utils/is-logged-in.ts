@@ -5,12 +5,12 @@ export async function isLoggedIn(): Promise<boolean> {
   const id = localStorage.getItem("SPILLITSESS");
   if (id === null) return false;
 
-  const res = await fetchAPI("/api/v0/users/me", {
+  const result = await fetchAPI("/api/v0/users/me", "GET", {
     headers: {
       Authorization: buildHeaderAuth("SPILLITSESS", { id }),
     },
   });
-  if (!res.success) return false;
+  if (!result.success) return false;
 
   return true;
 }

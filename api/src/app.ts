@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { ErrorRequestHandler } from "express";
 import helmet from "helmet";
-import { ReasonPhrases, StatusCodes } from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import morgan from "morgan";
 import path from "path";
 import { LinksRouter } from "./routers/links";
@@ -76,7 +76,7 @@ app.use(express.static(path.join(__dirname, "public")));
  * and the handlers (and redirects!) reference a centralized endpoint map for better maintainability.
  */
 {
-  logger.info(
+  logger.debug(
     "Using the following endpoints: " +
       endpoints.map((ep) => `"${ep}"`).join(" "),
   );
@@ -93,7 +93,7 @@ app.use(express.static(path.join(__dirname, "public")));
 {
   /** When none of the above handlers are triggered, the requested resource likely does not exist. */
   app.use((req, res, next) => {
-    res.status(StatusCodes.NOT_FOUND).json({ error: ReasonPhrases.NOT_FOUND });
+    res.sendStatus(StatusCodes.NOT_FOUND);
   });
 
   /**
@@ -108,8 +108,6 @@ app.use(express.static(path.join(__dirname, "public")));
    */
   app.use(((err: Error, req, res, next) => {
     logger.error(formatError(err));
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: ReasonPhrases.INTERNAL_SERVER_ERROR });
+    res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
   }) satisfies ErrorRequestHandler);
 }

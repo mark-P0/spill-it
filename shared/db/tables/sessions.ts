@@ -27,7 +27,7 @@ export async function readUserSession(
     ? result.value
     : raise("Failed reading sessions table", result.error);
 
-  /* TODO Should multiple sessions per user be possible? */
+  // TODO Should multiple sessions per user be possible?
   if (sessions.length > 1) raise("Multiple sessions for a user...?");
   const session = sessions[0] ?? null;
 
