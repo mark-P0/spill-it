@@ -8,6 +8,7 @@ import { StatusCodes } from "http-status-codes";
 import morgan from "morgan";
 import path from "path";
 import { LinksRouter } from "./routers/links";
+import { PostsRouter } from "./routers/posts";
 import { SessionsRouter } from "./routers/sessions";
 import { TryRouter } from "./routers/try";
 import "./routers/try/protected";
@@ -87,6 +88,7 @@ app.use(express.static(path.join(__dirname, "public")));
   app.use(LinksRouter);
   app.use(SessionsRouter);
   app.use(UsersRouter);
+  app.use(PostsRouter);
 }
 
 /** Custom catch-call handlers, to override Express' defaults */

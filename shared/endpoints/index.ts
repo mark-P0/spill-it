@@ -1,4 +1,4 @@
-import { zodSample, zodUser } from "@spill-it/db/schema";
+import { zodPost, zodSample, zodUser } from "@spill-it/db/schema";
 import { z } from "zod";
 
 export const endpointMap = {
@@ -66,6 +66,35 @@ export const endpointMap = {
       }),
       output: z.object({
         link: z.string().url(),
+      }),
+    },
+  },
+  "/api/v0/posts": {
+    POST: {
+      input: z.object({
+        headers: z.preprocess(
+          (value) => {
+            const isObjectWithLowercaseAuth =
+              typeof value === "object" &&
+              value !== null &&
+              "authorization" in value;
+            if (isObjectWithLowercaseAuth) {
+              return {
+                Authorization: value.authorization,
+              };
+            }
+            return value;
+          },
+          z.object({
+            Authorization: z.string(),
+          }),
+        ),
+        body: z.object({
+          content: z.string(),
+        }),
+      }),
+      output: z.object({
+        data: zodPost,
       }),
     },
   },
