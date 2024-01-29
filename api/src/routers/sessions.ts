@@ -15,7 +15,7 @@ import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { convertCodeIntoGoogleInfo } from "../../auth/google";
+import { convertCodeIntoGoogleInfo } from "../auth/google";
 import { parseInputFromRequest } from "../utils/endpoints";
 import { localizeLogger } from "../utils/logger";
 

@@ -5,7 +5,7 @@ import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { buildAuthUrl } from "../../../auth/google";
+import { buildAuthUrl } from "../../auth/google";
 import { parseInputFromRequest } from "../../utils/endpoints";
 import { env } from "../../utils/env";
 import { localizeLogger } from "../../utils/logger";
