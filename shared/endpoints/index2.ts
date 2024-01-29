@@ -41,7 +41,7 @@ export const endpointMap = {
       }),
     },
   },
-  "/try/sample": {
+  "/try/samples": {
     GET: {
       input: z.object({}),
       output: z.object({
