@@ -27,7 +27,7 @@ export const endpointMap = {
                 Authorization: value.authorization,
               };
             }
-            return {};
+            return value;
           },
           z.object({
             Authorization: z.string(),
@@ -108,7 +108,7 @@ export const endpointMap = {
                 Authorization: value.authorization,
               };
             }
-            return {};
+            return value;
           },
           z.object({
             Authorization: z.string(),
