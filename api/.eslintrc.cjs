@@ -8,7 +8,13 @@
 module.exports = {
   root: true,
   env: {
-    // browser: true, es2020: true
+    // browser: true,
+
+    /**
+     * Set as same as `tsconfig.json` target
+     * (Mainly for `Error.cause`)
+     */
+    es2022: true,
 
     /**
      * Tells ESLint about the existence of the global `module` variable
