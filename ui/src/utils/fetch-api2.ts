@@ -43,7 +43,7 @@ function buildRequestFromInput<T extends Endpoint>(
   return new Request(url.href, options);
 }
 
-export async function fetchAPI2<
+export async function fetchAPI<
   T extends Endpoint,
   U extends EndpointMethod<T>,
 >(

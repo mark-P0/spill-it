@@ -9,7 +9,7 @@ import {
 import { z } from "zod";
 import { endpoint } from "../utils/endpoints";
 import { env } from "../utils/env";
-import { fetchAPI2 } from "../utils/fetch-api2";
+import { fetchAPI } from "../utils/fetch-api2";
 import { isLoggedIn } from "../utils/is-logged-in";
 
 /**
@@ -60,7 +60,7 @@ async function loadWelcomeRoute() {
 
   /** Fetch login link from API */
   {
-    const result = await fetchAPI2("/api/v0/links/google", "GET", {
+    const result = await fetchAPI("/api/v0/links/google", "GET", {
       query: { redirectUri },
     });
     const output = result.success
@@ -96,7 +96,7 @@ export const LoginGoogleRedirectRoute = () => (
 
       /** Convert authorization code to session ID */
       {
-        const result = await fetchAPI2("/api/v0/sessions", "GET", {
+        const result = await fetchAPI("/api/v0/sessions", "GET", {
           headers: {
             Authorization: buildHeaderAuth("SPILLITGOOGLE", {
               code,
