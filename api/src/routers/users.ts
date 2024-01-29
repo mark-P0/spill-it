@@ -3,40 +3,42 @@ import {
   readSessionFromUUID,
 } from "@spill-it/db/tables/sessions";
 import { readUser } from "@spill-it/db/tables/users";
+import { endpointDetails } from "@spill-it/endpoints/index2";
 import { parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
 import { safe, safeAsync } from "@spill-it/utils/safe";
-import { Router } from "express";
+import { Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { endpointHandler } from "../utils/endpoint-handler";
+import { parseInputFromRequest } from "../utils/endpoints";
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(__filename);
 export const UsersRouter = Router();
 
-UsersRouter.get(
-  ...endpointHandler("/api/v0/users/me", async (req, res, next) => {
-    logger.info("Parsing headers...");
-    const parsingHeaders = z
-      .object({ authorization: z.string() })
-      .safeParse(req.headers);
-    if (!parsingHeaders.success) {
-      logger.error(formatError(parsingHeaders.error));
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ success: false, error: "Invalid headers" });
-    }
-    const headers = parsingHeaders.data;
+{
+  const details = endpointDetails("/api/v0/users/me", "GET");
+  const [ep, method, signature, methodLower] = details;
+  type Input = z.infer<typeof signature.input>;
+  type Output = z.infer<typeof signature.output>;
 
+  UsersRouter[methodLower](ep, async (req, res: Response<Output>, next) => {
+    logger.info("Parsing input...");
+    const parsingInput = parseInputFromRequest(ep, method, req);
+    if (!parsingInput.success) {
+      logger.error(formatError(parsingInput.error));
+      return res.sendStatus(StatusCodes.BAD_REQUEST);
+    }
+    const input = parsingInput.value;
+
+    const { headers } = input;
     const resultHeaderAuth = safe(() =>
-      parseHeaderAuth("SPILLITSESS", headers.authorization),
+      parseHeaderAuth("SPILLITSESS", headers.Authorization),
     );
     if (!resultHeaderAuth.success) {
       logger.error(formatError(resultHeaderAuth.error));
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ success: false, error: "Invalid headers" });
+      return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
     const headerAuth = resultHeaderAuth.value;
 
@@ -45,42 +47,35 @@ UsersRouter.get(
     const resultSession = await safeAsync(() => readSessionFromUUID(id));
     if (!resultSession.success) {
       logger.error(formatError(resultSession.error));
-      return res
-        .status(StatusCodes.BAD_GATEWAY)
-        .json({ success: false, error: "Read session failed" });
+      return res.sendStatus(StatusCodes.BAD_GATEWAY);
     }
-
     const session = resultSession.value;
+
+    logger.info("Verifying session...");
     if (session === null) {
       logger.error("Session does not exist");
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ success: false, error: "Session not found" });
+      return res.sendStatus(StatusCodes.UNAUTHORIZED);
     }
     if (isSessionExpired(session)) {
       logger.error("Session is expired");
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ success: false, error: "Session expired" });
+      return res.sendStatus(StatusCodes.UNAUTHORIZED);
     }
 
+    logger.info("Fetching user info...");
     const resultUser = await safeAsync(() => readUser(session.userId));
     if (!resultUser.success) {
       logger.error(formatError(resultUser.error));
-      return res
-        .status(StatusCodes.BAD_GATEWAY)
-        .json({ success: false, error: "Read user failed" });
+      return res.sendStatus(StatusCodes.BAD_GATEWAY);
     }
-
     const user = resultUser.value;
+
+    logger.info("Verifying user info...");
     if (user === null) {
       logger.error("User of given session does not exist...?");
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ success: false, error: "Invalid session" });
+      return res.sendStatus(StatusCodes.UNAUTHORIZED);
     }
 
-    logger.info("Providing user information...");
-    res.json({ success: true, data: user });
-  }),
-);
+    logger.info("Sending user info...");
+    res.json({ data: user });
+  });
+}
