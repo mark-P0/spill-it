@@ -1,4 +1,4 @@
-import { endpoints } from "@spill-it/endpoints";
+import { endpoints } from "@spill-it/endpoints/index2";
 import { formatError } from "@spill-it/utils/errors";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -76,7 +76,7 @@ app.use(express.static(path.join(__dirname, "public")));
  * and the handlers (and redirects!) reference a centralized endpoint map for better maintainability.
  */
 {
-  logger.info(
+  logger.debug(
     "Using the following endpoints: " +
       endpoints.map((ep) => `"${ep}"`).join(" "),
   );
