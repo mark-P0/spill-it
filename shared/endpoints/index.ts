@@ -102,10 +102,29 @@ export const endpointMap = {
     },
   },
   "/api/v0/posts/:postId": {
-    // TODO Implement!
     GET: {
-      input: z.object({}),
-      output: z.object({}),
+      input: z.object({
+        headers: z.preprocess(
+          (value) => {
+            const isObjectWithLowercaseAuth =
+              typeof value === "object" &&
+              value !== null &&
+              "authorization" in value;
+            if (isObjectWithLowercaseAuth) {
+              return {
+                Authorization: value.authorization,
+              };
+            }
+            return value;
+          },
+          z.object({
+            Authorization: z.string(),
+          }),
+        ),
+      }),
+      output: z.object({
+        data: zodPost,
+      }),
     },
   },
   "/try/hello": {
