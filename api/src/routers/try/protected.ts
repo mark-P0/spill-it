@@ -2,9 +2,11 @@ import {
   isSessionExpired,
   readSessionFromUUID,
 } from "@spill-it/db/tables/sessions";
+import { endpointDetails } from "@spill-it/endpoints/index2";
 import { parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
 import { safe, safeAsync } from "@spill-it/utils/safe";
+import { Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { endpointHandler } from "../../utils/endpoint-handler";
@@ -13,16 +15,22 @@ import { TryRouter } from "../try";
 
 const logger = localizeLogger(__filename);
 
-TryRouter.get(
-  ...endpointHandler("/try/unprotected", (req, res, next) => {
+{
+  const details = endpointDetails("/try/unprotected", "GET");
+  const [ep, method, signature, methodLower] = details;
+  type Input = z.infer<typeof signature.input>;
+  type Output = z.infer<typeof signature.output>;
+
+  TryRouter[methodLower](ep, async (req, res: Response<Output>, next) => {
+    logger.info("Sending unprotected resource...");
     res.json({
       data: {
         resource: "unprotected",
         access: true,
       },
     });
-  }),
-);
+  });
+}
 
 TryRouter.get(
   ...endpointHandler("/try/protected", async (req, res, next) => {
