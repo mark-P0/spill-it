@@ -31,7 +31,11 @@ export const endpointMap = {
   },
   "/try/hello": {
     GET: {
-      input: z.object({}),
+      input: z.object({
+        query: z.object({
+          who: z.string().optional(),
+        }),
+      }),
       output: z.object({
         hello: z.string(),
       }),
