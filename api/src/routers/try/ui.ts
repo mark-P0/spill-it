@@ -1,5 +1,4 @@
-import { endpoint } from "@spill-it/endpoints";
-import { endpointDetails } from "@spill-it/endpoints/index2";
+import { endpoint, endpointDetails } from "@spill-it/endpoints/index2";
 import { buildHeaderAuth } from "@spill-it/header-auth";
 import { formatError, raise } from "@spill-it/utils/errors";
 import { safe, safeAsync } from "@spill-it/utils/safe";

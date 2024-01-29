@@ -218,6 +218,8 @@ export type EndpointInput<
 
 export const endpoints = Object.keys(endpointMap) as Endpoint[];
 
+export const endpoint = <T extends Endpoint>(endpoint: T): T => endpoint;
+
 export function endpointDetails<
   T extends Endpoint,
   U extends EndpointMethod<T> & string,
