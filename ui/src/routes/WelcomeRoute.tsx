@@ -9,7 +9,6 @@ import {
 import { z } from "zod";
 import { endpoint } from "../utils/endpoints";
 import { env } from "../utils/env";
-import { fetchAPI } from "../utils/fetch-api";
 import { fetchAPI2 } from "../utils/fetch-api2";
 import { isLoggedIn } from "../utils/is-logged-in";
 
@@ -97,7 +96,7 @@ export const LoginGoogleRedirectRoute = () => (
 
       /** Convert authorization code to session ID */
       {
-        const res = await fetchAPI("/api/v0/sessions", {
+        const result = await fetchAPI2("/api/v0/sessions", "GET", {
           headers: {
             Authorization: buildHeaderAuth("SPILLITGOOGLE", {
               code,
@@ -105,14 +104,14 @@ export const LoginGoogleRedirectRoute = () => (
             }),
           },
         });
+        const { data } = result.success
+          ? result.value
+          : raise("Failed retrieving session ID", result.error);
+        const { scheme, id } = data;
 
-        // TODO What if this failed?
-        if (res.success) {
-          const { scheme, id } = res.data;
-          // TODO Create util wrapper for local storage, also using Zod?
-          // TODO Find better alternative to local storage...
-          localStorage.setItem(scheme, id);
-        }
+        // TODO Create util wrapper for local storage, also using Zod?
+        // TODO Find better alternative to local storage...
+        localStorage.setItem(scheme, id);
       }
 
       return redirect(endpoint("/"));
