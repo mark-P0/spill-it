@@ -24,4 +24,6 @@ module.exports = {
       { allowConstantExport: true },
     ],
   },
+
+  reportUnusedDisableDirectives: true,
 };
