@@ -10,6 +10,7 @@ import { z } from "zod";
 import { endpoint } from "../utils/endpoints";
 import { env } from "../utils/env";
 import { fetchAPI } from "../utils/fetch-api";
+import { fetchAPI2 } from "../utils/fetch-api2";
 import { isLoggedIn } from "../utils/is-logged-in";
 
 /**
@@ -60,12 +61,14 @@ async function loadWelcomeRoute() {
 
   /** Fetch login link from API */
   {
-    const res = await fetchAPI("/api/v0/links/google", {
+    const result = await fetchAPI2("/api/v0/links/google", "GET", {
       query: { redirectUri },
     });
-    const link = res.success
-      ? res.link
-      : raise("API did not provide login link");
+    const output = result.success
+      ? result.value
+      : raise("Failed fetching login link", result.error);
+
+    const link = output.link;
 
     return { link };
   }
