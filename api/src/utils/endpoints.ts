@@ -7,6 +7,7 @@ import {
 import { ensureError } from "@spill-it/utils/errors";
 import { Result } from "@spill-it/utils/safe";
 import { Request } from "express";
+import { RouteParameters } from "express-serve-static-core";
 
 export function parseInputFromRequest<
   T extends Endpoint,
@@ -29,4 +30,15 @@ export function parseInputFromRequest<
     });
     return { success: false, error };
   }
+}
+
+export function endpointWithParam<T extends Endpoint>(
+  endpoint: T,
+  params: RouteParameters<T>,
+): string {
+  let epActual: string = endpoint;
+  for (const [param, value] of Object.entries(params)) {
+    epActual = epActual.replace(`:${param}`, value);
+  }
+  return epActual;
 }

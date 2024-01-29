@@ -95,7 +95,17 @@ export const endpointMap = {
       }),
       output: z.object({
         data: zodPost,
+        links: z.object({
+          self: z.string().url(),
+        }),
       }),
+    },
+  },
+  "/api/v0/posts/:postId": {
+    // TODO Implement!
+    GET: {
+      input: z.object({}),
+      output: z.object({}),
     },
   },
   "/try/hello": {

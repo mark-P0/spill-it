@@ -11,7 +11,8 @@ import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { parseInputFromRequest } from "../utils/endpoints";
+import { endpointWithParam, parseInputFromRequest } from "../utils/endpoints";
+import { apiHost } from "../utils/hosts";
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(__filename);
@@ -85,7 +86,24 @@ export const PostsRouter = Router();
     }
     const post = postResult.value;
 
+    logger.info("Creating post link...");
+    const linkResult = safe(
+      () =>
+        new URL(
+          endpointWithParam("/api/v0/posts/:postId", { postId: `${post.id}` }),
+          apiHost,
+        ).href,
+    );
+    if (!linkResult.success) {
+      logger.error(formatError(linkResult.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const link = linkResult.value;
+
     logger.info("Sending post info...");
-    res.json({ data: post });
+    res.json({
+      data: post,
+      links: { self: link },
+    });
   });
 }
