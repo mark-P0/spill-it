@@ -6,7 +6,6 @@ import { safeAsync } from "@spill-it/utils/safe";
 import { Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { endpointHandler } from "../utils/endpoint-handler";
 import { parseInputFromRequest } from "../utils/endpoints";
 import { localizeLogger } from "../utils/logger";
 
