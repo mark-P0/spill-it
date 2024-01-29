@@ -2,6 +2,8 @@
  * Based from
  * - [Vite `react-ts` template](https://github.com/vitejs/vite/blob/main/packages/create-vite/template-react-ts/.eslintrc.cjs)
  * - [`typescript-eslint` Getting Started page](https://typescript-eslint.io/getting-started/)
+ *
+ * @type {import('eslint').Linter.Config}
  */
 module.exports = {
   root: true,
