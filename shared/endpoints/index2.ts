@@ -111,7 +111,11 @@ export const endpointMap = {
   },
   "/try/ui/login/google/redirect": {
     GET: {
-      input: z.object({}),
+      input: z.object({
+        query: z.object({
+          code: z.string(),
+        }),
+      }),
       output: z.object({
         data: z.object({
           code: z.string(),

@@ -1,14 +1,18 @@
-/* TODO Do this on UI */
-
 import { endpoint } from "@spill-it/endpoints";
+import { endpointDetails } from "@spill-it/endpoints/index2";
 import { buildHeaderAuth } from "@spill-it/header-auth";
-import { raise } from "@spill-it/utils/errors";
+import { formatError, raise } from "@spill-it/utils/errors";
+import { safe, safeAsync } from "@spill-it/utils/safe";
+import { Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { buildAuthUrl } from "../../../auth/google";
-import { endpointHandler } from "../../utils/endpoint-handler";
+import { parseInputFromRequest } from "../../utils/endpoints";
 import { env } from "../../utils/env";
+import { localizeLogger } from "../../utils/logger";
 import { TryRouter } from "../try";
+
+const logger = localizeLogger(__filename);
 
 const baseUrl =
   env.NODE_ENV === "development"
@@ -19,31 +23,58 @@ const baseUrl =
 const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), baseUrl)
   .href;
 
-TryRouter.get(
-  ...endpointHandler("/try/ui/login/google", async (req, res, next) => {
-    const authUrl = await buildAuthUrl(redirectUri);
+{
+  const details = endpointDetails("/try/ui/login/google", "GET");
+  const [ep, method, signature, methodLower] = details;
+  type Input = z.infer<typeof signature.input>;
+  type Output = z.infer<typeof signature.output>;
 
-    res.json({ redirect: authUrl });
-  }),
-);
-
-TryRouter.get(
-  ...endpointHandler("/try/ui/login/google/redirect", (req, res, next) => {
-    const parsing = z.object({ code: z.string() }).safeParse(req.query);
-    if (!parsing.success) {
-      res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ success: false, error: "Invalid query params" });
-      return;
+  TryRouter[methodLower](ep, async (req, res: Response<Output>, next) => {
+    logger.info("Building auth URL...");
+    const result = await safeAsync(() => buildAuthUrl(redirectUri));
+    if (!result.success) {
+      logger.error(formatError(result.error));
+      return res.sendStatus(StatusCodes.BAD_GATEWAY);
     }
-    const { code } = parsing.data;
+    const url = result.value;
 
+    logger.info("Sending login link...");
+    res.json({ redirect: url });
+  });
+}
+
+{
+  const details = endpointDetails("/try/ui/login/google/redirect", "GET");
+  const [ep, method, signature, methodLower] = details;
+  type Input = z.infer<typeof signature.input>;
+  type Output = z.infer<typeof signature.output>;
+
+  TryRouter[methodLower](ep, async (req, res: Response<Output>, next) => {
+    logger.info("Parsing input...");
+    const parsingInput = parseInputFromRequest(ep, method, req);
+    if (!parsingInput.success) {
+      logger.error(formatError(parsingInput.error));
+      return res.sendStatus(StatusCodes.BAD_REQUEST);
+    }
+    const input = parsingInput.value;
+
+    logger.info("Building header auth...");
+    const { code } = input.query;
+    const resultHeaderAuth = safe(() =>
+      buildHeaderAuth("SPILLITGOOGLE", { code, redirectUri }),
+    );
+    if (!resultHeaderAuth.success) {
+      logger.error(formatError(resultHeaderAuth.error));
+      return res.sendStatus(StatusCodes.BAD_REQUEST);
+    }
+    const headerAuth = resultHeaderAuth.value;
+
+    logger.info("Sending app Google auth...");
     res.json({
-      success: true,
       data: { code, redirectUri },
       headers: {
-        Authorization: buildHeaderAuth("SPILLITGOOGLE", { code, redirectUri }),
+        Authorization: headerAuth,
       },
     });
-  }),
-);
+  });
+}
