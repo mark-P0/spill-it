@@ -7,6 +7,7 @@ import {
 } from "@spill-it/endpoints";
 import { ensureError, raise } from "@spill-it/utils/errors";
 import { Result } from "@spill-it/utils/safe";
+import { parse as jsonUnpack } from "superjson";
 import { env } from "./env";
 
 const hostAPI = env.DEV
@@ -61,6 +62,11 @@ export async function fetchAPI<T extends Endpoint, U extends EndpointMethod<T>>(
     const req = buildRequestFromInput(endpoint, method, input);
 
     const res = await fetch(req);
+    if (endpoint === "/api/v0/posts") {
+      const rawOutput = await res.text();
+      const output = signature.output.parse(jsonUnpack(rawOutput));
+      return { success: true, value: output };
+    }
     const rawOutput = await res.json();
     const output = signature.output.parse(rawOutput);
     return { success: true, value: output };

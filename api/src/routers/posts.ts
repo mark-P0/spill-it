@@ -14,6 +14,7 @@ import { formatError } from "@spill-it/utils/errors";
 import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
+import { stringify as jsonPack } from "superjson";
 import { z } from "zod";
 import { endpointWithParam, parseInputFromRequest } from "../utils/endpoints";
 import { apiHost } from "../utils/hosts";
@@ -199,7 +200,7 @@ export const PostsRouter = Router();
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  PostsRouter[methodLower](ep, async (req, res: Response<Output>, next) => {
+  PostsRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const inputParsing = parseInputFromRequest(ep, method, req);
     if (!inputParsing.success) {
@@ -276,9 +277,11 @@ export const PostsRouter = Router();
     const link = linkResult.value;
 
     logger.info("Sending post info...");
-    res.json({
+    const output: Output = {
       data: post,
       links: { self: link },
-    });
+    };
+    const rawOutput = jsonPack(output);
+    res.send(rawOutput);
   });
 }
