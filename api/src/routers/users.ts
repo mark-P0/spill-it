@@ -8,7 +8,7 @@ import { parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
 import { safe, safeAsync } from "@spill-it/utils/safe";
-import { Response, Router } from "express";
+import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { parseInputFromRequest } from "../utils/endpoints";
