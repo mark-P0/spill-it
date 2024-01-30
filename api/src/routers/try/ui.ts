@@ -1,6 +1,7 @@
 import { endpoint, endpointDetails } from "@spill-it/endpoints";
 import { buildHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
+import { jsonPack } from "@spill-it/utils/json";
 import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response } from "express";
 import { StatusCodes } from "http-status-codes";
@@ -22,7 +23,7 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  TryRouter[methodLower](ep, async (req, res: Response<Output>, next) => {
+  TryRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Building auth URL...");
     const result = await safeAsync(() => buildAuthUrl(redirectUri));
     if (!result.success) {
@@ -32,7 +33,11 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
     const url = result.value;
 
     logger.info("Sending login link...");
-    res.json({ redirect: url });
+    const output: Output = {
+      redirect: url,
+    };
+    const rawOutput = jsonPack(output);
+    res.send(rawOutput);
   });
 }
 
@@ -42,7 +47,7 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  TryRouter[methodLower](ep, async (req, res: Response<Output>, next) => {
+  TryRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const parsingInput = parseInputFromRequest(ep, method, req);
     if (!parsingInput.success) {
@@ -63,11 +68,13 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
     const headerAuth = resultHeaderAuth.value;
 
     logger.info("Sending app Google auth...");
-    res.json({
+    const output: Output = {
       data: { code, redirectUri },
       headers: {
         Authorization: headerAuth,
       },
-    });
+    };
+    const rawOutput = jsonPack(output);
+    res.send(rawOutput);
   });
 }
