@@ -8,20 +8,14 @@ import {
 import { ensureError, raise } from "@spill-it/utils/errors";
 import { jsonUnpack } from "@spill-it/utils/json";
 import { Result } from "@spill-it/utils/safe";
-import { env } from "./env";
-
-const hostAPI = env.DEV
-  ? env.VITE_HOST_API_DEV
-  : env.PROD
-    ? env.VITE_HOST_API_PROD
-    : raise("Impossible situation for API host URL");
+import { apiHost } from "./env";
 
 function buildRequestFromInput<T extends Endpoint>(
   endpoint: T,
   method: EndpointMethod<T>,
   input: Record<string, Record<string, string>>, // Could be `EndpointInput<T, U>` but that goes crazy...
 ): Request {
-  const url = new URL(endpoint, hostAPI);
+  const url = new URL(endpoint, apiHost);
   const options: RequestInit = {};
 
   options.method =

@@ -29,3 +29,15 @@ const parsing = z
 export const env = parsing.success
   ? parsing.data
   : raise("Unexpected UI environment variables", parsing.error);
+
+export const apiHost = env.DEV
+  ? env.VITE_HOST_API_DEV
+  : env.PROD
+    ? env.VITE_HOST_API_PROD
+    : raise("Unknown environment for API host");
+
+export const uiHost = env.DEV
+  ? env.VITE_HOST_UI_DEV
+  : env.PROD
+    ? env.VITE_HOST_UI_PROD
+    : raise("Unknown environment for UI host");

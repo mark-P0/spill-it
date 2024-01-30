@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 import { z } from "zod";
 import { endpoint } from "../utils/endpoints";
-import { env } from "../utils/env";
+import { uiHost } from "../utils/env";
 import { fetchAPI } from "../utils/fetch-api";
 import { isLoggedIn } from "../utils/is-logged-in";
 
@@ -22,13 +22,7 @@ function useTypedLoaderData<TLoader extends LoaderFunction>() {
   return useLoaderData() as LoaderData<TLoader>;
 }
 
-const hostUI = env.DEV
-  ? env.VITE_HOST_UI_DEV
-  : env.PROD
-    ? env.VITE_HOST_UI_PROD
-    : raise("Impossible situation for UI host URL");
-
-const redirectUri = new URL(endpoint("/login/google/redirect"), hostUI).href;
+const redirectUri = new URL(endpoint("/login/google/redirect"), uiHost).href;
 
 function GoogleLoginButtonLink() {
   const { link } = useTypedLoaderData<WelcomeRouteLoader>();
