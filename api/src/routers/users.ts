@@ -6,6 +6,7 @@ import { readUser } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
 import { parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
+import { jsonPack } from "@spill-it/utils/json";
 import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
@@ -21,7 +22,7 @@ export const UsersRouter = Router();
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  UsersRouter[methodLower](ep, async (req, res: Response<Output>, next) => {
+  UsersRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const parsingInput = parseInputFromRequest(ep, method, req);
     if (!parsingInput.success) {
@@ -74,6 +75,10 @@ export const UsersRouter = Router();
     }
 
     logger.info("Sending user info...");
-    res.json({ data: user });
+    const output: Output = {
+      data: user,
+    };
+    const rawOutput = jsonPack(output);
+    res.send(rawOutput);
   });
 }

@@ -11,6 +11,7 @@ import { readUser } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
 import { parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
+import { jsonPack } from "@spill-it/utils/json";
 import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
@@ -28,7 +29,7 @@ export const PostsRouter = Router();
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  PostsRouter[methodLower](ep, async (req, res: Response<Output>, next) => {
+  PostsRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const inputParsing = parseInputFromRequest(ep, method, req);
     if (!inputParsing.success) {
@@ -114,9 +115,11 @@ export const PostsRouter = Router();
     }
 
     logger.info("Sending post info...");
-    res.json({
+    const output: Output = {
       data: post,
-    });
+    };
+    const rawOutput = jsonPack(output);
+    res.send(rawOutput);
   });
 }
 
@@ -126,7 +129,7 @@ export const PostsRouter = Router();
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  PostsRouter[methodLower](ep, async (req, res: Response<Output>, next) => {
+  PostsRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const inputParsing = parseInputFromRequest(ep, method, req);
     if (!inputParsing.success) {
@@ -187,9 +190,11 @@ export const PostsRouter = Router();
     const posts = postsResult.value;
 
     logger.info("Sending user posts...");
-    res.json({
+    const output: Output = {
       data: posts,
-    });
+    };
+    const rawOutput = jsonPack(output);
+    res.send(rawOutput);
   });
 }
 
@@ -199,7 +204,7 @@ export const PostsRouter = Router();
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  PostsRouter[methodLower](ep, async (req, res: Response<Output>, next) => {
+  PostsRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const inputParsing = parseInputFromRequest(ep, method, req);
     if (!inputParsing.success) {
@@ -276,9 +281,11 @@ export const PostsRouter = Router();
     const link = linkResult.value;
 
     logger.info("Sending post info...");
-    res.json({
+    const output: Output = {
       data: post,
       links: { self: link },
-    });
+    };
+    const rawOutput = jsonPack(output);
+    res.send(rawOutput);
   });
 }

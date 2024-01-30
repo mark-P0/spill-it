@@ -5,6 +5,7 @@ import {
 import { endpointDetails } from "@spill-it/endpoints";
 import { parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
+import { jsonPack } from "@spill-it/utils/json";
 import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response } from "express";
 import { StatusCodes } from "http-status-codes";
@@ -21,14 +22,16 @@ const logger = localizeLogger(__filename);
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  TryRouter[methodLower](ep, async (req, res: Response<Output>, next) => {
+  TryRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Sending unprotected resource...");
-    res.json({
+    const output: Output = {
       data: {
         resource: "unprotected",
         access: true,
       },
-    });
+    };
+    const rawOutput = jsonPack(output);
+    res.send(rawOutput);
   });
 }
 
@@ -38,7 +41,7 @@ const logger = localizeLogger(__filename);
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  TryRouter[methodLower](ep, async (req, res: Response<Output>, next) => {
+  TryRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const parsingInput = parseInputFromRequest(ep, method, req);
     if (!parsingInput.success) {
@@ -77,8 +80,13 @@ const logger = localizeLogger(__filename);
     }
 
     logger.info("Sending protected resource...");
-    res.json({
-      data: { resource: "protected", access: id },
-    });
+    const output: Output = {
+      data: {
+        resource: "protected",
+        access: id,
+      },
+    };
+    const rawOutput = jsonPack(output);
+    res.send(rawOutput);
   });
 }

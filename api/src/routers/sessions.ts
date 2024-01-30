@@ -11,6 +11,7 @@ import {
 import { endpointDetails } from "@spill-it/endpoints";
 import { AuthScheme, parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
+import { jsonPack } from "@spill-it/utils/json";
 import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
@@ -29,8 +30,7 @@ export const SessionsRouter = Router();
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  type Res = Response<Output>;
-  SessionsRouter[methodLower](ep, async (req, res: Res, next) => {
+  SessionsRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const parsingInput = parseInputFromRequest(ep, method, req);
     if (!parsingInput.success) {
@@ -116,8 +116,13 @@ export const SessionsRouter = Router();
     session satisfies NonNullable<typeof session>;
 
     logger.info("Sending session ID...");
-    const scheme: AuthScheme = "SPILLITSESS";
-    const id = session.uuid;
-    res.json({ data: { scheme, id } });
+    const output: Output = {
+      data: {
+        scheme: "SPILLITSESS" satisfies AuthScheme,
+        id: session.uuid,
+      },
+    };
+    const rawOutput = jsonPack(output);
+    res.send(rawOutput);
   });
 }

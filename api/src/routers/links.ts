@@ -1,5 +1,6 @@
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
+import { jsonPack } from "@spill-it/utils/json";
 import { safeAsync } from "@spill-it/utils/safe";
 import { Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
@@ -17,7 +18,7 @@ export const LinksRouter = Router();
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  LinksRouter[methodLower](ep, async (req, res: Response<Output>, next) => {
+  LinksRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const parsingInput = parseInputFromRequest(ep, method, req);
     if (!parsingInput.success) {
@@ -36,6 +37,10 @@ export const LinksRouter = Router();
     const authUrl = resultAuthUrl.value;
 
     logger.info("Sending auth URL...");
-    res.json({ link: authUrl });
+    const output: Output = {
+      link: authUrl,
+    };
+    const rawOutput = jsonPack(output);
+    res.send(rawOutput);
   });
 }

@@ -6,6 +6,7 @@ import {
   endpointMap,
 } from "@spill-it/endpoints";
 import { ensureError, raise } from "@spill-it/utils/errors";
+import { jsonUnpack } from "@spill-it/utils/json";
 import { Result } from "@spill-it/utils/safe";
 import { env } from "./env";
 
@@ -41,7 +42,7 @@ function buildRequestFromInput<T extends Endpoint>(
       ...options.headers,
       "Content-Type": "application/json",
     };
-    options.body = JSON.stringify(input.body); // TODO Use `superjson`?
+    options.body = JSON.stringify(input.body); // TODO Also package with JSON util?
   }
 
   return new Request(url.href, options);
@@ -60,7 +61,8 @@ export async function fetchAPI<T extends Endpoint, U extends EndpointMethod<T>>(
     const req = buildRequestFromInput(endpoint, method, input);
 
     const res = await fetch(req);
-    const rawOutput = await res.json();
+    const rawOutputPacked = await res.text();
+    const rawOutput = jsonUnpack(rawOutputPacked);
     const output = signature.output.parse(rawOutput);
     return { success: true, value: output };
   } catch (caughtError) {
