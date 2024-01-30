@@ -10,11 +10,12 @@ import {
 } from "react-router-dom";
 import { ErrorScreen, RootRoute } from "./App.tsx";
 import "./assets/tailwind.css";
-import { HomeRoute } from "./routes/HomeRoute.tsx";
 import {
   LoginGoogleRedirectRoute,
   WelcomeRoute,
 } from "./routes/WelcomeRoute.tsx";
+import { HomeScreen, loadHome } from "./routes/home";
+import { endpoint } from "./utils/endpoints.ts";
 
 async function sleep(seconds: number) {
   return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
@@ -43,7 +44,11 @@ const routes = createRoutesFromElements(
     {RootRoute()}
     {WelcomeRoute()}
     {LoginGoogleRedirectRoute()}
-    {HomeRoute()}
+    <Route
+      path={endpoint("/home")}
+      loader={loadHome}
+      element={<HomeScreen />}
+    />
     <Route path="/query" element={null} loader={loadSearchParamsFromUrl} />
     <Route path="/sleep" element={null} loader={loadSleep} />
     <Route path="/error" element={null} loader={loadError} />
