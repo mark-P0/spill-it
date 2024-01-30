@@ -1,10 +1,10 @@
 import { endpoints } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
+import { safe } from "@spill-it/utils/safe";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { ErrorRequestHandler } from "express";
 import helmet from "helmet";
-import { IncomingHttpHeaders } from "http";
 import { StatusCodes } from "http-status-codes";
 import morgan from "morgan";
 import path from "path";
@@ -98,8 +98,18 @@ app.use(express.static(path.join(__dirname, "public")));
       ]),
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Request headers should not be used directly anyway...
-    req.headers = headersPascalKebab as any;
+    const result = safe(() => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Request headers should not be used directly anyway...
+      req.headers = headersPascalKebab as any;
+    });
+    if (!result.success) {
+      const error = new Error(
+        "Failed converting request headers to Pascal-Kebab-Case",
+        { cause: result.error },
+      );
+      logger.error(formatError(error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
 
     next();
   });
