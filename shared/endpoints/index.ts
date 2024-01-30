@@ -5,23 +5,9 @@ export const endpointMap = {
   "/api/v0/sessions": {
     GET: {
       input: z.object({
-        headers: z.preprocess(
-          (value) => {
-            const isObjectWithLowercaseAuth =
-              typeof value === "object" &&
-              value !== null &&
-              "authorization" in value;
-            if (isObjectWithLowercaseAuth) {
-              return {
-                Authorization: value.authorization,
-              };
-            }
-            return value;
-          },
-          z.object({
-            Authorization: z.string(),
-          }),
-        ),
+        headers: z.object({
+          Authorization: z.string(),
+        }),
       }),
       output: z.object({
         data: z.object({
@@ -34,23 +20,9 @@ export const endpointMap = {
   "/api/v0/users/me": {
     GET: {
       input: z.object({
-        headers: z.preprocess(
-          (value) => {
-            const isObjectWithLowercaseAuth =
-              typeof value === "object" &&
-              value !== null &&
-              "authorization" in value;
-            if (isObjectWithLowercaseAuth) {
-              return {
-                Authorization: value.authorization,
-              };
-            }
-            return value;
-          },
-          z.object({
-            Authorization: z.string(),
-          }),
-        ),
+        headers: z.object({
+          Authorization: z.string(),
+        }),
       }),
       output: z.object({
         data: zodUser,
@@ -72,23 +44,9 @@ export const endpointMap = {
   "/api/v0/posts": {
     POST: {
       input: z.object({
-        headers: z.preprocess(
-          (value) => {
-            const isObjectWithLowercaseAuth =
-              typeof value === "object" &&
-              value !== null &&
-              "authorization" in value;
-            if (isObjectWithLowercaseAuth) {
-              return {
-                Authorization: value.authorization,
-              };
-            }
-            return value;
-          },
-          z.object({
-            Authorization: z.string(),
-          }),
-        ),
+        headers: z.object({
+          Authorization: z.string(),
+        }),
         body: z.object({
           content: z.string(),
         }),
@@ -102,23 +60,9 @@ export const endpointMap = {
     },
     GET: {
       input: z.object({
-        headers: z.preprocess(
-          (value) => {
-            const isObjectWithLowercaseAuth =
-              typeof value === "object" &&
-              value !== null &&
-              "authorization" in value;
-            if (isObjectWithLowercaseAuth) {
-              return {
-                Authorization: value.authorization,
-              };
-            }
-            return value;
-          },
-          z.object({
-            Authorization: z.string(),
-          }),
-        ),
+        headers: z.object({
+          Authorization: z.string(),
+        }),
       }),
       output: z.object({
         data: z.array(zodPost),
@@ -128,23 +72,9 @@ export const endpointMap = {
   "/api/v0/posts/:postId": {
     GET: {
       input: z.object({
-        headers: z.preprocess(
-          (value) => {
-            const isObjectWithLowercaseAuth =
-              typeof value === "object" &&
-              value !== null &&
-              "authorization" in value;
-            if (isObjectWithLowercaseAuth) {
-              return {
-                Authorization: value.authorization,
-              };
-            }
-            return value;
-          },
-          z.object({
-            Authorization: z.string(),
-          }),
-        ),
+        headers: z.object({
+          Authorization: z.string(),
+        }),
       }),
       output: z.object({
         data: zodPost,
@@ -197,23 +127,9 @@ export const endpointMap = {
   "/try/protected": {
     GET: {
       input: z.object({
-        headers: z.preprocess(
-          (value) => {
-            const isObjectWithLowercaseAuth =
-              typeof value === "object" &&
-              value !== null &&
-              "authorization" in value;
-            if (isObjectWithLowercaseAuth) {
-              return {
-                Authorization: value.authorization,
-              };
-            }
-            return value;
-          },
-          z.object({
-            Authorization: z.string(),
-          }),
-        ),
+        headers: z.object({
+          Authorization: z.string(),
+        }),
       }),
       output: z.object({
         data: z.object({
