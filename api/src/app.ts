@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { ErrorRequestHandler } from "express";
 import helmet from "helmet";
+import { IncomingHttpHeaders } from "http";
 import { StatusCodes } from "http-status-codes";
 import morgan from "morgan";
 import path from "path";
@@ -65,6 +66,43 @@ app.use(express.static(path.join(__dirname, "public")));
       origin: uiHost,
     }),
   );
+}
+
+/**
+ * Convert request headers into Pascal-Kebab-Case
+ *
+ * Express (or Node?) uses lowercase headers because the standards demand them to be case-insensitive
+ * - https://stackoverflow.com/a/63113385
+ * - https://github.com/nodejs/node-v0.x-archive/issues/1954
+ *
+ * For the app though, Pascal-Kebab-Case is preferred. Mostly as an aesthetic choice.
+ */
+{
+  function capitalize(str: string): string {
+    const first = str[0];
+    if (first === undefined) return ""; // Given string is empty if it does not have a "first" character
+
+    return first.toUpperCase() + str.slice(1); // TODO Lower the remaining characters?
+  }
+
+  function convertKebabToPascalKebab(str: string): string {
+    const words = str.split("-");
+    return words.map(capitalize).join("-");
+  }
+
+  app.use((req, res, next) => {
+    const headersPascalKebab = Object.fromEntries(
+      Object.entries(req.headers).map(([header, value]) => [
+        convertKebabToPascalKebab(header),
+        value,
+      ]),
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Request headers should not be used directly anyway...
+    req.headers = headersPascalKebab as any;
+
+    next();
+  });
 }
 
 /**
