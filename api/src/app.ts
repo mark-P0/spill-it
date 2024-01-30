@@ -15,7 +15,7 @@ import { TryRouter } from "./routers/try";
 import "./routers/try/protected";
 import "./routers/try/ui";
 import { UsersRouter } from "./routers/users";
-import { uiHost } from "./utils/hosts";
+import { uiHost } from "./utils/env";
 import { logger as directLogger, localizeLogger } from "./utils/logger";
 
 const logger = localizeLogger(__filename);

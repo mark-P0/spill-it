@@ -17,7 +17,7 @@ import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { endpointWithParam, parseInputFromRequest } from "../utils/endpoints";
-import { apiHost } from "../utils/hosts";
+import { apiHost } from "../utils/env";
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(__filename);

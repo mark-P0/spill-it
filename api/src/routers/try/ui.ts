@@ -7,7 +7,7 @@ import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { buildAuthUrl } from "../../auth/google";
 import { parseInputFromRequest } from "../../utils/endpoints";
-import { apiHost } from "../../utils/hosts";
+import { apiHost } from "../../utils/env";
 import { localizeLogger } from "../../utils/logger";
 import { TryRouter } from "../try";
 
