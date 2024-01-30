@@ -37,16 +37,18 @@ function buildRequestFromInput<T extends Endpoint>(
     options.headers = input.headers;
   }
   if (input?.body !== undefined) {
+    options.headers = {
+      ...options.headers,
+      "Content-Type": "application/json",
+    };
+
     options.body = JSON.stringify(input.body); // TODO Use `superjson`?
   }
 
   return new Request(url.href, options);
 }
 
-export async function fetchAPI<
-  T extends Endpoint,
-  U extends EndpointMethod<T>,
->(
+export async function fetchAPI<T extends Endpoint, U extends EndpointMethod<T>>(
   endpoint: T,
   method: U,
   rawInput: EndpointInput<T, U>,
