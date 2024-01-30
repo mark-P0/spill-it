@@ -42,7 +42,7 @@ function buildRequestFromInput<T extends Endpoint>(
       ...options.headers,
       "Content-Type": "application/json",
     };
-    options.body = JSON.stringify(input.body); // TODO Use `superjson`?
+    options.body = JSON.stringify(input.body); // TODO Also package with JSON util?
   }
 
   return new Request(url.href, options);
