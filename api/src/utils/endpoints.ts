@@ -17,12 +17,7 @@ export function parseInputFromRequest<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Something about TypeScript does not work after 2 indices...
     const signature = endpointMap[endpoint][method] as any;
 
-    const rawInput = {
-      headers: req.headers,
-      query: req.query,
-      body: req.body,
-    };
-    const input = signature.input.parse(rawInput);
+    const input = signature.input.parse(req);
     return { success: true, value: input };
   } catch (caughtError) {
     const error = new Error("Failed parsing input from request", {
