@@ -12,6 +12,20 @@ const logger = localizeLogger(__filename);
 export const TryRouter = Router();
 
 {
+  TryRouter.get("/try/json", (req, res) => {
+    res.json({ hello: "world!" });
+  });
+
+  TryRouter.get("/try/json/send", (req, res) => {
+    res.send({ hello: "world!" });
+  });
+
+  TryRouter.get("/try/json/text", (req, res) => {
+    res.send(JSON.stringify({ hello: "world!" }));
+  });
+}
+
+{
   const details = endpointDetails("/try/hello", "GET");
   const [ep, method, signature, methodLower] = details;
   type Input = z.infer<typeof signature.input>;
