@@ -50,6 +50,9 @@ module.exports = {
      * in which case this rule can be manually enabled, e.g. via the CLI.
      */
     "@typescript-eslint/no-unused-vars": "off",
+
+    /** Allow defining functions (and others?) inside blocks */
+    "no-inner-declarations": "off",
   },
 
   reportUnusedDisableDirectives: true,
