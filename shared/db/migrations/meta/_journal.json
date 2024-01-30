@@ -43,6 +43,13 @@
       "when": 1705258531877,
       "tag": "0005_huge_deathstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1706548549017,
+      "tag": "0006_adorable_the_fallen",
+      "breakpoints": true
     }
   ]
 }

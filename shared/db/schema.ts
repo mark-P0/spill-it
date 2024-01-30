@@ -46,3 +46,11 @@ export const SessionsTable = pgTable("sessions", {
   userId: integer("userId").notNull(), // Users primary key
   expiry: timestamp("expiry").notNull(),
 });
+
+export const PostsTable = pgTable("posts", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull(), // Users primary key
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+  content: text("content").notNull(),
+});
+export const zodPost = createSelectSchema(PostsTable);
