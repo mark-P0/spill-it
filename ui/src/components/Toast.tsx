@@ -6,6 +6,10 @@ import { randomKey } from "../utils/react";
 export function Toast() {
   const { toastAttrs, setToastAttrs } = useToastContext();
 
+  function removeToastComponent() {
+    setToastAttrs(null);
+  }
+
   if (toastAttrs === null) return null;
   const { content, level } = toastAttrs;
 
@@ -13,17 +17,27 @@ export function Toast() {
     <dialog
       key={randomKey()} // Ensure "new" toast every time content is changed
       open
-      onAnimationEnd={() => setToastAttrs(null)} // Remove from DOM when finished
+      onAnimationEnd={removeToastComponent}
       className={clsx(
         "absolute bottom-[5%]",
+        "flex gap-4",
         "rounded px-4 py-2",
-        "font-bold text-sm tracking-wider",
         level === "info" && "bg-fuchsia-500 text-white",
         level === "warn" && "bg-yellow-500",
         "animate-toast",
       )}
     >
-      {content}
+      <span className="text-sm tracking-wider">{content}</span>
+
+      <button
+        onClick={removeToastComponent}
+        className={clsx(
+          "font-bold text-sm uppercase tracking-widest",
+          "opacity-50 hover:opacity-100 transition",
+        )}
+      >
+        Close
+      </button>
     </dialog>
   );
 }
