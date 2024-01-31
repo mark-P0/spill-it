@@ -8,6 +8,7 @@ import { buildHeaderAuthFromStorage, isLoggedIn } from "../utils/is-logged-in";
 
 function PostForm() {
   const [content, setContent] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function reset() {
     setContent("");
@@ -16,10 +17,12 @@ function PostForm() {
   // TODO Show a popup on error?
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setIsSubmitting(true);
 
     const headerAuthResult = safe(() => buildHeaderAuthFromStorage());
     if (!headerAuthResult.success) {
       console.error(headerAuthResult.error);
+      setIsSubmitting(false);
       return;
     }
     const headerAuth = headerAuthResult.value;
@@ -30,34 +33,50 @@ function PostForm() {
     });
     if (!fetchResult.success) {
       console.error(fetchResult.error);
+      setIsSubmitting(false);
       return;
     }
 
+    setIsSubmitting(false);
     reset();
   }
 
+  /**
+   * More reliable for showing a cursor over the whole form
+   * as the interactive elements override it with their respective styles
+   */
+  const CursorOverlay = (
+    <div className="absolute w-full h-full cursor-wait"></div>
+  );
   return (
-    <form onSubmit={submit} className="grid gap-3">
-      <label>
-        <textarea
-          value={content}
-          onChange={(event) => setContent(event.currentTarget.value)}
-          placeholder="What's the tea sis?!"
-          className={clsx("resize-none", "w-full p-3", "bg-black/20")}
-        ></textarea>
-      </label>
-
-      <button
-        disabled={content === ""}
-        className={clsx(
-          "ml-auto",
-          "rounded-full px-6 py-3",
-          "bg-rose-500 disabled:opacity-50",
-          "font-bold tracking-wide",
-        )}
-      >
-        Spill! 🍵
-      </button>
+    <form onSubmit={submit}>
+      <fieldset disabled={isSubmitting} className="relative grid gap-3">
+        <label>
+          <span className="sr-only">Tea 🍵</span>
+          <textarea
+            value={content}
+            onChange={(event) => setContent(event.currentTarget.value)}
+            placeholder="What's the tea sis?!"
+            className={clsx(
+              "resize-none placeholder:text-white/50",
+              "w-full rounded p-3",
+              "bg-white/10 disabled:opacity-50",
+            )}
+          ></textarea>
+        </label>
+        <button
+          disabled={content === ""}
+          className={clsx(
+            "ml-auto",
+            "rounded-full px-6 py-3",
+            "bg-rose-500 disabled:opacity-50",
+            "font-bold tracking-wide",
+          )}
+        >
+          {isSubmitting ? <>Spilling...</> : <>Spill! 🍵</>}
+        </button>
+        {isSubmitting && CursorOverlay}
+      </fieldset>
     </form>
   );
 }
