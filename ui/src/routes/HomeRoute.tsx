@@ -44,7 +44,11 @@ function PostForm() {
           value={content}
           onChange={(event) => setContent(event.currentTarget.value)}
           placeholder="What's the tea sis?!"
-          className={clsx("resize-none", "w-full p-3", "bg-black/20")}
+          className={clsx(
+            "resize-none placeholder:text-white/50",
+            "w-full rounded p-3",
+            "bg-white/10",
+          )}
         ></textarea>
       </label>
 
