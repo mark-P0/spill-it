@@ -21,16 +21,13 @@ function PostForm() {
     event.preventDefault();
     setIsSubmitting(true);
 
-    // DELETEME
-    {
-      setToastAttrs({ content, level: "warn" });
-      setIsSubmitting(false);
-      return;
-    }
-
     const headerAuthResult = safe(() => buildHeaderAuthFromStorage());
     if (!headerAuthResult.success) {
       console.error(headerAuthResult.error);
+      setToastAttrs({
+        content: "😫 We spilt too much! Please try again.",
+        level: "warn",
+      });
       setIsSubmitting(false);
       return;
     }
@@ -42,10 +39,18 @@ function PostForm() {
     });
     if (!fetchResult.success) {
       console.error(fetchResult.error);
+      setToastAttrs({
+        content: "😫 We spilt too much! Please try again.",
+        level: "warn",
+      });
       setIsSubmitting(false);
       return;
     }
 
+    setToastAttrs({
+      content: "Spilt! 😋",
+      level: "info",
+    });
     setIsSubmitting(false);
     reset();
   }

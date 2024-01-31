@@ -1,5 +1,5 @@
 import { raise } from "@spill-it/utils/errors";
-import { PropsWithChildren, createContext, useContext } from "react";
+import { Key, PropsWithChildren, createContext, useContext } from "react";
 
 export function createNewContext<T>(useContextValue: () => T) {
   const NewContext = createContext<T | null>(null);
@@ -18,3 +18,6 @@ export function createNewContext<T>(useContextValue: () => T) {
 
   return [useNewContext, NewContextProvider] as const;
 }
+
+let key = 0;
+export const randomKey = (): Key => key++;
