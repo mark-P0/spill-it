@@ -22,8 +22,9 @@ export function Toast() {
         "absolute bottom-[5%]",
         "flex gap-4",
         "rounded px-4 py-2",
+        "shadow-lg shadow-black/50",
         level === "info" && "bg-fuchsia-500 text-white",
-        level === "warn" && "bg-yellow-500",
+        level === "warn" && "bg-yellow-500 text-black",
         "animate-toast",
       )}
     >
