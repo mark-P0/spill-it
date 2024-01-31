@@ -14,6 +14,7 @@
     "@spill-it/header-auth": "workspace:^",
     "@spill-it/utils": "workspace:^",
     "autoprefixer": "^10.4.16",
+    "clsx": "^2.1.0",
     "postcss": "^8.4.33",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

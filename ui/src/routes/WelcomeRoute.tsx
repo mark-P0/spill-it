@@ -1,5 +1,6 @@
 import { buildHeaderAuth } from "@spill-it/header-auth";
 import { raise } from "@spill-it/utils/errors";
+import clsx from "clsx";
 import {
   LoaderFunction,
   Route,
@@ -28,7 +29,10 @@ function GoogleLoginButtonLink() {
   const { link } = useTypedLoaderData<WelcomeRouteLoader>();
 
   return (
-    <a href={link} className="bg-white text-black px-3 py-2 rounded">
+    <a
+      href={link}
+      className={clsx("bg-white text-black", "rounded-full px-6 py-3")}
+    >
       Login with Google
     </a>
   );
@@ -36,7 +40,13 @@ function GoogleLoginButtonLink() {
 
 function WelcomeScreen() {
   return (
-    <main className="h-screen w-screen grid place-items-center bg-stone-700 text-white">
+    <main
+      className={clsx(
+        "h-screen w-screen",
+        "grid place-items-center",
+        "bg-stone-700 text-white",
+      )}
+    >
       <GoogleLoginButtonLink />
     </main>
   );
