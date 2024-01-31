@@ -39,6 +39,7 @@ function PostForm() {
   return (
     <form onSubmit={submit} className="grid gap-3">
       <label>
+        <span className="sr-only">Tea 🍵</span>
         <textarea
           value={content}
           onChange={(event) => setContent(event.currentTarget.value)}
