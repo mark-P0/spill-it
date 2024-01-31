@@ -2,11 +2,14 @@ import { safe } from "@spill-it/utils/safe";
 import clsx from "clsx";
 import { FormEvent, useState } from "react";
 import { Route, redirect } from "react-router-dom";
+import { ToastProviderWithComponent } from "../components/Toast";
+import { useToastContext } from "../contexts/toast";
 import { endpoint } from "../utils/endpoints";
 import { fetchAPI } from "../utils/fetch-api";
 import { buildHeaderAuthFromStorage, isLoggedIn } from "../utils/is-logged-in";
 
 function PostForm() {
+  const { setToastAttrs } = useToastContext();
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -14,10 +17,16 @@ function PostForm() {
     setContent("");
   }
 
-  // TODO Show a popup on error?
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSubmitting(true);
+
+    // DELETEME
+    {
+      setToastAttrs({ content, level: "warn" });
+      setIsSubmitting(false);
+      return;
+    }
 
     const headerAuthResult = safe(() => buildHeaderAuthFromStorage());
     if (!headerAuthResult.success) {
@@ -83,17 +92,18 @@ function PostForm() {
 
 export function HomeScreen() {
   return (
-    <main
-      className={clsx(
-        "min-h-screen",
-        "grid auto-rows-min gap-6 p-6",
-        "bg-fuchsia-950 text-white",
-      )}
-    >
-      <h1 className="text-3xl">Home</h1>
-
-      <PostForm />
-    </main>
+    <ToastProviderWithComponent>
+      <div
+        className={clsx(
+          "min-h-screen",
+          "grid auto-rows-min gap-6 p-6",
+          "bg-fuchsia-950 text-white",
+        )}
+      >
+        <h1 className="text-3xl">Home</h1>
+        <PostForm />
+      </div>
+    </ToastProviderWithComponent>
   );
 }
 
