@@ -2,10 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import {
   LoaderFunction,
-  Route,
+  RouteObject,
   RouterProvider,
   createBrowserRouter,
-  createRoutesFromElements,
   redirect,
 } from "react-router-dom";
 import { ErrorScreen, RootRoute } from "./App.tsx";
@@ -37,18 +36,15 @@ const loadError: LoaderFunction = () => {
   throw new Error("bruh");
 };
 
-/** https://reactrouter.com/en/main/utils/create-routes-from-elements */
-const routes = createRoutesFromElements(
-  <Route errorElement={<ErrorScreen />}>
-    {RootRoute()}
-    {WelcomeRoute()}
-    {LoginGoogleRedirectRoute()}
-    {HomeRoute()}
-    <Route path="/query" element={null} loader={loadSearchParamsFromUrl} />
-    <Route path="/sleep" element={null} loader={loadSleep} />
-    <Route path="/error" element={null} loader={loadError} />
-  </Route>,
-);
+const routes: RouteObject[] = [
+  {
+    errorElement: <ErrorScreen />,
+    children: [RootRoute, WelcomeRoute, LoginGoogleRedirectRoute, HomeRoute],
+  },
+  { path: "/query", element: null, loader: loadSearchParamsFromUrl },
+  { path: "/sleep", element: null, loader: loadSleep },
+  { path: "/error", element: null, loader: loadError },
+];
 
 /** https://reactrouter.com/en/main/start/tutorial#adding-a-router */
 const router = createBrowserRouter(routes);

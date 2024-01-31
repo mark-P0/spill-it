@@ -1,7 +1,7 @@
 import { safe } from "@spill-it/utils/safe";
 import clsx from "clsx";
 import { FormEvent, useState } from "react";
-import { Route, redirect } from "react-router-dom";
+import { RouteObject, redirect } from "react-router-dom";
 import { ToastProviderWithComponent } from "../components/Toast";
 import { useToastContext } from "../contexts/toast";
 import { endpoint } from "../utils/endpoints";
@@ -112,17 +112,15 @@ export function HomeScreen() {
   );
 }
 
-export const HomeRoute = () => (
-  <Route
-    path={endpoint("/home")}
-    loader={async () => {
-      const canShowHome = await isLoggedIn();
-      if (!canShowHome) {
-        return redirect(endpoint("/welcome"));
-      }
+export const HomeRoute: RouteObject = {
+  path: endpoint("/home"),
+  async loader() {
+    const canShowHome = await isLoggedIn();
+    if (!canShowHome) {
+      return redirect(endpoint("/welcome"));
+    }
 
-      return null;
-    }}
-    element={<HomeScreen />}
-  />
-);
+    return null;
+  },
+  element: <HomeScreen />,
+};
