@@ -18,7 +18,7 @@ export function Toast() {
       open
       onAnimationEnd={removeToastComponent}
       className={clsx(
-        "absolute bottom-[5%]",
+        "fixed bottom-[5%]",
         "flex gap-4",
         "rounded px-4 py-2",
         "shadow-lg shadow-black/50",
