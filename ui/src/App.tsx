@@ -1,7 +1,5 @@
 import clsx from "clsx";
-import { RouteObject, redirect, useRouteError } from "react-router-dom";
-import { endpoint } from "./utils/endpoints";
-import { isLoggedIn } from "./utils/is-logged-in";
+import { useRouteError } from "react-router-dom";
 
 export function ErrorScreen() {
   const error = useRouteError();
@@ -19,16 +17,3 @@ export function ErrorScreen() {
     </main>
   );
 }
-
-export const RootRoute: RouteObject = {
-  path: endpoint("/"),
-  async loader() {
-    const canShowHome = await isLoggedIn();
-    if (canShowHome) {
-      return redirect(endpoint("/home"));
-    }
-
-    return redirect(endpoint("/welcome"));
-  },
-  element: null,
-};

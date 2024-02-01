@@ -7,13 +7,14 @@ import {
   createBrowserRouter,
   redirect,
 } from "react-router-dom";
-import { ErrorScreen, RootRoute } from "./App.tsx";
+import { ErrorScreen } from "./App.tsx";
 import "./assets/tailwind.css";
 import { HomeRoute } from "./routes/HomeRoute.tsx";
 import {
   LoginGoogleRedirectRoute,
   WelcomeRoute,
 } from "./routes/WelcomeRoute.tsx";
+import { RootRoute } from "./routes/_root.tsx";
 
 async function sleep(seconds: number) {
   return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
