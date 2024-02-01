@@ -1,6 +1,7 @@
 import { safe } from "@spill-it/utils/safe";
 import clsx from "clsx";
 import { FormEvent, useState } from "react";
+import { Screen } from "../../components/Screen";
 import { ToastProviderWithComponent } from "../../components/Toast";
 import { useToastContext } from "../../contexts/toast";
 import { fetchAPI } from "../../utils/fetch-api";
@@ -96,16 +97,10 @@ function PostForm() {
 export function HomeScreen() {
   return (
     <ToastProviderWithComponent>
-      <div
-        className={clsx(
-          "min-h-screen",
-          "grid auto-rows-min gap-6 p-6",
-          "bg-fuchsia-950 text-white",
-        )}
-      >
+      <Screen className="grid auto-rows-min gap-6 p-6">
         <h1 className="text-3xl">Home</h1>
         <PostForm />
-      </div>
+      </Screen>
     </ToastProviderWithComponent>
   );
 }
