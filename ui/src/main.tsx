@@ -8,9 +8,9 @@ import {
   redirect,
 } from "react-router-dom";
 import "./assets/tailwind.css";
-import { HomeRoute } from "./routes/HomeRoute.tsx";
 import { AppRoute } from "./routes/_app.tsx";
 import { RootRoute } from "./routes/_root.tsx";
+import { HomeRoute } from "./routes/home.tsx";
 import { LoginGoogleRedirectRoute, WelcomeRoute } from "./routes/welcome.tsx";
 
 async function sleep(seconds: number) {
