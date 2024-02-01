@@ -4,13 +4,14 @@ import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";
 import { endpoint } from "../utils/endpoints";
 import { fetchAPI } from "../utils/fetch-api";
-import { WelcomeScreen } from "./welcome/WelcomeScreen";
-import { loadWelcomeRoute, redirectUri } from "./welcome/load-welcome-route";
+import { LoadWelcomeRoute } from "./welcome/WelcomeScreen";
+import { redirectUri } from "./welcome/load-welcome-route";
 
 export const WelcomeRoute: RouteObject = {
   path: endpoint("/welcome"),
-  loader: loadWelcomeRoute,
-  element: <WelcomeScreen />,
+  // loader: loadWelcomeRoute,
+  // element: <WelcomeScreen />,
+  element: <LoadWelcomeRoute />,
 };
 
 export const LoginGoogleRedirectRoute: RouteObject = {

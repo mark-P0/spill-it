@@ -15,7 +15,16 @@ import { env } from "./utils/env.ts";
 
 const routes: RouteObject[] = [
   AppRoute({
-    children: [RootRoute, WelcomeRoute, LoginGoogleRedirectRoute, HomeRoute],
+    children: [
+      RootRoute,
+      WelcomeRoute,
+      LoginGoogleRedirectRoute,
+      HomeRoute,
+      {
+        path: "/DELETEME",
+        element: <code>DELETEME</code>,
+      },
+    ],
   }),
   ...(env.DEV ? tryRoutes : []), // Only use try routes in dev
 ];

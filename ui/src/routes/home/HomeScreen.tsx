@@ -96,13 +96,7 @@ function PostForm() {
 export function HomeScreen() {
   return (
     <ToastProviderWithComponent>
-      <div
-        className={clsx(
-          "min-h-screen",
-          "grid auto-rows-min gap-6 p-6",
-          "bg-fuchsia-950 text-white",
-        )}
-      >
+      <div className="grid auto-rows-min gap-6 p-6">
         <h1 className="text-3xl">Home</h1>
         <PostForm />
       </div>
