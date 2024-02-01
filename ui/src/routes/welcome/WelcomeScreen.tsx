@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { Screen } from "../../components/Screen";
 import { useTypedLoaderData } from "../../utils/react";
 import { loadWelcomeRoute } from "./load-welcome-route";
 
@@ -17,14 +18,8 @@ function GoogleLoginButtonLink() {
 
 export function WelcomeScreen() {
   return (
-    <main
-      className={clsx(
-        "h-screen w-screen",
-        "grid place-items-center",
-        "bg-stone-700 text-white",
-      )}
-    >
+    <Screen className="grid place-items-center">
       <GoogleLoginButtonLink />
-    </main>
+    </Screen>
   );
 }
