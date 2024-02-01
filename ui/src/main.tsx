@@ -7,13 +7,11 @@ import {
   createBrowserRouter,
   redirect,
 } from "react-router-dom";
-import { ErrorScreen, RootRoute } from "./App.tsx";
 import "./assets/tailwind.css";
-import { HomeRoute } from "./routes/HomeRoute.tsx";
-import {
-  LoginGoogleRedirectRoute,
-  WelcomeRoute,
-} from "./routes/WelcomeRoute.tsx";
+import { AppRoute } from "./routes/_app.tsx";
+import { HomeRoute } from "./routes/home.tsx";
+import { RootRoute } from "./routes/root.tsx";
+import { LoginGoogleRedirectRoute, WelcomeRoute } from "./routes/welcome.tsx";
 
 async function sleep(seconds: number) {
   return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
@@ -37,10 +35,9 @@ const loadError: LoaderFunction = () => {
 };
 
 const routes: RouteObject[] = [
-  {
-    errorElement: <ErrorScreen />,
+  AppRoute({
     children: [RootRoute, WelcomeRoute, LoginGoogleRedirectRoute, HomeRoute],
-  },
+  }),
   { path: "/query", element: null, loader: loadSearchParamsFromUrl },
   { path: "/sleep", element: null, loader: loadSleep },
   { path: "/error", element: null, loader: loadError },
