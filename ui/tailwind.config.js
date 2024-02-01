@@ -1,3 +1,4 @@
+import { AnimatePalettePlugin } from "./src/assets/tailwind/animate-palette.plugin";
 import { AnimateToastPlugin } from "./src/assets/tailwind/animate-toast.plugin";
 
 /** @type {import('tailwindcss').Config} */
@@ -6,5 +7,5 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [AnimateToastPlugin],
+  plugins: [AnimateToastPlugin, AnimatePalettePlugin],
 };
