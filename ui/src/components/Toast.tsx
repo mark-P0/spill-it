@@ -1,6 +1,5 @@
 import clsx from "clsx";
-import { PropsWithChildren } from "react";
-import { ToastProvider, useToastContext } from "../contexts/toast";
+import { useToastContext } from "../contexts/toast";
 import { randomKey } from "../utils/react";
 
 export function Toast() {
@@ -40,16 +39,5 @@ export function Toast() {
         Close
       </button>
     </dialog>
-  );
-}
-
-export function ToastProviderWithComponent(props: PropsWithChildren) {
-  const { children } = props;
-
-  return (
-    <ToastProvider>
-      {children}
-      <Toast />
-    </ToastProvider>
   );
 }
