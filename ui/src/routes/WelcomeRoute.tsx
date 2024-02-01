@@ -1,27 +1,13 @@
 import { buildHeaderAuth } from "@spill-it/header-auth";
 import { raise } from "@spill-it/utils/errors";
 import clsx from "clsx";
-import {
-  LoaderFunction,
-  RouteObject,
-  redirect,
-  useLoaderData,
-} from "react-router-dom";
+import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";
 import { endpoint } from "../utils/endpoints";
 import { uiHost } from "../utils/env";
 import { fetchAPI } from "../utils/fetch-api";
 import { isLoggedIn } from "../utils/is-logged-in";
-
-/**
- * - https://stackoverflow.com/q/74877170
- * - https://github.com/remix-run/react-router/discussions/9792
- */
-type LoaderData<TLoader extends LoaderFunction> =
-  Awaited<ReturnType<TLoader>> extends Response | infer D ? D : never;
-function useTypedLoaderData<TLoader extends LoaderFunction>() {
-  return useLoaderData() as LoaderData<TLoader>;
-}
+import { useTypedLoaderData } from "../utils/react";
 
 const redirectUri = new URL(endpoint("/login/google/redirect"), uiHost).href;
 
