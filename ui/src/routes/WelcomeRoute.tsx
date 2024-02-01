@@ -4,15 +4,12 @@ import clsx from "clsx";
 import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";
 import { endpoint } from "../utils/endpoints";
-import { uiHost } from "../utils/env";
 import { fetchAPI } from "../utils/fetch-api";
-import { isLoggedIn } from "../utils/is-logged-in";
 import { useTypedLoaderData } from "../utils/react";
-
-const redirectUri = new URL(endpoint("/login/google/redirect"), uiHost).href;
+import { loadWelcomeRoute, redirectUri } from "./welcome/load-welcome-route";
 
 function GoogleLoginButtonLink() {
-  const { link } = useTypedLoaderData<WelcomeRouteLoader>();
+  const { link } = useTypedLoaderData<typeof loadWelcomeRoute>();
 
   return (
     <a
@@ -38,30 +35,6 @@ function WelcomeScreen() {
   );
 }
 
-type WelcomeRouteLoader = typeof loadWelcomeRoute;
-async function loadWelcomeRoute() {
-  /** Redirect if already logged in */
-  {
-    const canShowHome = await isLoggedIn();
-    if (canShowHome) {
-      return redirect(endpoint("/home"));
-    }
-  }
-
-  /** Fetch login link from API */
-  {
-    const result = await fetchAPI("/api/v0/links/google", "GET", {
-      query: { redirectUri },
-    });
-    const output = result.success
-      ? result.value
-      : raise("Failed fetching login link", result.error);
-
-    const link = output.link;
-
-    return { link };
-  }
-}
 export const WelcomeRoute: RouteObject = {
   path: endpoint("/welcome"),
   loader: loadWelcomeRoute,
