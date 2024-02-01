@@ -1,12 +1,10 @@
 import { safe } from "@spill-it/utils/safe";
 import clsx from "clsx";
 import { FormEvent, useState } from "react";
-import { Route, redirect } from "react-router-dom";
-import { ToastProviderWithComponent } from "../components/Toast";
-import { useToastContext } from "../contexts/toast";
-import { endpoint } from "../utils/endpoints";
-import { fetchAPI } from "../utils/fetch-api";
-import { buildHeaderAuthFromStorage, isLoggedIn } from "../utils/is-logged-in";
+import { ToastProviderWithComponent } from "../../components/Toast";
+import { useToastContext } from "../../contexts/toast";
+import { fetchAPI } from "../../utils/fetch-api";
+import { buildHeaderAuthFromStorage } from "../../utils/is-logged-in";
 
 function PostForm() {
   const { setToastAttrs } = useToastContext();
@@ -111,18 +109,3 @@ export function HomeScreen() {
     </ToastProviderWithComponent>
   );
 }
-
-export const HomeRoute = () => (
-  <Route
-    path={endpoint("/home")}
-    loader={async () => {
-      const canShowHome = await isLoggedIn();
-      if (!canShowHome) {
-        return redirect(endpoint("/welcome"));
-      }
-
-      return null;
-    }}
-    element={<HomeScreen />}
-  />
-);
