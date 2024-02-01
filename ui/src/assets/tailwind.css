@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.animate-palette {
+  animation: palette 8s ease-in-out infinite;
+  @apply bg-fuchsia-500; /* Same as start of the keyframe */
+}
+@keyframes palette {
+  from,
+  to {
+    @apply bg-fuchsia-500;
+  }
+  33% {
+    @apply bg-rose-500;
+  }
+  66% {
+    @apply bg-yellow-500;
+  }
+}
