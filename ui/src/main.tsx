@@ -9,12 +9,9 @@ import {
 } from "react-router-dom";
 import "./assets/tailwind.css";
 import { HomeRoute } from "./routes/HomeRoute.tsx";
-import {
-  LoginGoogleRedirectRoute,
-  WelcomeRoute,
-} from "./routes/WelcomeRoute.tsx";
 import { AppRoute } from "./routes/_app.tsx";
 import { RootRoute } from "./routes/_root.tsx";
+import { LoginGoogleRedirectRoute, WelcomeRoute } from "./routes/welcome.tsx";
 
 async function sleep(seconds: number) {
   return new Promise((resolve) => setTimeout(resolve, seconds * 1000));

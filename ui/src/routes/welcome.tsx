@@ -1,39 +1,11 @@
 import { buildHeaderAuth } from "@spill-it/header-auth";
 import { raise } from "@spill-it/utils/errors";
-import clsx from "clsx";
 import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";
 import { endpoint } from "../utils/endpoints";
 import { fetchAPI } from "../utils/fetch-api";
-import { useTypedLoaderData } from "../utils/react";
+import { WelcomeScreen } from "./welcome/WelcomeScreen";
 import { loadWelcomeRoute, redirectUri } from "./welcome/load-welcome-route";
-
-function GoogleLoginButtonLink() {
-  const { link } = useTypedLoaderData<typeof loadWelcomeRoute>();
-
-  return (
-    <a
-      href={link}
-      className={clsx("bg-white text-black", "rounded-full px-6 py-3")}
-    >
-      Login with Google
-    </a>
-  );
-}
-
-function WelcomeScreen() {
-  return (
-    <main
-      className={clsx(
-        "h-screen w-screen",
-        "grid place-items-center",
-        "bg-stone-700 text-white",
-      )}
-    >
-      <GoogleLoginButtonLink />
-    </main>
-  );
-}
 
 export const WelcomeRoute: RouteObject = {
   path: endpoint("/welcome"),
