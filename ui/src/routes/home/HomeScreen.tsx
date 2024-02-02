@@ -1,4 +1,4 @@
-import { Post } from "@spill-it/db/tables/posts";
+import { PostWithAuthor } from "@spill-it/db/tables/posts";
 import { safe } from "@spill-it/utils/safe";
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
@@ -10,7 +10,9 @@ import { buildHeaderAuthFromStorage } from "../../utils/is-logged-in";
 import { createNewContext } from "../../utils/react";
 
 const [useHomeContext, HomeProvider] = createNewContext(() => {
-  const [posts, setPosts] = useState<Post[] | "fetching" | "error">("fetching");
+  const [posts, setPosts] = useState<PostWithAuthor[] | "fetching" | "error">(
+    "fetching",
+  );
 
   async function refreshPosts() {
     const headerAuthResult = safe(() => buildHeaderAuthFromStorage());
@@ -131,7 +133,7 @@ function PostForm() {
   );
 }
 
-function formatPostDate(date: Post["timestamp"]): string {
+function formatPostDate(date: PostWithAuthor["timestamp"]): string {
   return formatDistanceToNow(date, {
     addSuffix: true,
     includeSeconds: true,

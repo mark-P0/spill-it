@@ -1,11 +1,13 @@
 import { raise } from "@spill-it/utils/errors";
 import { safeAsync } from "@spill-it/utils/safe";
 import { desc, eq } from "drizzle-orm";
+import { z } from "zod";
 import { db } from "../db";
-import { PostsTable } from "../schema";
+import { PostsTable, zodPostWithAuthor } from "../schema";
 
-export type Post = typeof PostsTable.$inferSelect;
 type PostDetails = typeof PostsTable.$inferInsert;
+export type Post = typeof PostsTable.$inferSelect;
+export type PostWithAuthor = z.infer<typeof zodPostWithAuthor>;
 
 export async function createPost(details: PostDetails): Promise<Post> {
   const result = await safeAsync(() =>
@@ -35,13 +37,15 @@ export async function readPost(id: Post["id"]): Promise<Post | null> {
   return post;
 }
 
-export async function readPostsOfUser(userId: Post["userId"]): Promise<Post[]> {
+export async function readPostsOfUser(
+  userId: PostWithAuthor["userId"],
+): Promise<PostWithAuthor[]> {
   const result = await safeAsync(() =>
-    db
-      .select()
-      .from(PostsTable)
-      .where(eq(PostsTable.userId, userId))
-      .orderBy(desc(PostsTable.timestamp)),
+    db.query.PostsTable.findMany({
+      where: eq(PostsTable.userId, userId),
+      orderBy: desc(PostsTable.timestamp),
+      with: { author: true },
+    }),
   );
   const posts = result.success
     ? result.value
