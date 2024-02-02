@@ -1,6 +1,6 @@
 import { raise } from "@spill-it/utils/errors";
 import { safeAsync } from "@spill-it/utils/safe";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { db } from "../db";
 import { PostsTable } from "../schema";
 
@@ -37,7 +37,11 @@ export async function readPost(id: Post["id"]): Promise<Post | null> {
 
 export async function readPostsOfUser(userId: Post["userId"]): Promise<Post[]> {
   const result = await safeAsync(() =>
-    db.select().from(PostsTable).where(eq(PostsTable.userId, userId)),
+    db
+      .select()
+      .from(PostsTable)
+      .where(eq(PostsTable.userId, userId))
+      .orderBy(desc(PostsTable.timestamp)),
   );
   const posts = result.success
     ? result.value

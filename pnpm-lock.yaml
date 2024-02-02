@@ -184,6 +184,9 @@ importers:
       clsx:
         specifier: ^2.1.0
         version: 2.1.0
+      date-fns:
+        specifier: ^3.2.0
+        version: 3.2.0
       postcss:
         specifier: ^8.4.33
         version: 8.4.33
@@ -203,6 +206,9 @@ importers:
         specifier: ^3.22.4
         version: 3.22.4
     devDependencies:
+      '@spill-it/db':
+        specifier: workspace:^
+        version: link:../shared/db
       '@types/react':
         specifier: ^18.2.43
         version: 18.2.48
