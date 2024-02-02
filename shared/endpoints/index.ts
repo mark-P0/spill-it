@@ -1,4 +1,9 @@
-import { zodPost, zodSample, zodUser } from "@spill-it/db/schema";
+import {
+  zodPost,
+  zodPostWithAuthor,
+  zodSample,
+  zodUser,
+} from "@spill-it/db/schema";
 import { z } from "zod";
 
 export const endpointMap = {
@@ -65,7 +70,7 @@ export const endpointMap = {
         }),
       }),
       output: z.object({
-        data: z.array(zodPost),
+        data: z.array(zodPostWithAuthor),
       }),
     },
   },

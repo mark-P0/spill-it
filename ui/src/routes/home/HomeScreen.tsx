@@ -1,13 +1,52 @@
+import { PostWithAuthor } from "@spill-it/db/tables/posts";
 import { safe } from "@spill-it/utils/safe";
 import clsx from "clsx";
-import { FormEvent, useState } from "react";
+import { formatDistanceToNow } from "date-fns";
+import { FormEvent, useEffect, useState } from "react";
 import { Screen } from "../../components/Screen";
 import { useToastContext } from "../../contexts/toast";
 import { fetchAPI } from "../../utils/fetch-api";
 import { buildHeaderAuthFromStorage } from "../../utils/is-logged-in";
+import { createNewContext } from "../../utils/react";
+
+const [useHomeContext, HomeProvider] = createNewContext(() => {
+  const [posts, setPosts] = useState<PostWithAuthor[] | "fetching" | "error">(
+    "fetching",
+  );
+
+  async function refreshPosts() {
+    const headerAuthResult = safe(() => buildHeaderAuthFromStorage());
+    if (!headerAuthResult.success) {
+      console.error(headerAuthResult.error);
+      setPosts("error");
+      return;
+    }
+    const headerAuth = headerAuthResult.value;
+
+    const fetchResult = await fetchAPI("/api/v0/posts", "GET", {
+      headers: { Authorization: headerAuth },
+    });
+    if (!fetchResult.success) {
+      console.error(fetchResult.error);
+      setPosts("error");
+      return;
+    }
+    const { data } = fetchResult.value;
+
+    setPosts(data);
+  }
+
+  useEffect(() => {
+    setPosts("fetching");
+    refreshPosts();
+  }, []);
+
+  return { posts, refreshPosts };
+});
 
 function PostForm() {
   const { setToastAttrs } = useToastContext();
+  const { refreshPosts } = useHomeContext();
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -45,6 +84,7 @@ function PostForm() {
       return;
     }
 
+    refreshPosts();
     setToastAttrs({
       content: "Spilt! 😋",
       level: "info",
@@ -93,11 +133,80 @@ function PostForm() {
   );
 }
 
+function formatPostDate(date: PostWithAuthor["timestamp"]): string {
+  return formatDistanceToNow(date, {
+    addSuffix: true,
+    includeSeconds: true,
+  });
+}
+function PostCard(props: { post: PostWithAuthor }) {
+  const { post } = props;
+  const { content, timestamp, author } = post;
+
+  return (
+    <article className="grid grid-cols-[auto_1fr_auto] gap-6 bg-white/10 p-6">
+      <div>
+        <img
+          src={author.portraitUrl}
+          alt={`Portrait of "${author.handleName}"`}
+          className="w-9 aspect-square rounded-full"
+        />
+      </div>
+      <div>
+        <div className="flex items-center gap-3">
+          {/* TODO Link to profile? */}
+          <h2 className="font-bold">{author.username}</h2>
+          <p className="text-xs uppercase tracking-wide opacity-50">
+            {formatPostDate(timestamp)}
+          </p>
+        </div>
+        <p>{content}</p>
+      </div>
+      <div>
+        {/* TODO Delete posts */}
+        <button disabled className="bg-yellow-500 disabled:opacity-50">
+          Delete
+        </button>
+      </div>
+    </article>
+  );
+}
+function PostsList() {
+  const { setToastAttrs } = useToastContext();
+  const { posts } = useHomeContext();
+
+  useEffect(() => {
+    if (posts !== "error") return;
+
+    // TODO Allow retrying from toast?
+    setToastAttrs({
+      content: "🥶 We spilt things along the way",
+      level: "warn",
+    });
+  }, [posts, setToastAttrs]);
+  if (posts === "error") return null; // The "output" is the toast above
+
+  if (posts === "fetching") return "fetching"; // TODO Use loading component?
+  return (
+    <ol className="grid gap-3">
+      {posts.map((post) => (
+        <li key={post.id}>
+          <PostCard post={post} />
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 export function HomeScreen() {
   return (
-    <Screen className="grid auto-rows-min gap-6 p-6">
-      <h1 className="text-3xl">Home</h1>
-      <PostForm />
-    </Screen>
+    <HomeProvider>
+      <Screen className="grid auto-rows-min gap-6 p-6">
+        <h1 className="text-3xl">Home</h1>
+        <PostForm />
+
+        <PostsList />
+      </Screen>
+    </HomeProvider>
   );
 }
