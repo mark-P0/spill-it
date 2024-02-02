@@ -3,6 +3,7 @@
  * - Dedicated schema files recommended for migrations to avoid runtime executions...
  */
 
+import { relations } from "drizzle-orm";
 import {
   integer,
   pgTable,
@@ -13,6 +14,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
 /** https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle */
 export const SamplesTable = pgTable("samples", {
@@ -54,3 +56,16 @@ export const PostsTable = pgTable("posts", {
   content: text("content").notNull(),
 });
 export const zodPost = createSelectSchema(PostsTable);
+
+export const PostsRelations = relations(PostsTable, ({ one }) => ({
+  author: one(UsersTable, {
+    fields: [PostsTable.userId],
+    references: [UsersTable.id],
+  }),
+}));
+export const zodPostWithAuthor = z.intersection(
+  zodPost,
+  z.object({
+    author: zodUser,
+  }),
+);

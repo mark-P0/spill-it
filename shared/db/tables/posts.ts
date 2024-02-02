@@ -35,13 +35,13 @@ export async function readPost(id: Post["id"]): Promise<Post | null> {
   return post;
 }
 
-export async function readPostsOfUser(userId: Post["userId"]): Promise<Post[]> {
+export async function readPostsOfUser(userId: Post["userId"]) {
   const result = await safeAsync(() =>
-    db
-      .select()
-      .from(PostsTable)
-      .where(eq(PostsTable.userId, userId))
-      .orderBy(desc(PostsTable.timestamp)),
+    db.query.PostsTable.findMany({
+      where: eq(PostsTable.userId, userId),
+      orderBy: desc(PostsTable.timestamp),
+      with: { author: true },
+    }),
   );
   const posts = result.success
     ? result.value
