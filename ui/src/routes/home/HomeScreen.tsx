@@ -139,6 +139,38 @@ function formatPostDate(date: PostWithAuthor["timestamp"]): string {
     includeSeconds: true,
   });
 }
+function PostCard(props: { post: PostWithAuthor }) {
+  const { post } = props;
+  const { content, timestamp, author } = post;
+
+  return (
+    <article className="grid grid-cols-[auto_1fr_auto] gap-6 bg-white/10 p-6">
+      <div>
+        <img
+          src={author.portraitUrl}
+          alt={`Portrait of "${author.handleName}"`}
+          className="w-9 aspect-square rounded-full"
+        />
+      </div>
+      <div>
+        <div className="flex items-center gap-3">
+          {/* TODO Link to profile? */}
+          <h2 className="font-bold">{author.username}</h2>
+          <p className="text-xs uppercase tracking-wide opacity-50">
+            {formatPostDate(timestamp)}
+          </p>
+        </div>
+        <p>{content}</p>
+      </div>
+      <div>
+        {/* TODO Delete posts */}
+        <button disabled className="bg-yellow-500 disabled:opacity-50">
+          Delete
+        </button>
+      </div>
+    </article>
+  );
+}
 function PostsList() {
   const { setToastAttrs } = useToastContext();
   const { posts } = useHomeContext();
@@ -156,13 +188,10 @@ function PostsList() {
 
   if (posts === "fetching") return "fetching"; // TODO Use loading component?
   return (
-    <ol>
+    <ol className="grid gap-3">
       {posts.map((post) => (
         <li key={post.id}>
-          {post.content}{" "}
-          <span className="text-xs uppercase tracking-wide opacity-50">
-            {formatPostDate(post.timestamp)}
-          </span>
+          <PostCard post={post} />
         </li>
       ))}
     </ol>
