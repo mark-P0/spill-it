@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { ComponentProps, useEffect, useState } from "react";
-import { ToastProvider } from "../../contexts/toast";
+import { ToastProvider } from "../../contexts/ToastContext";
 import {
   removeBodyClasses,
   restoreBodyClasses,

@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useToastContext } from "../../../contexts/toast";
+import { useToastContext } from "../../../contexts/ToastContext";
 import { randomKey } from "../../../utils/react";
 
 export function Toast() {

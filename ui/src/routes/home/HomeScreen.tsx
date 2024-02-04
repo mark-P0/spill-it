@@ -3,7 +3,7 @@ import { safe } from "@spill-it/utils/safe";
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
 import { FormEvent, useEffect, useState } from "react";
-import { useToastContext } from "../../contexts/toast";
+import { useToastContext } from "../../contexts/ToastContext";
 import { fetchAPI } from "../../utils/fetch-api";
 import { buildHeaderAuthFromStorage } from "../../utils/is-logged-in";
 import { Screen } from "../_app/Screen";
