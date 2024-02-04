@@ -1,6 +1,6 @@
 import { PostWithAuthor } from "@spill-it/db/tables/posts";
 import { safe } from "@spill-it/utils/safe";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { fetchAPI } from "../../utils/fetch-api";
 import { buildHeaderAuthFromStorage } from "../../utils/is-logged-in";
 import { createNewContext } from "../../utils/react";
@@ -10,7 +10,7 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
     "fetching",
   );
 
-  async function refreshPosts() {
+  const refreshPosts = useCallback(async () => {
     const headerAuthResult = safe(() => buildHeaderAuthFromStorage());
     if (!headerAuthResult.success) {
       console.error(headerAuthResult.error);
@@ -30,12 +30,12 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
     const { data } = fetchResult.value;
 
     setPosts(data);
-  }
+  }, []);
 
   useEffect(() => {
     setPosts("fetching");
     refreshPosts();
-  }, []);
+  }, [refreshPosts]);
 
   return { posts, refreshPosts };
 });
