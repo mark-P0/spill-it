@@ -21,9 +21,12 @@ export function Screen(props: ComponentProps<"div">) {
   const { children, className, ...attributes } = props;
   return (
     <ToastProvider>
+      {/** "Container" for hiding overflow of actual screen  */}
       <div className="overflow-clip">
+        {/** Actual screen */}
         <div
           {...attributes}
+          onTransitionEnd={() => setHasTransitioned(true)}
           className={clsx(
             "min-h-screen",
             "bg-fuchsia-950 text-white",
@@ -33,7 +36,6 @@ export function Screen(props: ComponentProps<"div">) {
             ],
             className,
           )}
-          onTransitionEnd={() => setHasTransitioned(true)}
         >
           {children}
         </div>
