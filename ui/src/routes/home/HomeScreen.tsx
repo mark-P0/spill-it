@@ -3,10 +3,10 @@ import { safe } from "@spill-it/utils/safe";
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
 import { FormEvent, useEffect, useState } from "react";
-import { Screen } from "../../components/Screen";
 import { useToastContext } from "../../contexts/toast";
 import { fetchAPI } from "../../utils/fetch-api";
 import { buildHeaderAuthFromStorage } from "../../utils/is-logged-in";
+import { Screen } from "../_app/Screen";
 import { HomeProvider, useHomeContext } from "./HomeContext";
 
 function PostForm() {
