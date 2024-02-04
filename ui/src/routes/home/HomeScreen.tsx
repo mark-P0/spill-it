@@ -120,7 +120,7 @@ function PostCard(props: { post: PostWithAuthor }) {
       <div>
         <div className="flex items-center gap-3">
           {/* TODO Link to profile? */}
-          <h2 className="font-bold">{author.username}</h2>
+          <h3 className="font-bold">{author.username}</h3>
           <p className="text-xs uppercase tracking-wide opacity-50">
             {formatPostDate(timestamp)}
           </p>
@@ -170,7 +170,11 @@ export function HomeScreen() {
         <h1 className="text-3xl">Home</h1>
         <PostForm />
 
-        <PostsList />
+        <main>
+          <h2 className="sr-only">Spills 🍵</h2>
+
+          <PostsList />
+        </main>
       </Screen>
     </HomeProvider>
   );
