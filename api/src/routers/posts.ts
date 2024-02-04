@@ -75,11 +75,17 @@ export const PostsRouter = Router();
     }
 
     logger.info("Sending post info...");
-    const output: Output = {
-      data: post,
-    };
-    const rawOutput = jsonPack(output);
-    res.send(rawOutput);
+    const result = safe(() => {
+      const output: Output = {
+        data: post,
+      };
+      const rawOutput = jsonPack(output);
+      return res.send(rawOutput);
+    });
+    if (!result.success) {
+      logger.error(formatError(result.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
   });
 }
 
@@ -115,11 +121,17 @@ export const PostsRouter = Router();
     const posts = postsResult.value;
 
     logger.info("Sending user posts...");
-    const output: Output = {
-      data: posts,
-    };
-    const rawOutput = jsonPack(output);
-    res.send(rawOutput);
+    const result = safe(() => {
+      const output: Output = {
+        data: posts,
+      };
+      const rawOutput = jsonPack(output);
+      return res.send(rawOutput);
+    });
+    if (!result.success) {
+      logger.error(formatError(result.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
   });
 }
 
@@ -171,11 +183,17 @@ export const PostsRouter = Router();
     const link = linkResult.value;
 
     logger.info("Sending post info...");
-    const output: Output = {
-      data: post,
-      links: { self: link },
-    };
-    const rawOutput = jsonPack(output);
-    res.send(rawOutput);
+    const result = safe(() => {
+      const output: Output = {
+        data: post,
+        links: { self: link },
+      };
+      const rawOutput = jsonPack(output);
+      return res.send(rawOutput);
+    });
+    if (!result.success) {
+      logger.error(formatError(result.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
   });
 }

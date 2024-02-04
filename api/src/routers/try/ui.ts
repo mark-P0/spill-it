@@ -24,19 +24,25 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
 
   TryRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Building auth URL...");
-    const result = await safeAsync(() => buildAuthUrl(redirectUri));
-    if (!result.success) {
-      logger.error(formatError(result.error));
+    const authUrlResult = await safeAsync(() => buildAuthUrl(redirectUri));
+    if (!authUrlResult.success) {
+      logger.error(formatError(authUrlResult.error));
       return res.sendStatus(StatusCodes.BAD_GATEWAY);
     }
-    const url = result.value;
+    const authUrl = authUrlResult.value;
 
     logger.info("Sending login link...");
-    const output: Output = {
-      redirect: url,
-    };
-    const rawOutput = jsonPack(output);
-    res.send(rawOutput);
+    const result = safe(() => {
+      const output: Output = {
+        redirect: authUrl,
+      };
+      const rawOutput = jsonPack(output);
+      return res.send(rawOutput);
+    });
+    if (!result.success) {
+      logger.error(formatError(result.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
   });
 }
 
@@ -67,13 +73,19 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
     const headerAuth = resultHeaderAuth.value;
 
     logger.info("Sending app Google auth...");
-    const output: Output = {
-      data: { code, redirectUri },
-      headers: {
-        Authorization: headerAuth,
-      },
-    };
-    const rawOutput = jsonPack(output);
-    res.send(rawOutput);
+    const result = safe(() => {
+      const output: Output = {
+        data: { code, redirectUri },
+        headers: {
+          Authorization: headerAuth,
+        },
+      };
+      const rawOutput = jsonPack(output);
+      return res.send(rawOutput);
+    });
+    if (!result.success) {
+      logger.error(formatError(result.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
   });
 }

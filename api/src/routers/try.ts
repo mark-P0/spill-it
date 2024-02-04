@@ -2,7 +2,7 @@ import { getAllSamples } from "@spill-it/db/tables/samples";
 import { endpoint, endpointDetails } from "@spill-it/endpoints";
 import { formatError, raise } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
-import { safeAsync } from "@spill-it/utils/safe";
+import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
@@ -29,11 +29,17 @@ export const TryRouter = Router();
 
     logger.info("Sending response...");
     const { who = "world" } = input.query;
-    const output: Output = {
-      hello: `${who}!`,
-    };
-    const rawOutput = jsonPack(output);
-    res.send(rawOutput);
+    const result = safe(() => {
+      const output: Output = {
+        hello: `${who}!`,
+      };
+      const rawOutput = jsonPack(output);
+      return res.send(rawOutput);
+    });
+    if (!result.success) {
+      logger.error(formatError(result.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
   });
 }
 
@@ -53,11 +59,17 @@ export const TryRouter = Router();
     const samples = resultSamples.value;
 
     logger.info("Sending samples...");
-    const output: Output = {
-      data: samples,
-    };
-    const rawOutput = jsonPack(output);
-    res.send(rawOutput);
+    const result = safe(() => {
+      const output: Output = {
+        data: samples,
+      };
+      const rawOutput = jsonPack(output);
+      return res.send(rawOutput);
+    });
+    if (!result.success) {
+      logger.error(formatError(result.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
   });
 }
 
