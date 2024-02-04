@@ -24,6 +24,7 @@ export function Screen(props: ComponentProps<"div">) {
       <div className="overflow-clip">
         <div
           {...attributes}
+          onTransitionEnd={() => setHasTransitioned(true)}
           className={clsx(
             "min-h-screen",
             "bg-fuchsia-950 text-white",
@@ -33,7 +34,6 @@ export function Screen(props: ComponentProps<"div">) {
             ],
             className,
           )}
-          onTransitionEnd={() => setHasTransitioned(true)}
         >
           {children}
         </div>
