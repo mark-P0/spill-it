@@ -1,8 +1,11 @@
 import clsx from "clsx";
 import { ComponentProps, useEffect, useState } from "react";
-import { ToastProvider } from "../contexts/toast";
-import { removeBodyClasses, restoreBodyClasses } from "../utils/body-classes";
-import { Toast } from "./Toast";
+import {
+  removeBodyClasses,
+  restoreBodyClasses,
+} from "../../utils/body-classes";
+import { Toast } from "./toast/Toast";
+import { ToastProvider } from "./toast/ToastContext";
 
 export function Screen(props: ComponentProps<"div">) {
   const [isRendered, setIsRendered] = useState(false);

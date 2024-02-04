@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import { Screen } from "../../components/Screen";
 import { useTypedLoaderData } from "../../utils/react";
+import { Screen } from "../_app/Screen";
 import { loadWelcomeRoute } from "./load-welcome-route";
 
 function GoogleLoginButtonLink() {

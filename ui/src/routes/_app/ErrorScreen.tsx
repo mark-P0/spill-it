@@ -1,5 +1,5 @@
 import { useRouteError } from "react-router-dom";
-import { Screen } from "../../components/Screen";
+import { Screen } from "./Screen";
 
 export function ErrorScreen() {
   const error = useRouteError();
