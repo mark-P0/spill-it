@@ -3,6 +3,7 @@ import { safe } from "@spill-it/utils/safe";
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
 import { FormEvent, useEffect, useState } from "react";
+import { BsTrashFill } from "react-icons/bs";
 import { fetchAPI } from "../../utils/fetch-api";
 import { buildHeaderAuthFromStorage } from "../../utils/is-logged-in";
 import { Screen } from "../_app/Screen";
@@ -251,8 +252,11 @@ function PostCard(props: { post: PostWithAuthor }) {
         <p>{content}</p>
       </div>
       <div>
-        <button onClick={promptDelete} className="bg-yellow-500">
-          Delete
+        <button
+          onClick={promptDelete}
+          className="rounded-full p-1 transition hover:bg-white/25 active:scale-90"
+        >
+          <BsTrashFill />
         </button>
       </div>
     </article>
