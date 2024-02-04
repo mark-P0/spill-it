@@ -9,9 +9,9 @@
 import { ensureError } from "./errors";
 
 // type Result<T> = [T, null] | [null, Error]; // Monadic-ish?
-export type Result<T> =
+export type Result<T, TError extends Error = Error> =
   | { success: true; value: T }
-  | { success: false; error: Error }; // Same format as Zod...? Or is it from another source?
+  | { success: false; error: TError }; // Same format as Zod...? Or is it from another source?
 
 /**
  * try-catch wrapper

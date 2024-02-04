@@ -17,6 +17,7 @@ import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
+import { convertHeaderAuthToUser } from "../middlewares/header-auth-user";
 import { endpointWithParam, parseInputFromRequest } from "../utils/endpoints";
 import { apiHost } from "../utils/env";
 import { localizeLogger } from "../utils/logger";
@@ -39,48 +40,13 @@ export const PostsRouter = Router();
     }
     const input = inputParsing.value;
 
+    logger.info("Converting header authorization to user info...");
     const { headers } = input;
-    const headerAuthResult = safe(() =>
-      parseHeaderAuth("SPILLITSESS", headers.Authorization),
-    );
-    if (!headerAuthResult.success) {
-      logger.error(formatError(headerAuthResult.error));
-      return res.sendStatus(StatusCodes.BAD_REQUEST);
-    }
-    const headerAuth = headerAuthResult.value;
-
-    logger.info("Fetching session info...");
-    const { id } = headerAuth.params;
-    const sessionResult = await safeAsync(() => readSessionFromUUID(id));
-    if (!sessionResult.success) {
-      logger.error(formatError(sessionResult.error));
-      return res.sendStatus(StatusCodes.BAD_GATEWAY);
-    }
-    const session = sessionResult.value;
-
-    logger.info("Verifying session...");
-    if (session === null) {
-      logger.error("Session does not exist");
-      return res.sendStatus(StatusCodes.UNAUTHORIZED);
-    }
-    if (isSessionExpired(session)) {
-      logger.error("Session is expired");
-      return res.sendStatus(StatusCodes.UNAUTHORIZED);
-    }
-
-    logger.info("Fetching user info...");
-    const userResult = await safeAsync(() => readUser(session.userId));
+    const userResult = await convertHeaderAuthToUser(headers.Authorization);
     if (!userResult.success) {
-      logger.error(formatError(userResult.error));
-      return res.sendStatus(StatusCodes.BAD_GATEWAY);
+      return res.sendStatus(userResult.error.statusCode);
     }
     const user = userResult.value;
-
-    logger.info("Verifying user info...");
-    if (user === null) {
-      logger.error("User of given session does not exist...?");
-      return res.sendStatus(StatusCodes.UNAUTHORIZED);
-    }
 
     logger.info("Parsing URL params...");
     const paramsParsing = z
@@ -139,48 +105,13 @@ export const PostsRouter = Router();
     }
     const input = inputParsing.value;
 
+    logger.info("Converting header authorization to user info...");
     const { headers } = input;
-    const headerAuthResult = safe(() =>
-      parseHeaderAuth("SPILLITSESS", headers.Authorization),
-    );
-    if (!headerAuthResult.success) {
-      logger.error(formatError(headerAuthResult.error));
-      return res.sendStatus(StatusCodes.BAD_REQUEST);
-    }
-    const headerAuth = headerAuthResult.value;
-
-    logger.info("Fetching session info...");
-    const { id } = headerAuth.params;
-    const sessionResult = await safeAsync(() => readSessionFromUUID(id));
-    if (!sessionResult.success) {
-      logger.error(formatError(sessionResult.error));
-      return res.sendStatus(StatusCodes.BAD_GATEWAY);
-    }
-    const session = sessionResult.value;
-
-    logger.info("Verifying session...");
-    if (session === null) {
-      logger.error("Session does not exist");
-      return res.sendStatus(StatusCodes.UNAUTHORIZED);
-    }
-    if (isSessionExpired(session)) {
-      logger.error("Session is expired");
-      return res.sendStatus(StatusCodes.UNAUTHORIZED);
-    }
-
-    logger.info("Fetching user info...");
-    const userResult = await safeAsync(() => readUser(session.userId));
+    const userResult = await convertHeaderAuthToUser(headers.Authorization);
     if (!userResult.success) {
-      logger.error(formatError(userResult.error));
-      return res.sendStatus(StatusCodes.BAD_GATEWAY);
+      return res.sendStatus(userResult.error.statusCode);
     }
     const user = userResult.value;
-
-    logger.info("Verifying user info...");
-    if (user === null) {
-      logger.error("User of given session does not exist...?");
-      return res.sendStatus(StatusCodes.UNAUTHORIZED);
-    }
 
     logger.info("Fetching user posts...");
     const postsResult = await safeAsync(() => readPostsOfUser(user.id));
@@ -214,48 +145,13 @@ export const PostsRouter = Router();
     }
     const input = inputParsing.value;
 
+    logger.info("Converting header authorization to user info...");
     const { headers } = input;
-    const headerAuthResult = safe(() =>
-      parseHeaderAuth("SPILLITSESS", headers.Authorization),
-    );
-    if (!headerAuthResult.success) {
-      logger.error(formatError(headerAuthResult.error));
-      return res.sendStatus(StatusCodes.BAD_REQUEST);
-    }
-    const headerAuth = headerAuthResult.value;
-
-    logger.info("Fetching session info...");
-    const { id } = headerAuth.params;
-    const sessionResult = await safeAsync(() => readSessionFromUUID(id));
-    if (!sessionResult.success) {
-      logger.error(formatError(sessionResult.error));
-      return res.sendStatus(StatusCodes.BAD_GATEWAY);
-    }
-    const session = sessionResult.value;
-
-    logger.info("Verifying session...");
-    if (session === null) {
-      logger.error("Session does not exist");
-      return res.sendStatus(StatusCodes.UNAUTHORIZED);
-    }
-    if (isSessionExpired(session)) {
-      logger.error("Session is expired");
-      return res.sendStatus(StatusCodes.UNAUTHORIZED);
-    }
-
-    logger.info("Fetching user info...");
-    const userResult = await safeAsync(() => readUser(session.userId));
+    const userResult = await convertHeaderAuthToUser(headers.Authorization);
     if (!userResult.success) {
-      logger.error(formatError(userResult.error));
-      return res.sendStatus(StatusCodes.BAD_GATEWAY);
+      return res.sendStatus(userResult.error.statusCode);
     }
     const user = userResult.value;
-
-    logger.info("Verifying user info...");
-    if (user === null) {
-      logger.error("User of given session does not exist...?");
-      return res.sendStatus(StatusCodes.UNAUTHORIZED);
-    }
 
     logger.info("Creating post...");
     const userId = user.id;
@@ -306,48 +202,13 @@ export const PostsRouter = Router();
     }
     const input = inputParsing.value;
 
+    logger.info("Converting header authorization to user info...");
     const { headers } = input;
-    const headerAuthResult = safe(() =>
-      parseHeaderAuth("SPILLITSESS", headers.Authorization),
-    );
-    if (!headerAuthResult.success) {
-      logger.error(formatError(headerAuthResult.error));
-      return res.sendStatus(StatusCodes.BAD_REQUEST);
-    }
-    const headerAuth = headerAuthResult.value;
-
-    logger.info("Fetching session info...");
-    const { id } = headerAuth.params;
-    const sessionResult = await safeAsync(() => readSessionFromUUID(id));
-    if (!sessionResult.success) {
-      logger.error(formatError(sessionResult.error));
-      return res.sendStatus(StatusCodes.BAD_GATEWAY);
-    }
-    const session = sessionResult.value;
-
-    logger.info("Verifying session...");
-    if (session === null) {
-      logger.error("Session does not exist");
-      return res.sendStatus(StatusCodes.UNAUTHORIZED);
-    }
-    if (isSessionExpired(session)) {
-      logger.error("Session is expired");
-      return res.sendStatus(StatusCodes.UNAUTHORIZED);
-    }
-
-    logger.info("Fetching user info...");
-    const userResult = await safeAsync(() => readUser(session.userId));
+    const userResult = await convertHeaderAuthToUser(headers.Authorization);
     if (!userResult.success) {
-      logger.error(formatError(userResult.error));
-      return res.sendStatus(StatusCodes.BAD_GATEWAY);
+      return res.sendStatus(userResult.error.statusCode);
     }
     const user = userResult.value;
-
-    logger.info("Verifying user info...");
-    if (user === null) {
-      logger.error("User of given session does not exist...?");
-      return res.sendStatus(StatusCodes.UNAUTHORIZED);
-    }
 
     logger.info("Fetching post...");
     const { query } = input;
