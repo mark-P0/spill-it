@@ -73,6 +73,17 @@ export const endpointMap = {
         data: z.array(zodPostWithAuthor),
       }),
     },
+    DELETE: {
+      input: z.object({
+        headers: z.object({
+          Authorization: z.string(),
+        }),
+        query: z.object({
+          id: z.coerce.number(),
+        }),
+      }),
+      output: z.object({}),
+    },
   },
   "/api/v0/posts/:postId": {
     GET: {

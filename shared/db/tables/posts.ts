@@ -53,3 +53,10 @@ export async function readPostsOfUser(
 
   return posts;
 }
+
+export async function deletePost(id: Post["id"]) {
+  const result = await safeAsync(() =>
+    db.delete(PostsTable).where(eq(PostsTable.id, id)),
+  );
+  if (!result.success) raise("Failed deleting post", result.error);
+}
