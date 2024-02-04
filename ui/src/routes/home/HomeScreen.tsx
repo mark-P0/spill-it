@@ -6,6 +6,8 @@ import { FormEvent, useEffect, useState } from "react";
 import { fetchAPI } from "../../utils/fetch-api";
 import { buildHeaderAuthFromStorage } from "../../utils/is-logged-in";
 import { Screen } from "../_app/Screen";
+import { ModalContent } from "../_app/modal/Modal";
+import { useModalContext } from "../_app/modal/ModalContext";
 import { useToastContext } from "../_app/toast/ToastContext";
 import { HomeProvider, useHomeContext } from "./HomeContext";
 
@@ -58,13 +60,6 @@ function PostForm() {
     reset();
   }
 
-  /**
-   * More reliable for showing a cursor over the whole form
-   * as the interactive elements override it with their respective styles
-   */
-  const CursorOverlay = (
-    <div className="absolute w-full h-full cursor-wait"></div>
-  );
   return (
     <form onSubmit={submit}>
       <fieldset disabled={isSubmitting} className="relative grid gap-3">
@@ -92,9 +87,131 @@ function PostForm() {
         >
           {isSubmitting ? <>Spilling...</> : <>Spill! 🍵</>}
         </button>
-        {isSubmitting && CursorOverlay}
+
+        {/**
+         * More reliable for showing a cursor over the whole form
+         * as the interactive elements override it with their respective styles
+         */}
+        {isSubmitting && (
+          <div className="absolute w-full h-full cursor-wait"></div>
+        )}
       </fieldset>
     </form>
+  );
+}
+
+function DeletePostModalContent() {
+  const { setToastAttrs } = useToastContext();
+  const { closeModal, makeModalCancellable } = useModalContext();
+  const { postToDelete, setPostToDelete, refreshPosts } = useHomeContext();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  function finalizeDeleting() {
+    setIsDeleting(false);
+    makeModalCancellable(true);
+    setPostToDelete(null);
+    closeModal();
+  }
+
+  async function deletePost() {
+    if (isDeleting) {
+      console.warn("Cannot delete if already deleting...");
+      return;
+    }
+    setIsDeleting(true);
+    makeModalCancellable(false);
+
+    if (postToDelete === null) {
+      console.error("Post to delete does not exist...?");
+      setToastAttrs({
+        content: "😫 We spilt too much! Please try again.",
+        level: "warn",
+      });
+      finalizeDeleting();
+      return;
+    }
+
+    const headerAuthResult = safe(() => buildHeaderAuthFromStorage());
+    if (!headerAuthResult.success) {
+      console.error(headerAuthResult.error);
+      setToastAttrs({
+        content: "😫 We spilt too much! Please try again.",
+        level: "warn",
+      });
+      finalizeDeleting();
+      return;
+    }
+    const headerAuth = headerAuthResult.value;
+
+    const fetchResult = await fetchAPI("/api/v0/posts", "DELETE", {
+      headers: { Authorization: headerAuth },
+      query: {
+        id: postToDelete.id,
+      },
+    });
+    if (!fetchResult.success) {
+      console.error(fetchResult.error);
+      setToastAttrs({
+        content: "😫 We spilt too much! Please try again.",
+        level: "warn",
+      });
+      finalizeDeleting();
+      return;
+    }
+
+    setToastAttrs({
+      content: "Spill cleaned up 😔",
+      level: "info",
+    });
+    finalizeDeleting();
+    refreshPosts();
+  }
+
+  return (
+    <ModalContent>
+      <h4 className="text-xl font-bold tracking-wide">
+        Are you sure you want to delete this post?
+      </h4>
+      <p>This cannot be undone!</p>
+
+      <form>
+        <fieldset disabled={isDeleting} className="relative grid gap-3 mt-6">
+          <button
+            type="button"
+            onClick={deletePost}
+            className={clsx(
+              "rounded-full px-6 py-3",
+              "disabled:opacity-50",
+              "font-bold tracking-wide",
+              ...[
+                "transition",
+                "bg-rose-500 hover:bg-red-700",
+                "active:scale-95",
+              ],
+            )}
+          >
+            Delete 🗑
+          </button>
+          <button
+            type="button"
+            onClick={closeModal}
+            className={clsx(
+              "rounded-full px-6 py-3",
+              "disabled:opacity-50",
+              "outline outline-1 outline-white/50",
+              // "font-bold tracking-wide",
+              ...["transition", "hover:bg-white/10", "active:scale-95"],
+            )}
+          >
+            Cancel 🙅‍♀️
+          </button>
+
+          {isDeleting && (
+            <div className="absolute top-0 left-0 h-full w-full cursor-wait"></div>
+          )}
+        </fieldset>
+      </form>
+    </ModalContent>
   );
 }
 
@@ -105,8 +222,15 @@ function formatPostDate(date: PostWithAuthor["timestamp"]): string {
   });
 }
 function PostCard(props: { post: PostWithAuthor }) {
+  const { showOnModal } = useModalContext();
+  const { setPostToDelete } = useHomeContext();
   const { post } = props;
   const { content, timestamp, author } = post;
+
+  function promptDelete() {
+    setPostToDelete(post);
+    showOnModal(<DeletePostModalContent />);
+  }
 
   return (
     <article className="grid grid-cols-[auto_1fr_auto] gap-6 bg-white/10 p-6">
@@ -128,8 +252,11 @@ function PostCard(props: { post: PostWithAuthor }) {
         <p>{content}</p>
       </div>
       <div>
-        {/* TODO Delete posts */}
-        <button disabled className="bg-yellow-500 disabled:opacity-50">
+        {/* {(() => {
+          console.warn("Customize delete button"); // TODO
+          return null;
+        })()} */}
+        <button onClick={promptDelete} className="bg-yellow-500">
           Delete
         </button>
       </div>
