@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import { useToastContext } from "../../../contexts/ToastContext";
 import { randomKey } from "../../../utils/react";
+import { useToastContext } from "./ToastContext";
 
 export function Toast() {
   const { toastAttrs, setToastAttrs } = useToastContext();
