@@ -8,6 +8,8 @@ import { useToastContext } from "../../contexts/toast";
 import { fetchAPI } from "../../utils/fetch-api";
 import { buildHeaderAuthFromStorage } from "../../utils/is-logged-in";
 import { createNewContext } from "../../utils/react";
+import { ModalContent } from "../_app/modal/Modal";
+import { useModalContext } from "../_app/modal/ModalContext";
 
 const [useHomeContext, HomeProvider] = createNewContext(() => {
   const [posts, setPosts] = useState<PostWithAuthor[] | "fetching" | "error">(
@@ -37,11 +39,36 @@ const [useHomeContext, HomeProvider] = createNewContext(() => {
   }
 
   useEffect(() => {
+    setPosts([
+      {
+        id: 51,
+        userId: 2,
+        timestamp: new Date("2024-02-02T03:12:19.757Z"),
+        content: "One more time for good measure",
+        author: {
+          id: 2,
+          username: "graham-cake",
+          handleName: "Graham Cake",
+          portraitUrl:
+            "https://lh3.googleusercontent.com/a/ACg8ocJC7kxJ4WAxMeyWC0cGfFdofYS20cxiIvH1eCw52V_8=s96-c",
+          googleId: "101461882238569466390",
+          loginCt: 0,
+        },
+      },
+    ]);
+    return;
+
     setPosts("fetching");
     refreshPosts();
   }, []);
 
   return { posts, refreshPosts };
+});
+
+const [useDeletePostContext, DeletePostProvider] = createNewContext(() => {
+  const [postToDelete, setPostToDelete] = useState<PostWithAuthor | null>(null);
+
+  return { postToDelete, setPostToDelete };
 });
 
 function PostForm() {
@@ -133,6 +160,55 @@ function PostForm() {
   );
 }
 
+function DeletePostModalContent() {
+  const { closeModal } = useModalContext();
+  const { postToDelete } = useDeletePostContext();
+
+  // TODO Trigger DELETE on API
+  function deletePost() {
+    console.warn("Actually delete post");
+
+    closeModal();
+  }
+
+  return (
+    <ModalContent>
+      <h4 className="text-xl font-bold tracking-wide">
+        Are you sure you want to delete this post?
+      </h4>
+      <p>This cannot be undone!</p>
+
+      <div className="grid gap-3 mt-6">
+        <button
+          onClick={deletePost}
+          className={clsx(
+            "rounded-full px-6 py-3",
+            "font-bold tracking-wide",
+            ...[
+              "transition",
+              "bg-rose-500 hover:bg-red-700",
+              "active:scale-95",
+            ],
+          )}
+        >
+          Delete 🗑
+        </button>
+        <button
+          onClick={closeModal}
+          className={clsx(
+            "rounded-full px-6 py-3",
+            "outline outline-1 outline-white/50",
+            // "font-bold tracking-wide",
+            ...["transition", "hover:bg-white/10", "active:scale-95"],
+          )}
+        >
+          Cancel 🙅‍♀️
+        </button>
+      </div>
+    </ModalContent>
+  );
+}
+
 function formatPostDate(date: PostWithAuthor["timestamp"]): string {
   return formatDistanceToNow(date, {
     addSuffix: true,
@@ -140,8 +216,20 @@ function formatPostDate(date: PostWithAuthor["timestamp"]): string {
   });
 }
 function PostCard(props: { post: PostWithAuthor }) {
+  const { showOnModal } = useModalContext();
+  const { setPostToDelete } = useDeletePostContext();
   const { post } = props;
   const { content, timestamp, author } = post;
+
+  function promptDelete() {
+    setPostToDelete(post);
+    showOnModal(<DeletePostModalContent />);
+  }
+
+  // DELETEME
+  useEffect(() => {
+    promptDelete();
+  }, []);
 
   return (
     <article className="grid grid-cols-[auto_1fr_auto] gap-6 bg-white/10 p-6">
@@ -163,8 +251,11 @@ function PostCard(props: { post: PostWithAuthor }) {
         <p>{content}</p>
       </div>
       <div>
-        {/* TODO Delete posts */}
-        <button disabled className="bg-yellow-500 disabled:opacity-50">
+        {(() => {
+          console.warn("Customize delete button"); // TODO
+          return null;
+        })()}
+        <button onClick={promptDelete} className="bg-yellow-500">
           Delete
         </button>
       </div>
@@ -201,12 +292,13 @@ function PostsList() {
 export function HomeScreen() {
   return (
     <HomeProvider>
-      <Screen className="grid auto-rows-min gap-6 p-6">
-        <h1 className="text-3xl">Home</h1>
-        <PostForm />
-
-        <PostsList />
-      </Screen>
+      <DeletePostProvider>
+        <Screen className="grid auto-rows-min gap-6 p-6">
+          <h1 className="text-3xl">Home</h1>
+          <PostForm />
+          <PostsList />
+        </Screen>
+      </DeletePostProvider>
     </HomeProvider>
   );
 }

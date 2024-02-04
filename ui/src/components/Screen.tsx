@@ -1,6 +1,8 @@
 import clsx from "clsx";
 import { ComponentProps, useEffect, useState } from "react";
 import { ToastProvider } from "../contexts/toast";
+import { Modal } from "../routes/_app/modal/Modal";
+import { ModalProvider } from "../routes/_app/modal/ModalContext";
 import { removeBodyClasses, restoreBodyClasses } from "../utils/body-classes";
 import { Toast } from "./Toast";
 
@@ -20,26 +22,32 @@ export function Screen(props: ComponentProps<"div">) {
 
   const { children, className, ...attributes } = props;
   return (
-    <ToastProvider>
-      <div className="overflow-clip">
-        <div
-          {...attributes}
-          className={clsx(
-            "min-h-screen",
-            "bg-fuchsia-950 text-white",
-            ...[
-              "transition duration-700",
-              !isRendered && "opacity-0 scale-105",
-            ],
-            className,
-          )}
-          onTransitionEnd={() => setHasTransitioned(true)}
-        >
-          {children}
+    <ModalProvider>
+      <ToastProvider>
+        {/** "Container" for hiding overflow of actual screen  */}
+        <div className="overflow-clip">
+          {/** Actual screen */}
+          <div
+            {...attributes}
+            onTransitionEnd={() => setHasTransitioned(true)}
+            className={clsx(
+              "min-h-screen",
+              "bg-fuchsia-950 text-white",
+              ...[
+                "transition duration-700",
+                !isRendered && "opacity-0 scale-105",
+              ],
+              className,
+            )}
+          >
+            {children}
+          </div>
         </div>
-      </div>
 
-      <Toast />
-    </ToastProvider>
+        <Toast />
+      </ToastProvider>
+
+      <Modal />
+    </ModalProvider>
   );
 }

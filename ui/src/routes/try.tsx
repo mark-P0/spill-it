@@ -1,4 +1,5 @@
 import { LoaderFunction, RouteObject, redirect } from "react-router-dom";
+import { Screen } from "../components/Screen";
 
 async function sleep(seconds: number) {
   return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
@@ -25,4 +26,8 @@ export const tryRoutes: RouteObject[] = [
   { path: "/query", element: null, loader: loadSearchParamsFromUrl },
   { path: "/sleep", element: null, loader: loadSleep },
   { path: "/error", element: null, loader: loadError },
+  {
+    path: "/modal",
+    element: <Screen></Screen>,
+  },
 ];
