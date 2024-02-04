@@ -116,13 +116,20 @@ export const SessionsRouter = Router();
     session satisfies NonNullable<typeof session>;
 
     logger.info("Sending session ID...");
-    const output: Output = {
-      data: {
-        scheme: "SPILLITSESS" satisfies AuthScheme,
-        id: session.uuid,
-      },
-    };
-    const rawOutput = jsonPack(output);
-    res.send(rawOutput);
+    const sessionUUID = session.uuid;
+    const result = safe(() => {
+      const output: Output = {
+        data: {
+          scheme: "SPILLITSESS" satisfies AuthScheme,
+          id: sessionUUID,
+        },
+      };
+      const rawOutput = jsonPack(output);
+      return res.send(rawOutput);
+    });
+    if (!result.success) {
+      logger.error(formatError(result.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
   });
 }

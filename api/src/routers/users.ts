@@ -1,6 +1,7 @@
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
+import { safe } from "@spill-it/utils/safe";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
@@ -35,10 +36,16 @@ export const UsersRouter = Router();
     const user = userResult.value;
 
     logger.info("Sending user info...");
-    const output: Output = {
-      data: user,
-    };
-    const rawOutput = jsonPack(output);
-    res.send(rawOutput);
+    const result = safe(() => {
+      const output: Output = {
+        data: user,
+      };
+      const rawOutput = jsonPack(output);
+      return res.send(rawOutput);
+    });
+    if (!result.success) {
+      logger.error(formatError(result.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
   });
 }

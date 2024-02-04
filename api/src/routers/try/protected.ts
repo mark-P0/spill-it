@@ -23,14 +23,20 @@ const logger = localizeLogger(__filename);
 
   TryRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Sending unprotected resource...");
-    const output: Output = {
-      data: {
-        resource: "unprotected",
-        access: true,
-      },
-    };
-    const rawOutput = jsonPack(output);
-    res.send(rawOutput);
+    const result = safe(() => {
+      const output: Output = {
+        data: {
+          resource: "unprotected",
+          access: true,
+        },
+      };
+      const rawOutput = jsonPack(output);
+      return res.send(rawOutput);
+    });
+    if (!result.success) {
+      logger.error(formatError(result.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
   });
 }
 
@@ -79,13 +85,19 @@ const logger = localizeLogger(__filename);
     }
 
     logger.info("Sending protected resource...");
-    const output: Output = {
-      data: {
-        resource: "protected",
-        access: id,
-      },
-    };
-    const rawOutput = jsonPack(output);
-    res.send(rawOutput);
+    const result = safe(() => {
+      const output: Output = {
+        data: {
+          resource: "protected",
+          access: id,
+        },
+      };
+      const rawOutput = jsonPack(output);
+      return res.send(rawOutput);
+    });
+    if (!result.success) {
+      logger.error(formatError(result.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
   });
 }

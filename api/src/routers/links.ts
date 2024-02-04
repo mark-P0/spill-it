@@ -1,7 +1,7 @@
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
-import { safeAsync } from "@spill-it/utils/safe";
+import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
@@ -37,10 +37,16 @@ export const LinksRouter = Router();
     const authUrl = resultAuthUrl.value;
 
     logger.info("Sending auth URL...");
-    const output: Output = {
-      link: authUrl,
-    };
-    const rawOutput = jsonPack(output);
-    res.send(rawOutput);
+    const result = safe(() => {
+      const output: Output = {
+        link: authUrl,
+      };
+      const rawOutput = jsonPack(output);
+      return res.send(rawOutput);
+    });
+    if (!result.success) {
+      logger.error(formatError(result.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
   });
 }
