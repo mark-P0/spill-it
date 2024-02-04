@@ -1,18 +1,13 @@
-import {
-  isSessionExpired,
-  readSessionFromUUID,
-} from "@spill-it/db/tables/sessions";
-import { readUser } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
-import { parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
-import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
+import { convertHeaderAuthToUser } from "../middlewares/header-auth-user";
 import { parseInputFromRequest } from "../utils/endpoints";
 import { localizeLogger } from "../utils/logger";
+
 const logger = localizeLogger(__filename);
 export const UsersRouter = Router();
 
@@ -24,55 +19,20 @@ export const UsersRouter = Router();
 
   UsersRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Parsing input...");
-    const parsingInput = parseInputFromRequest(ep, method, req);
-    if (!parsingInput.success) {
-      logger.error(formatError(parsingInput.error));
+    const inputParsing = parseInputFromRequest(ep, method, req);
+    if (!inputParsing.success) {
+      logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = parsingInput.value;
+    const input = inputParsing.value;
 
+    logger.info("Converting header authorization to user info...");
     const { headers } = input;
-    const resultHeaderAuth = safe(() =>
-      parseHeaderAuth("SPILLITSESS", headers.Authorization),
-    );
-    if (!resultHeaderAuth.success) {
-      logger.error(formatError(resultHeaderAuth.error));
-      return res.sendStatus(StatusCodes.BAD_REQUEST);
+    const userResult = await convertHeaderAuthToUser(headers.Authorization);
+    if (!userResult.success) {
+      return res.sendStatus(userResult.error.statusCode);
     }
-    const headerAuth = resultHeaderAuth.value;
-
-    logger.info("Fetching session info...");
-    const { id } = headerAuth.params;
-    const resultSession = await safeAsync(() => readSessionFromUUID(id));
-    if (!resultSession.success) {
-      logger.error(formatError(resultSession.error));
-      return res.sendStatus(StatusCodes.BAD_GATEWAY);
-    }
-    const session = resultSession.value;
-
-    logger.info("Verifying session...");
-    if (session === null) {
-      logger.error("Session does not exist");
-      return res.sendStatus(StatusCodes.UNAUTHORIZED);
-    }
-    if (isSessionExpired(session)) {
-      logger.error("Session is expired");
-      return res.sendStatus(StatusCodes.UNAUTHORIZED);
-    }
-
-    logger.info("Fetching user info...");
-    const resultUser = await safeAsync(() => readUser(session.userId));
-    if (!resultUser.success) {
-      logger.error(formatError(resultUser.error));
-      return res.sendStatus(StatusCodes.BAD_GATEWAY);
-    }
-    const user = resultUser.value;
-
-    logger.info("Verifying user info...");
-    if (user === null) {
-      logger.error("User of given session does not exist...?");
-      return res.sendStatus(StatusCodes.UNAUTHORIZED);
-    }
+    const user = userResult.value;
 
     logger.info("Sending user info...");
     const output: Output = {
