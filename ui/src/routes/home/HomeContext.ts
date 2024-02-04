@@ -9,6 +9,7 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
   const [posts, setPosts] = useState<PostWithAuthor[] | "fetching" | "error">(
     "fetching",
   );
+  const [postToDelete, setPostToDelete] = useState<PostWithAuthor | null>(null);
 
   const refreshPosts = useCallback(async () => {
     const headerAuthResult = safe(() => buildHeaderAuthFromStorage());
@@ -37,5 +38,8 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
     refreshPosts();
   }, [refreshPosts]);
 
-  return { posts, refreshPosts };
+  return {
+    ...{ posts, refreshPosts },
+    ...{ postToDelete, setPostToDelete },
+  };
 });
