@@ -68,6 +68,9 @@ export const SessionsTable = pgTable("sessions", {
 });
 export type Session = typeof SessionsTable.$inferSelect;
 export type SessionDetails = typeof SessionsTable.$inferInsert;
+{
+  (userId: Session["userId"]) => userId satisfies User["id"];
+}
 
 export const PostsTable = pgTable("posts", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -78,6 +81,9 @@ export const PostsTable = pgTable("posts", {
 export const zodPost = createSelectSchema(PostsTable);
 export type Post = typeof PostsTable.$inferSelect;
 export type PostDetails = typeof PostsTable.$inferInsert;
+{
+  (userId: Post["userId"]) => userId satisfies User["id"];
+}
 
 export const PostsRelations = relations(PostsTable, ({ one }) => ({
   author: one(UsersTable, {
