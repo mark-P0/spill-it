@@ -8,7 +8,7 @@ import {
 } from "@spill-it/db/tables/sessions";
 import {
   createUserFromGoogle,
-  readGoogleUser,
+  readUserWithGoogleId,
 } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
@@ -62,7 +62,7 @@ export const SessionsRouter = Router();
 
     logger.info("Fetching user info...");
     const { googleId } = info;
-    const resultUser = await safeAsync(() => readGoogleUser(googleId));
+    const resultUser = await safeAsync(() => readUserWithGoogleId(googleId));
     if (!resultUser.success) {
       logger.error(formatError(resultUser.error));
       return res.sendStatus(StatusCodes.BAD_GATEWAY);

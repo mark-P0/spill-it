@@ -4,9 +4,9 @@ import { eq, sql } from "drizzle-orm";
 import { db } from "../db";
 import { User, UsersTable } from "../schema";
 
-function createUsernameFromHandle(handleName: string) {
-  const tentativeHandle = handleName.toLowerCase().split(/\s/g).join("-"); // TODO Ensure unique from existing database entries!
-  return tentativeHandle;
+export async function isGoogleUserExisting(googleId: string): Promise<boolean> {
+  const user = await readUserWithGoogleId(googleId);
+  return user !== null;
 }
 
 export async function readUser(id: User["id"]): Promise<User | null> {
@@ -23,7 +23,9 @@ export async function readUser(id: User["id"]): Promise<User | null> {
   return user;
 }
 
-export async function readGoogleUser(googleId: string): Promise<User | null> {
+export async function readUserWithGoogleId(
+  googleId: NonNullable<User["googleId"]>,
+): Promise<User | null> {
   const result = await safeAsync(() =>
     db
       .select()
@@ -41,11 +43,10 @@ export async function readGoogleUser(googleId: string): Promise<User | null> {
   return user;
 }
 
-export async function isGoogleUserExisting(googleId: string): Promise<boolean> {
-  const user = await readGoogleUser(googleId);
-  return user !== null;
+function createUsernameFromHandle(handleName: string) {
+  const tentativeHandle = handleName.toLowerCase().split(/\s/g).join("-"); // TODO Ensure unique from existing database entries!
+  return tentativeHandle;
 }
-
 export async function createUserFromGoogle(
   googleId: string,
   handleName: string,
