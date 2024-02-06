@@ -1,7 +1,7 @@
 import { raise } from "@spill-it/utils/errors";
 import { safeAsync } from "@spill-it/utils/safe";
 import { db } from "../db";
-import { SamplesTable } from "../schema";
+import { Sample, SampleDetails, SamplesTable } from "../schema";
 
 // /* DELETEME */
 // (async () => {
@@ -28,9 +28,6 @@ import { SamplesTable } from "../schema";
 //   });
 //   logger.warn("Sample data added.", { file: import.meta.url });
 // })();
-
-type Sample = typeof SamplesTable.$inferSelect;
-type SampleDetails = typeof SamplesTable.$inferInsert;
 
 export async function getAllSamples(): Promise<Sample[]> {
   const result = await safeAsync(() => db.select().from(SamplesTable));

@@ -46,6 +46,8 @@ export const SamplesTable = pgTable("samples", {
   phone: varchar("phone", { length: 256 }),
 });
 export const zodSample = createSelectSchema(SamplesTable);
+export type Sample = typeof SamplesTable.$inferSelect;
+export type SampleDetails = typeof SamplesTable.$inferInsert;
 
 export const UsersTable = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
