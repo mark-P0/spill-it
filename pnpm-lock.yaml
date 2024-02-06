@@ -8,6 +8,9 @@ importers:
 
   api:
     dependencies:
+      '@spill-it/auth':
+        specifier: workspace:^
+        version: link:../shared/auth
       '@spill-it/db':
         specifier: workspace:^
         version: link:../shared/db
@@ -166,6 +169,9 @@ importers:
 
   ui:
     dependencies:
+      '@spill-it/auth':
+        specifier: workspace:^
+        version: link:../shared/auth
       '@spill-it/endpoints':
         specifier: workspace:^
         version: link:../shared/endpoints

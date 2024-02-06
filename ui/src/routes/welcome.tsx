@@ -1,4 +1,4 @@
-import { buildHeaderAuth } from "@spill-it/header-auth";
+import { buildHeaderAuth } from "@spill-it/auth/headers";
 import { raise } from "@spill-it/utils/errors";
 import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";

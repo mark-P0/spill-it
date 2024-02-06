@@ -1,3 +1,4 @@
+import { AuthScheme, parseHeaderAuth } from "@spill-it/auth/headers";
 import {
   createSession,
   deleteSession,
@@ -9,7 +10,6 @@ import {
   readGoogleUser,
 } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
-import { AuthScheme, parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
 import { safe, safeAsync } from "@spill-it/utils/safe";

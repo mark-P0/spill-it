@@ -1,9 +1,9 @@
+import { parseHeaderAuth } from "@spill-it/auth/headers";
 import {
   isSessionExpired,
   readSessionFromUUID,
 } from "@spill-it/db/tables/sessions";
 import { endpointDetails } from "@spill-it/endpoints";
-import { parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
 import { safe, safeAsync } from "@spill-it/utils/safe";
