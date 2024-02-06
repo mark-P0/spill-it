@@ -35,11 +35,16 @@ export const UsersRouter = Router();
     }
     const user = userResult.value;
 
+    logger.info("Parsing output...");
+    const outputParsing = signature.output.safeParse({ data: user });
+    if (!outputParsing.success) {
+      logger.error(formatError(outputParsing.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const output = outputParsing.data;
+
     logger.info("Sending user info...");
     const result = safe(() => {
-      const output: Output = {
-        data: user,
-      };
       const rawOutput = jsonPack(output);
       return res.send(rawOutput);
     });
