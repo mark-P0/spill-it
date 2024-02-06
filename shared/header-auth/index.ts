@@ -2,6 +2,7 @@ import { raise } from "@spill-it/utils/errors";
 import { safe } from "@spill-it/utils/safe";
 import { z } from "zod";
 
+/** Could use `.split()` array approach but is rather inefficient */
 function splitAtFirstInstance(str: string, sep: string): [string, string] {
   const sepIdx = str.indexOf(sep);
   if (sepIdx === -1) {
@@ -11,17 +12,17 @@ function splitAtFirstInstance(str: string, sep: string): [string, string] {
   return [str.slice(0, sepIdx), str.slice(sepIdx + 1)];
 }
 
-const mapSchemeParams = {
+const schemeMap = {
   SPILLITGOOGLE: z.object({ code: z.string(), redirectUri: z.string() }),
   SPILLITSESS: z.object({ id: z.string().uuid() }),
 };
-type MapSchemeParams = typeof mapSchemeParams;
-export type AuthScheme = keyof MapSchemeParams;
-type SchemeParams<T extends AuthScheme> = z.infer<MapSchemeParams[T]>;
+type SchemeMap = typeof schemeMap;
+export type AuthScheme = keyof SchemeMap;
+type SchemeParams<T extends AuthScheme> = z.infer<SchemeMap[T]>;
 
-export function buildHeaderAuth<TScheme extends AuthScheme>(
-  scheme: TScheme,
-  params: SchemeParams<TScheme>,
+export function buildHeaderAuth<T extends AuthScheme>(
+  scheme: T,
+  params: SchemeParams<T>,
 ) {
   const paramsEncoded = new URLSearchParams(params);
   return `${scheme} ${paramsEncoded}`;
@@ -30,35 +31,35 @@ export function buildHeaderAuth<TScheme extends AuthScheme>(
 /**
  * https://stackoverflow.com/a/43164958
  * - Use standard "Authorization" header instead of custom
- * - Can use custom authorization scheme
+ * - Can use custom authorization "scheme"
  * - Recommended not to separate parameters with commas
  *
  * https://stackoverflow.com/a/11420667
  * - Parameters follow a `key=value` format
  * - Parameters are separated by comma
  *
- * Expected `authorization` format is `<scheme> URLSearchParams({key: value}).toString()`
+ * Current "Authorization" format used is `<scheme> <URLSearchParams({param: value})>`
  */
-export function parseHeaderAuth<TScheme extends AuthScheme>(
-  targetScheme: TScheme,
-  value: string,
+export function parseHeaderAuth<T extends AuthScheme>(
+  targetScheme: T,
+  headerAuth: string,
 ) {
-  const [scheme, paramsEncoded] = splitAtFirstInstance(value, " ");
+  const [scheme, paramsEncoded] = splitAtFirstInstance(headerAuth, " ");
   if (scheme !== targetScheme) {
     raise("Invalid authorization scheme");
   }
 
-  const result = safe(() => new URLSearchParams(paramsEncoded));
-  const paramsMap = result.success
-    ? result.value
-    : raise("Invalid authorization parameters", result.error);
+  const paramsDecodedResult = safe(() => new URLSearchParams(paramsEncoded));
+  const paramsDecoded = paramsDecodedResult.success
+    ? paramsDecodedResult.value
+    : raise("Invalid authorization parameters", paramsDecodedResult.error);
 
-  const parsing = mapSchemeParams[targetScheme].safeParse(
-    Object.fromEntries(paramsMap),
+  const paramsParsing = schemeMap[targetScheme].safeParse(
+    Object.fromEntries(paramsDecoded),
   );
-  const params: SchemeParams<TScheme> = parsing.success
-    ? parsing.data
-    : raise("Invalid authorization parameters", parsing.error);
+  const params: SchemeParams<T> = paramsParsing.success
+    ? paramsParsing.data
+    : raise("Invalid authorization parameters", paramsParsing.error);
 
   return { scheme: targetScheme, params };
 }
