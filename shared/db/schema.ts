@@ -64,6 +64,8 @@ export const SessionsTable = pgTable("sessions", {
   userId: uuid("userId").notNull(),
   expiry: timestamp("expiry").notNull(),
 });
+export type Session = typeof SessionsTable.$inferSelect;
+export type SessionDetails = typeof SessionsTable.$inferInsert;
 
 export const PostsTable = pgTable("posts", {
   id: uuid("id").defaultRandom().primaryKey(),
