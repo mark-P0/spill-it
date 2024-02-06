@@ -1,5 +1,8 @@
 import { parseHeaderAuth } from "@spill-it/auth/headers";
-import { isSessionExpired, readSession } from "@spill-it/db/tables/sessions";
+import {
+  isSessionExpired,
+  readSessionWithUser,
+} from "@spill-it/db/tables/sessions";
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
@@ -64,7 +67,7 @@ const logger = localizeLogger(__filename);
 
     logger.info("Fetching session info...");
     const { id } = headerAuth.params;
-    const resultSession = await safeAsync(() => readSession(id));
+    const resultSession = await safeAsync(() => readSessionWithUser(id));
     if (!resultSession.success) {
       logger.error(formatError(resultSession.error));
       return res.sendStatus(StatusCodes.BAD_GATEWAY);
