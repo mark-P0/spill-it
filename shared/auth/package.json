@@ -1,6 +1,7 @@
 {
   "name": "@spill-it/auth",
   "dependencies": {
+    "@spill-it/db": "workspace:^",
     "@spill-it/utils": "workspace:^",
     "jose": "^5.2.0",
     "typescript": "^5.3.3",
