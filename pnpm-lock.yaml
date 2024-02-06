@@ -96,9 +96,19 @@ importers:
       '@spill-it/utils':
         specifier: workspace:^
         version: link:../utils
+      jose:
+        specifier: ^5.2.0
+        version: 5.2.0
+      typescript:
+        specifier: ^5.3.3
+        version: 5.3.3
       zod:
         specifier: ^3.22.4
         version: 3.22.4
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.6
+        version: 20.11.5
 
   shared/db:
     dependencies:
