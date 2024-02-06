@@ -18,14 +18,14 @@ import { z } from "zod";
 
 /** https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle */
 export const SamplesTable = pgTable("samples", {
-  uuid: uuid("uuid").unique().notNull().defaultRandom(),
+  id: uuid("id").defaultRandom().primaryKey(),
   fullName: text("fullName"),
   phone: varchar("phone", { length: 256 }),
 });
 export const zodSample = createSelectSchema(SamplesTable);
 
 export const UsersTable = pgTable("users", {
-  uuid: uuid("uuid").unique().notNull().defaultRandom(),
+  id: uuid("id").defaultRandom().primaryKey(),
   username: text("username").notNull(),
   handleName: text("handleName").notNull(),
   portraitUrl: text("portraitUrl").notNull(),
@@ -41,14 +41,14 @@ export const SessionsTable = pgTable("sessions", {
    * - https://github.com/drizzle-team/drizzle-orm-docs/issues/120
    * - https://www.postgresql.org/docs/current/datatype-uuid.html
    */
-  uuid: uuid("uuid").unique().notNull().defaultRandom(),
+  id: uuid("id").defaultRandom().primaryKey(),
 
   userId: integer("userId").notNull(), // Users primary key
   expiry: timestamp("expiry").notNull(),
 });
 
 export const PostsTable = pgTable("posts", {
-  uuid: uuid("uuid").unique().notNull().defaultRandom(),
+  id: uuid("id").defaultRandom().primaryKey(),
   userId: integer("userId").notNull(), // Users primary key
   timestamp: timestamp("timestamp").notNull().defaultNow(),
   content: text("content").notNull(),
