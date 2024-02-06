@@ -78,6 +78,13 @@
       "when": 1707227385763,
       "tag": "0010_rapid_ravenous",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1707228453673,
+      "tag": "0011_stiff_daimon_hellstrom",
+      "breakpoints": true
     }
   ]
 }
