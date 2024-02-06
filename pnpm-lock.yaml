@@ -8,15 +8,15 @@ importers:
 
   api:
     dependencies:
+      '@spill-it/auth':
+        specifier: workspace:^
+        version: link:../shared/auth
       '@spill-it/db':
         specifier: workspace:^
         version: link:../shared/db
       '@spill-it/endpoints':
         specifier: workspace:^
         version: link:../shared/endpoints
-      '@spill-it/header-auth':
-        specifier: workspace:^
-        version: link:../shared/header-auth
       '@spill-it/utils':
         specifier: workspace:^
         version: link:../shared/utils
@@ -38,9 +38,6 @@ importers:
       http-status-codes:
         specifier: ^2.3.0
         version: 2.3.0
-      jose:
-        specifier: ^5.2.0
-        version: 5.2.0
       morgan:
         specifier: ~1.9.1
         version: 1.9.1
@@ -91,6 +88,25 @@ importers:
         specifier: ^3.1.1
         version: 3.2.4
 
+  shared/auth:
+    dependencies:
+      '@spill-it/utils':
+        specifier: workspace:^
+        version: link:../utils
+      jose:
+        specifier: ^5.2.0
+        version: 5.2.0
+      typescript:
+        specifier: ^5.3.3
+        version: 5.3.3
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.6
+        version: 20.11.5
+
   shared/db:
     dependencies:
       '@spill-it/utils':
@@ -140,15 +156,6 @@ importers:
         specifier: ^3.22.4
         version: 3.22.4
 
-  shared/header-auth:
-    dependencies:
-      '@spill-it/utils':
-        specifier: workspace:^
-        version: link:../utils
-      zod:
-        specifier: ^3.22.4
-        version: 3.22.4
-
   shared/utils:
     dependencies:
       superjson:
@@ -157,12 +164,12 @@ importers:
 
   ui:
     dependencies:
+      '@spill-it/auth':
+        specifier: workspace:^
+        version: link:../shared/auth
       '@spill-it/endpoints':
         specifier: workspace:^
         version: link:../shared/endpoints
-      '@spill-it/header-auth':
-        specifier: workspace:^
-        version: link:../shared/header-auth
       '@spill-it/utils':
         specifier: workspace:^
         version: link:../shared/utils

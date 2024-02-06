@@ -5,8 +5,12 @@ const parsing = z
   .object({
     NODE_ENV: z.enum(["development", "production"]),
     LOG_LEVEL: z.string(),
-    AUTH_GOOGLE_CLIENT_ID: z.string(),
-    AUTH_GOOGLE_CLIENT_SECRET: z.string(),
+
+    /** Also in `@spill-it/auth` */
+    ...{
+      AUTH_GOOGLE_CLIENT_ID: z.string(),
+      AUTH_GOOGLE_CLIENT_SECRET: z.string(),
+    },
 
     /** Also in `@spill-it/db` */
     ...{ SUPABASE_POSTGRES_URI_POOLING: z.string() },

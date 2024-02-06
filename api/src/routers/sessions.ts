@@ -1,3 +1,5 @@
+import { convertCodeIntoGoogleInfo } from "@spill-it/auth/google";
+import { AuthScheme, parseHeaderAuth } from "@spill-it/auth/headers";
 import {
   createSession,
   deleteSession,
@@ -9,14 +11,12 @@ import {
   readGoogleUser,
 } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
-import { AuthScheme, parseHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
 import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { convertCodeIntoGoogleInfo } from "../auth/google";
 import { parseInputFromRequest } from "../utils/endpoints";
 import { localizeLogger } from "../utils/logger";
 

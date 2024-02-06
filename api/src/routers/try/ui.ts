@@ -1,11 +1,11 @@
+import { buildAuthUrl } from "@spill-it/auth/google";
+import { buildHeaderAuth } from "@spill-it/auth/headers";
 import { endpoint, endpointDetails } from "@spill-it/endpoints";
-import { buildHeaderAuth } from "@spill-it/header-auth";
 import { formatError } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
 import { safe, safeAsync } from "@spill-it/utils/safe";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { buildAuthUrl } from "../../auth/google";
 import { parseInputFromRequest } from "../../utils/endpoints";
 import { apiHost } from "../../utils/env";
 import { localizeLogger } from "../../utils/logger";
