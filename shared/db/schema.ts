@@ -3,6 +3,30 @@
  * - Dedicated schema files recommended for migrations to avoid runtime executions...
  */
 
+/**
+ * UUID type mentioned in Drizzle docs but not in list
+ * - https://orm.drizzle.team/docs/column-types/pg#default-value
+ * - https://github.com/drizzle-team/drizzle-orm-docs/issues/120
+ * - https://www.postgresql.org/docs/current/datatype-uuid.html
+ *
+ * ---
+ *
+ * UUIDs as Primary Key
+ *
+ * https://stackoverflow.com/questions/33274291/uuid-or-sequence-for-primary-key
+ * - It is fine to use UUIDs as Primary Key
+ * - UUIDs could be inefficient in terms of computation (random generation) and storage (needs more bytes)
+ * - Correctly implemented UUIDs should be secure and random enough
+ * - Postgres UUID generation might not be secure and random enough
+ *
+ * https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#session-id-entropy
+ * - IDs (e.g. session IDs) should be
+ *   - Random
+ *     - UUIDv4 should be generated with a CSPRNG
+ *   - Unique
+ *     - Primary Key constraint
+ */
+
 import { relations } from "drizzle-orm";
 import {
   integer,
@@ -34,14 +58,7 @@ export const UsersTable = pgTable("users", {
 export const zodUser = createSelectSchema(UsersTable);
 
 export const SessionsTable = pgTable("sessions", {
-  /**
-   * UUID type mentioned in Drizzle docs but not in list
-   * - https://orm.drizzle.team/docs/column-types/pg#default-value
-   * - https://github.com/drizzle-team/drizzle-orm-docs/issues/120
-   * - https://www.postgresql.org/docs/current/datatype-uuid.html
-   */
   id: uuid("id").defaultRandom().primaryKey(),
-
   userId: uuid("userId").notNull(),
   expiry: timestamp("expiry").notNull(),
 });
