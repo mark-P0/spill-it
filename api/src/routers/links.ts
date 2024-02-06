@@ -36,11 +36,18 @@ export const LinksRouter = Router();
     }
     const authUrl = resultAuthUrl.value;
 
+    logger.info("Parsing output...");
+    const outputParsing = signature.output.safeParse({
+      link: authUrl,
+    });
+    if (!outputParsing.success) {
+      logger.error(formatError(outputParsing.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const output = outputParsing.data;
+
     logger.info("Sending auth URL...");
     const result = safe(() => {
-      const output: Output = {
-        link: authUrl,
-      };
       const rawOutput = jsonPack(output);
       return res.send(rawOutput);
     });

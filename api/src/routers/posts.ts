@@ -75,11 +75,18 @@ export const PostsRouter = Router();
       return res.sendStatus(StatusCodes.FORBIDDEN);
     }
 
+    logger.info("Parsing output...");
+    const outputParsing = signature.output.safeParse({
+      data: post,
+    });
+    if (!outputParsing.success) {
+      logger.error(formatError(outputParsing.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const output = outputParsing.data;
+
     logger.info("Sending post info...");
     const result = safe(() => {
-      const output: Output = {
-        data: post,
-      };
       const rawOutput = jsonPack(output);
       return res.send(rawOutput);
     });
@@ -121,11 +128,18 @@ export const PostsRouter = Router();
     }
     const posts = postsResult.value;
 
+    logger.info("Parsing output...");
+    const outputParsing = signature.output.safeParse({
+      data: posts,
+    });
+    if (!outputParsing.success) {
+      logger.error(formatError(outputParsing.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const output = outputParsing.data;
+
     logger.info("Sending user posts...");
     const result = safe(() => {
-      const output: Output = {
-        data: posts,
-      };
       const rawOutput = jsonPack(output);
       return res.send(rawOutput);
     });
@@ -183,12 +197,19 @@ export const PostsRouter = Router();
     }
     const link = linkResult.value;
 
+    logger.info("Parsing output...");
+    const outputParsing = signature.output.safeParse({
+      data: post,
+      links: { self: link },
+    });
+    if (!outputParsing.success) {
+      logger.error(formatError(outputParsing.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const output = outputParsing.data;
+
     logger.info("Sending post info...");
     const result = safe(() => {
-      const output: Output = {
-        data: post,
-        links: { self: link },
-      };
       const rawOutput = jsonPack(output);
       return res.send(rawOutput);
     });
@@ -251,9 +272,16 @@ export const PostsRouter = Router();
       return res.sendStatus(StatusCodes.BAD_GATEWAY);
     }
 
+    logger.info("Parsing output...");
+    const outputParsing = signature.output.safeParse({});
+    if (!outputParsing.success) {
+      logger.error(formatError(outputParsing.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const output = outputParsing.data;
+
     logger.info("Sending response...");
     const result = safe(() => {
-      const output: Output = {};
       const rawOutput = jsonPack(output);
       return res.send(rawOutput);
     });

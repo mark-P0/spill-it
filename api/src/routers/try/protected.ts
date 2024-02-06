@@ -22,14 +22,21 @@ const logger = localizeLogger(__filename);
   type Output = z.infer<typeof signature.output>;
 
   TryRouter[methodLower](ep, async (req, res, next) => {
+    logger.info("Parsing output...");
+    const outputParsing = signature.output.safeParse({
+      data: {
+        resource: "unprotected",
+        access: true,
+      },
+    });
+    if (!outputParsing.success) {
+      logger.error(formatError(outputParsing.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const output = outputParsing.data;
+
     logger.info("Sending unprotected resource...");
     const result = safe(() => {
-      const output: Output = {
-        data: {
-          resource: "unprotected",
-          access: true,
-        },
-      };
       const rawOutput = jsonPack(output);
       return res.send(rawOutput);
     });
@@ -84,14 +91,21 @@ const logger = localizeLogger(__filename);
       return res.sendStatus(StatusCodes.UNAUTHORIZED);
     }
 
+    logger.info("Parsing output...");
+    const outputParsing = signature.output.safeParse({
+      data: {
+        resource: "protected",
+        access: id,
+      },
+    });
+    if (!outputParsing.success) {
+      logger.error(formatError(outputParsing.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const output = outputParsing.data;
+
     logger.info("Sending protected resource...");
     const result = safe(() => {
-      const output: Output = {
-        data: {
-          resource: "protected",
-          access: id,
-        },
-      };
       const rawOutput = jsonPack(output);
       return res.send(rawOutput);
     });

@@ -27,12 +27,19 @@ export const TryRouter = Router();
     }
     const input = parsingInput.value;
 
-    logger.info("Sending response...");
+    logger.info("Parsing output...");
     const { who = "world" } = input.query;
+    const outputParsing = signature.output.safeParse({
+      hello: `${who}!`,
+    });
+    if (!outputParsing.success) {
+      logger.error(formatError(outputParsing.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const output = outputParsing.data;
+
+    logger.info("Sending response...");
     const result = safe(() => {
-      const output: Output = {
-        hello: `${who}!`,
-      };
       const rawOutput = jsonPack(output);
       return res.send(rawOutput);
     });
@@ -58,11 +65,18 @@ export const TryRouter = Router();
     }
     const samples = resultSamples.value;
 
+    logger.info("Parsing output...");
+    const outputParsing = signature.output.safeParse({
+      data: samples,
+    });
+    if (!outputParsing.success) {
+      logger.error(formatError(outputParsing.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const output = outputParsing.data;
+
     logger.info("Sending samples...");
     const result = safe(() => {
-      const output: Output = {
-        data: samples,
-      };
       const rawOutput = jsonPack(output);
       return res.send(rawOutput);
     });

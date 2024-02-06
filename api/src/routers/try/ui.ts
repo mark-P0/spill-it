@@ -31,11 +31,18 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
     }
     const authUrl = authUrlResult.value;
 
+    logger.info("Parsing output...");
+    const outputParsing = signature.output.safeParse({
+      redirect: authUrl,
+    });
+    if (!outputParsing.success) {
+      logger.error(formatError(outputParsing.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const output = outputParsing.data;
+
     logger.info("Sending login link...");
     const result = safe(() => {
-      const output: Output = {
-        redirect: authUrl,
-      };
       const rawOutput = jsonPack(output);
       return res.send(rawOutput);
     });
@@ -72,14 +79,21 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
     }
     const headerAuth = resultHeaderAuth.value;
 
+    logger.info("Parsing output...");
+    const outputParsing = signature.output.safeParse({
+      data: { code, redirectUri },
+      headers: {
+        Authorization: headerAuth,
+      },
+    });
+    if (!outputParsing.success) {
+      logger.error(formatError(outputParsing.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const output = outputParsing.data;
+
     logger.info("Sending app Google auth...");
     const result = safe(() => {
-      const output: Output = {
-        data: { code, redirectUri },
-        headers: {
-          Authorization: headerAuth,
-        },
-      };
       const rawOutput = jsonPack(output);
       return res.send(rawOutput);
     });

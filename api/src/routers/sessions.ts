@@ -115,15 +115,22 @@ export const SessionsRouter = Router();
     }
     session satisfies NonNullable<typeof session>;
 
-    logger.info("Sending session ID...");
+    logger.info("Parsing output...");
     const sessionId = session.id;
+    const outputParsing = signature.output.safeParse({
+      data: {
+        scheme: "SPILLITSESS" satisfies AuthScheme,
+        id: sessionId,
+      },
+    });
+    if (!outputParsing.success) {
+      logger.error(formatError(outputParsing.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const output = outputParsing.data;
+
+    logger.info("Sending session ID...");
     const result = safe(() => {
-      const output: Output = {
-        data: {
-          scheme: "SPILLITSESS" satisfies AuthScheme,
-          id: sessionId,
-        },
-      };
       const rawOutput = jsonPack(output);
       return res.send(rawOutput);
     });
