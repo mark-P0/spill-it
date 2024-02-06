@@ -44,12 +44,14 @@ export const SessionsTable = pgTable("sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
 
   userId: integer("userId").notNull(), // Users primary key
+  userId2: uuid("userId2").notNull().defaultRandom(), // TODO Set as userId, remove defaults
   expiry: timestamp("expiry").notNull(),
 });
 
 export const PostsTable = pgTable("posts", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: integer("userId").notNull(), // Users primary key
+  userId2: uuid("userId2").notNull().defaultRandom(), // TODO Set as userId, remove defaults
   timestamp: timestamp("timestamp").notNull().defaultNow(),
   content: text("content").notNull(),
 });
