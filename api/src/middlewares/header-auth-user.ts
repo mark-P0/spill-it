@@ -1,7 +1,9 @@
 import { parseHeaderAuth } from "@spill-it/auth/headers";
 import { User } from "@spill-it/db/schema";
-import { isSessionExpired, readSession } from "@spill-it/db/tables/sessions";
-import { readUser } from "@spill-it/db/tables/users";
+import {
+  isSessionExpired,
+  readSessionWithUser,
+} from "@spill-it/db/tables/sessions";
 import { formatError } from "@spill-it/utils/errors";
 import { Result, safe, safeAsync } from "@spill-it/utils/safe";
 import { StatusCodes } from "http-status-codes";
@@ -31,7 +33,7 @@ export async function convertHeaderAuthToUser(
 
   logger.info("Fetching session info...");
   const { id } = headerAuth.params;
-  const resultSession = await safeAsync(() => readSession(id));
+  const resultSession = await safeAsync(() => readSessionWithUser(id));
   if (!resultSession.success) {
     logger.error(formatError(resultSession.error));
     const error = new StatusCodeError(StatusCodes.BAD_GATEWAY);
@@ -51,21 +53,6 @@ export async function convertHeaderAuthToUser(
     return { success: false, error };
   }
 
-  logger.info("Fetching user info...");
-  const resultUser = await safeAsync(() => readUser(session.userId));
-  if (!resultUser.success) {
-    logger.error(formatError(resultUser.error));
-    const error = new StatusCodeError(StatusCodes.BAD_GATEWAY);
-    return { success: false, error };
-  }
-  const user = resultUser.value;
-
-  logger.info("Verifying user info...");
-  if (user === null) {
-    logger.error("User of given session does not exist...?");
-    const error = new StatusCodeError(StatusCodes.UNAUTHORIZED);
-    return { success: false, error };
-  }
-
+  const { user } = session;
   return { success: true, value: user };
 }
