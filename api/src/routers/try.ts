@@ -6,7 +6,7 @@ import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { parseInputFromRequest } from "../utils/endpoints";
+
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(__filename);
@@ -14,18 +14,18 @@ export const TryRouter = Router();
 
 {
   const details = endpointDetails("/try/hello", "GET");
-  const [ep, method, signature, methodLower] = details;
+  const [ep, , signature, method] = details;
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  TryRouter[methodLower](ep, (req, res, next) => {
+  TryRouter[method](ep, (req, res, next) => {
     logger.info("Parsing input...");
-    const parsingInput = parseInputFromRequest(ep, method, req);
+    const parsingInput = signature.input.safeParse(req);
     if (!parsingInput.success) {
       logger.error(formatError(parsingInput.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = parsingInput.value;
+    const input = parsingInput.data;
 
     logger.info("Parsing output...");
     const { who = "world" } = input.query;
@@ -52,11 +52,11 @@ export const TryRouter = Router();
 
 {
   const details = endpointDetails("/try/samples", "GET");
-  const [ep, method, signature, methodLower] = details;
+  const [ep, , signature, method] = details;
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  TryRouter[methodLower](ep, async (req, res, next) => {
+  TryRouter[method](ep, async (req, res, next) => {
     logger.info("Getting samples from database...");
     const resultSamples = await safeAsync(() => readSamplesAll());
     if (!resultSamples.success) {
