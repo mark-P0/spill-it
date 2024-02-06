@@ -1,15 +1,15 @@
 import { raise } from "@spill-it/utils/errors";
 import { safeAsync } from "@spill-it/utils/safe";
-import { addDays, isBefore } from "date-fns";
+import { addDays, isPast } from "date-fns";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { Session, SessionsTable, User } from "../schema";
 
 export function isSessionExpired(session: Session) {
-  return isBefore(session.expiry, new Date());
+  return isPast(session.expiry);
 }
 
-export async function readUserSession(
+export async function readSessionOfUser(
   userId: User["id"],
 ): Promise<Session | null> {
   const result = await safeAsync(() =>

@@ -4,7 +4,7 @@ import {
   createSession,
   deleteSession,
   isSessionExpired,
-  readUserSession,
+  readSessionOfUser,
 } from "@spill-it/db/tables/sessions";
 import {
   createUserFromGoogle,
@@ -85,7 +85,7 @@ export const SessionsRouter = Router();
 
     logger.info("Fetching user session...");
     const userId = user.id; // For some reason TS will not accept nesting this in below
-    const resultSession = await safeAsync(() => readUserSession(userId));
+    const resultSession = await safeAsync(() => readSessionOfUser(userId));
     if (!resultSession.success) {
       logger.error(formatError(resultSession.error));
       return res.sendStatus(StatusCodes.BAD_GATEWAY);
