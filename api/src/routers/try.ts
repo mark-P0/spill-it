@@ -1,4 +1,4 @@
-import { getAllSamples } from "@spill-it/db/tables/samples";
+import { readSamplesAll } from "@spill-it/db/tables/samples";
 import { endpoint, endpointDetails } from "@spill-it/endpoints";
 import { formatError, raise } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
@@ -51,7 +51,7 @@ export const TryRouter = Router();
 
   TryRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Getting samples from database...");
-    const resultSamples = await safeAsync(() => getAllSamples());
+    const resultSamples = await safeAsync(() => readSamplesAll());
     if (!resultSamples.success) {
       logger.error(formatError(resultSamples.error));
       return res.sendStatus(StatusCodes.BAD_GATEWAY);

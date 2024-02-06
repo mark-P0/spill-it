@@ -4,11 +4,11 @@ import {
   createSession,
   deleteSession,
   isSessionExpired,
-  readUserSession,
+  readSessionOfUser,
 } from "@spill-it/db/tables/sessions";
 import {
   createUserFromGoogle,
-  readGoogleUser,
+  readUserWithGoogleId,
 } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
@@ -62,7 +62,7 @@ export const SessionsRouter = Router();
 
     logger.info("Fetching user info...");
     const { googleId } = info;
-    const resultUser = await safeAsync(() => readGoogleUser(googleId));
+    const resultUser = await safeAsync(() => readUserWithGoogleId(googleId));
     if (!resultUser.success) {
       logger.error(formatError(resultUser.error));
       return res.sendStatus(StatusCodes.BAD_GATEWAY);
@@ -85,7 +85,7 @@ export const SessionsRouter = Router();
 
     logger.info("Fetching user session...");
     const userId = user.id; // For some reason TS will not accept nesting this in below
-    const resultSession = await safeAsync(() => readUserSession(userId));
+    const resultSession = await safeAsync(() => readSessionOfUser(userId));
     if (!resultSession.success) {
       logger.error(formatError(resultSession.error));
       return res.sendStatus(StatusCodes.BAD_GATEWAY);

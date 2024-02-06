@@ -8,7 +8,7 @@ import { Sample, SampleDetails, SamplesTable } from "../schema";
 //   const { localizeLogger } = await import("../src/utils/logger");
 //   const logger = localizeLogger(__filename);
 //
-//   const samples = await getAllSamples();
+//   const samples = await readSamplesAll();
 //
 //   /* Only add sample data when nothing exists */
 //   if (samples.length !== 0) {
@@ -24,12 +24,12 @@ import { Sample, SampleDetails, SamplesTable } from "../schema";
 //   Array.from({ length: 16 }, async () => {
 //     const fullName = randomString(randomInteger(8, 16));
 //     const phone = randomNumberByLength(randomInteger(8, 16)).toString();
-//     await addSample({ fullName, phone });
+//     await createSample({ fullName, phone });
 //   });
 //   logger.warn("Sample data added.", { file: import.meta.url });
 // })();
 
-export async function getAllSamples(): Promise<Sample[]> {
+export async function readSamplesAll(): Promise<Sample[]> {
   const result = await safeAsync(() => db.select().from(SamplesTable));
   const samples = result.success
     ? result.value
@@ -38,7 +38,7 @@ export async function getAllSamples(): Promise<Sample[]> {
   return samples;
 }
 
-export async function addSample(
+export async function createSample(
   details: Omit<SampleDetails, "id">,
 ): Promise<Sample> {
   const { fullName, phone } = details;
