@@ -1,4 +1,4 @@
-import { PostWithAuthor } from "@spill-it/db/tables/posts";
+import { PostWithAuthor } from "@spill-it/db/schema";
 import { safe } from "@spill-it/utils/safe";
 import { useCallback, useEffect, useState } from "react";
 import { fetchAPI } from "../../utils/fetch-api";

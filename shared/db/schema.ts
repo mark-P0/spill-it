@@ -46,6 +46,8 @@ export const SamplesTable = pgTable("samples", {
   phone: varchar("phone", { length: 256 }),
 });
 export const zodSample = createSelectSchema(SamplesTable);
+export type Sample = typeof SamplesTable.$inferSelect;
+export type SampleDetails = typeof SamplesTable.$inferInsert;
 
 export const UsersTable = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -56,12 +58,19 @@ export const UsersTable = pgTable("users", {
   loginCt: integer("loginCt").notNull(),
 });
 export const zodUser = createSelectSchema(UsersTable);
+export type User = typeof UsersTable.$inferSelect;
+export type UserDetails = typeof UsersTable.$inferInsert;
 
 export const SessionsTable = pgTable("sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("userId").notNull(),
   expiry: timestamp("expiry").notNull(),
 });
+export type Session = typeof SessionsTable.$inferSelect;
+export type SessionDetails = typeof SessionsTable.$inferInsert;
+{
+  (userId: Session["userId"]) => userId satisfies User["id"];
+}
 
 export const PostsTable = pgTable("posts", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -70,6 +79,11 @@ export const PostsTable = pgTable("posts", {
   content: text("content").notNull(),
 });
 export const zodPost = createSelectSchema(PostsTable);
+export type Post = typeof PostsTable.$inferSelect;
+export type PostDetails = typeof PostsTable.$inferInsert;
+{
+  (userId: Post["userId"]) => userId satisfies User["id"];
+}
 
 export const PostsRelations = relations(PostsTable, ({ one }) => ({
   author: one(UsersTable, {
@@ -83,3 +97,4 @@ export const zodPostWithAuthor = z.intersection(
     author: zodUser,
   }),
 );
+export type PostWithAuthor = z.infer<typeof zodPostWithAuthor>;

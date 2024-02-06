@@ -2,15 +2,12 @@ import { raise } from "@spill-it/utils/errors";
 import { safeAsync } from "@spill-it/utils/safe";
 import { eq, sql } from "drizzle-orm";
 import { db } from "../db";
-import { UsersTable } from "../schema";
+import { User, UsersTable } from "../schema";
 
 function createUsernameFromHandle(handleName: string) {
   const tentativeHandle = handleName.toLowerCase().split(/\s/g).join("-"); // TODO Ensure unique from existing database entries!
   return tentativeHandle;
 }
-
-export type User = typeof UsersTable.$inferSelect;
-type UserDetails = typeof UsersTable.$inferInsert;
 
 export async function readUser(id: User["id"]): Promise<User | null> {
   const result = await safeAsync(

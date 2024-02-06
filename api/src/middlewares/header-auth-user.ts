@@ -1,6 +1,7 @@
 import { parseHeaderAuth } from "@spill-it/auth/headers";
+import { User } from "@spill-it/db/schema";
 import { isSessionExpired, readSession } from "@spill-it/db/tables/sessions";
-import { User, readUser } from "@spill-it/db/tables/users";
+import { readUser } from "@spill-it/db/tables/users";
 import { formatError } from "@spill-it/utils/errors";
 import { Result, safe, safeAsync } from "@spill-it/utils/safe";
 import { StatusCodes } from "http-status-codes";

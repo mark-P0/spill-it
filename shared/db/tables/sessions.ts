@@ -3,11 +3,7 @@ import { safeAsync } from "@spill-it/utils/safe";
 import { addDays, isBefore } from "date-fns";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
-import { SessionsTable } from "../schema";
-import { User } from "./users";
-
-type Session = typeof SessionsTable.$inferSelect;
-type SessionDetails = typeof SessionsTable.$inferInsert;
+import { Session, SessionsTable, User } from "../schema";
 
 export function isSessionExpired(session: Session) {
   return isBefore(session.expiry, new Date());

@@ -1,13 +1,8 @@
 import { raise } from "@spill-it/utils/errors";
 import { safeAsync } from "@spill-it/utils/safe";
 import { desc, eq } from "drizzle-orm";
-import { z } from "zod";
 import { db } from "../db";
-import { PostsTable, zodPostWithAuthor } from "../schema";
-
-type PostDetails = typeof PostsTable.$inferInsert;
-export type Post = typeof PostsTable.$inferSelect;
-export type PostWithAuthor = z.infer<typeof zodPostWithAuthor>;
+import { Post, PostDetails, PostWithAuthor, PostsTable } from "../schema";
 
 export async function createPost(details: PostDetails): Promise<Post> {
   const result = await safeAsync(() =>
