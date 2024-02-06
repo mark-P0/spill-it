@@ -18,7 +18,6 @@ import { z } from "zod";
 
 /** https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-drizzle */
 export const SamplesTable = pgTable("samples", {
-  id: serial("id").primaryKey(),
   uuid: uuid("uuid").unique().notNull().defaultRandom(),
   fullName: text("fullName"),
   phone: varchar("phone", { length: 256 }),
@@ -26,7 +25,6 @@ export const SamplesTable = pgTable("samples", {
 export const zodSample = createSelectSchema(SamplesTable);
 
 export const UsersTable = pgTable("users", {
-  id: serial("id").primaryKey(),
   uuid: uuid("uuid").unique().notNull().defaultRandom(),
   username: text("username").notNull(),
   handleName: text("handleName").notNull(),
@@ -37,8 +35,6 @@ export const UsersTable = pgTable("users", {
 export const zodUser = createSelectSchema(UsersTable);
 
 export const SessionsTable = pgTable("sessions", {
-  id: serial("id").primaryKey(),
-
   /**
    * UUID type mentioned in Drizzle docs but not in list
    * - https://orm.drizzle.team/docs/column-types/pg#default-value
@@ -52,7 +48,6 @@ export const SessionsTable = pgTable("sessions", {
 });
 
 export const PostsTable = pgTable("posts", {
-  id: serial("id").primaryKey(),
   uuid: uuid("uuid").unique().notNull().defaultRandom(),
   userId: integer("userId").notNull(), // Users primary key
   timestamp: timestamp("timestamp").notNull().defaultNow(),
