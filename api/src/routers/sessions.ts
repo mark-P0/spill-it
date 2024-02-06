@@ -116,12 +116,12 @@ export const SessionsRouter = Router();
     session satisfies NonNullable<typeof session>;
 
     logger.info("Sending session ID...");
-    const sessionUUID = session.uuid;
+    const sessionId = session.id;
     const result = safe(() => {
       const output: Output = {
         data: {
           scheme: "SPILLITSESS" satisfies AuthScheme,
-          id: sessionUUID,
+          id: sessionId,
         },
       };
       const rawOutput = jsonPack(output);

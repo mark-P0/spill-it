@@ -45,7 +45,7 @@ export const PostsRouter = Router();
     logger.info("Parsing URL params...");
     const paramsParsing = z
       .object({
-        postId: z.coerce.number(),
+        postId: z.string().uuid(),
       })
       .safeParse(req.params);
     if (!paramsParsing.success) {
