@@ -66,11 +66,26 @@ export const SessionsTable = pgTable("sessions", {
   userId: uuid("userId").notNull(),
   expiry: timestamp("expiry").notNull(),
 });
+export const zodSession = createSelectSchema(SessionsTable);
 export type Session = typeof SessionsTable.$inferSelect;
 export type SessionDetails = typeof SessionsTable.$inferInsert;
 {
   (userId: Session["userId"]) => userId satisfies User["id"];
 }
+
+export const SessionsRelations = relations(SessionsTable, ({ one }) => ({
+  user: one(UsersTable, {
+    fields: [SessionsTable.userId],
+    references: [UsersTable.id],
+  }),
+}));
+export const zodSessionWithUser = z.intersection(
+  zodSession,
+  z.object({
+    user: zodUser,
+  }),
+);
+export type SessionWithUser = z.infer<typeof zodSessionWithUser>;
 
 export const PostsTable = pgTable("posts", {
   id: uuid("id").defaultRandom().primaryKey(),

@@ -3,7 +3,7 @@ import { safeAsync } from "@spill-it/utils/safe";
 import { addDays, isPast } from "date-fns";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
-import { Session, SessionsTable, User } from "../schema";
+import { Session, SessionWithUser, SessionsTable, User } from "../schema";
 
 export function isSessionExpired(session: Session) {
   return isPast(session.expiry);
@@ -38,6 +38,28 @@ export async function readSession(id: Session["id"]): Promise<Session | null> {
   const sessions = result.success
     ? result.value
     : raise("Failed reading sessions table", result.error);
+
+  if (sessions.length > 1) raise("Multiple sessions for an ID...?");
+  const session = sessions[0] ?? null;
+
+  return session;
+}
+
+export async function readSessionWithUser(
+  id: SessionWithUser["id"],
+): Promise<SessionWithUser | null> {
+  const result = await safeAsync(() =>
+    db.query.SessionsTable.findMany({
+      where: eq(SessionsTable.id, id),
+      limit: 2, // There should only be at most 1. If there are 2 (or more), something has gone wrong...
+      with: {
+        user: true,
+      },
+    }),
+  );
+  const sessions = result.success
+    ? result.value
+    : raise("Failed querying sessions table", result.error);
 
   if (sessions.length > 1) raise("Multiple sessions for an ID...?");
   const session = sessions[0] ?? null;
