@@ -7,7 +7,6 @@ import { relations } from "drizzle-orm";
 import {
   integer,
   pgTable,
-  serial,
   text,
   timestamp,
   uuid,
@@ -43,27 +42,27 @@ export const SessionsTable = pgTable("sessions", {
    */
   id: uuid("id").defaultRandom().primaryKey(),
 
-  userId2: uuid("userId2").notNull().defaultRandom(), // TODO Set as userId, remove defaults
+  userId: uuid("userId").notNull(),
   expiry: timestamp("expiry").notNull(),
 });
 
 export const PostsTable = pgTable("posts", {
   id: uuid("id").defaultRandom().primaryKey(),
-  userId2: uuid("userId2").notNull().defaultRandom(), // TODO Set as userId, remove defaults
+  userId: uuid("userId").notNull(),
   timestamp: timestamp("timestamp").notNull().defaultNow(),
   content: text("content").notNull(),
 });
 export const zodPost = createSelectSchema(PostsTable);
 
-// export const PostsRelations = relations(PostsTable, ({ one }) => ({
-//   author: one(UsersTable, {
-//     fields: [PostsTable.userId],
-//     references: [UsersTable.id],
-//   }),
-// }));
-// export const zodPostWithAuthor = z.intersection(
-//   zodPost,
-//   z.object({
-//     author: zodUser,
-//   }),
-// );
+export const PostsRelations = relations(PostsTable, ({ one }) => ({
+  author: one(UsersTable, {
+    fields: [PostsTable.userId],
+    references: [UsersTable.id],
+  }),
+}));
+export const zodPostWithAuthor = z.intersection(
+  zodPost,
+  z.object({
+    author: zodUser,
+  }),
+);
