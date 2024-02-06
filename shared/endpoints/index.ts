@@ -79,7 +79,7 @@ export const endpointMap = {
           Authorization: z.string(),
         }),
         query: z.object({
-          id: z.coerce.number() satisfies typeof zodPost.shape.id,
+          id: z.string().uuid() satisfies typeof zodPost.shape.id,
         }),
       }),
       output: z.object({}),
