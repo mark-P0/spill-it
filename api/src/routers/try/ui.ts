@@ -6,7 +6,6 @@ import { jsonPack } from "@spill-it/utils/json";
 import { safe, safeAsync } from "@spill-it/utils/safe";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { parseInputFromRequest } from "../../utils/endpoints";
 import { apiHost } from "../../utils/env";
 import { localizeLogger } from "../../utils/logger";
 import { TryRouter } from "../try";
@@ -61,12 +60,12 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
 
   TryRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Parsing input...");
-    const parsingInput = parseInputFromRequest(ep, method, req);
+    const parsingInput = signature.input.safeParse(req);
     if (!parsingInput.success) {
       logger.error(formatError(parsingInput.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = parsingInput.value;
+    const input = parsingInput.data;
 
     logger.info("Building header auth...");
     const { code } = input.query;

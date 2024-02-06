@@ -17,7 +17,7 @@ import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { parseInputFromRequest } from "../utils/endpoints";
+
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(__filename);
@@ -32,12 +32,12 @@ export const SessionsRouter = Router();
 
   SessionsRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Parsing input...");
-    const parsingInput = parseInputFromRequest(ep, method, req);
+    const parsingInput = signature.input.safeParse(req);
     if (!parsingInput.success) {
       logger.error(formatError(parsingInput.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = parsingInput.value;
+    const input = parsingInput.data;
 
     const { headers } = input;
     const resultHeaderAuth = safe(() =>

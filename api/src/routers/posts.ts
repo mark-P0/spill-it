@@ -12,7 +12,7 @@ import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { convertHeaderAuthToUser } from "../middlewares/header-auth-user";
-import { endpointWithParam, parseInputFromRequest } from "../utils/endpoints";
+import { endpointWithParam } from "../utils/endpoints";
 import { apiHost } from "../utils/env";
 import { localizeLogger } from "../utils/logger";
 
@@ -27,12 +27,12 @@ export const PostsRouter = Router();
 
   PostsRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Parsing input...");
-    const inputParsing = parseInputFromRequest(ep, method, req);
+    const inputParsing = signature.input.safeParse(req);
     if (!inputParsing.success) {
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.value;
+    const input = inputParsing.data;
 
     logger.info("Converting header authorization to user info...");
     const { headers } = input;
@@ -105,12 +105,12 @@ export const PostsRouter = Router();
 
   PostsRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Parsing input...");
-    const inputParsing = parseInputFromRequest(ep, method, req);
+    const inputParsing = signature.input.safeParse(req);
     if (!inputParsing.success) {
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.value;
+    const input = inputParsing.data;
 
     logger.info("Converting header authorization to user info...");
     const { headers } = input;
@@ -158,12 +158,12 @@ export const PostsRouter = Router();
 
   PostsRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Parsing input...");
-    const inputParsing = parseInputFromRequest(ep, method, req);
+    const inputParsing = signature.input.safeParse(req);
     if (!inputParsing.success) {
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.value;
+    const input = inputParsing.data;
 
     logger.info("Converting header authorization to user info...");
     const { headers } = input;
@@ -228,12 +228,12 @@ export const PostsRouter = Router();
 
   PostsRouter[methodLower](ep, async (req, res, next) => {
     logger.info("Parsing input...");
-    const inputParsing = parseInputFromRequest(ep, method, req);
+    const inputParsing = signature.input.safeParse(req);
     if (!inputParsing.success) {
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.value;
+    const input = inputParsing.data;
 
     logger.info("Converting header authorization to user info...");
     const { headers } = input;
