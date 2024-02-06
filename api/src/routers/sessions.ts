@@ -122,7 +122,7 @@ export const SessionsRouter = Router();
         scheme: "SPILLITSESS" satisfies AuthScheme,
         id: sessionId,
       },
-    });
+    } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);

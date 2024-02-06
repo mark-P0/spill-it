@@ -27,7 +27,7 @@ const logger = localizeLogger(__filename);
         resource: "unprotected",
         access: true,
       },
-    });
+    } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -96,7 +96,7 @@ const logger = localizeLogger(__filename);
         resource: "protected",
         access: id,
       },
-    });
+    } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);

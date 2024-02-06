@@ -38,7 +38,7 @@ export const LinksRouter = Router();
     logger.info("Parsing output...");
     const outputParsing = signature.output.safeParse({
       link: authUrl,
-    });
+    } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);

@@ -35,7 +35,9 @@ export const UsersRouter = Router();
     const user = userResult.value;
 
     logger.info("Parsing output...");
-    const outputParsing = signature.output.safeParse({ data: user });
+    const outputParsing = signature.output.safeParse({
+      data: user,
+    } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
