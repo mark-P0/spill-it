@@ -56,6 +56,8 @@ export const UsersTable = pgTable("users", {
   loginCt: integer("loginCt").notNull(),
 });
 export const zodUser = createSelectSchema(UsersTable);
+export type User = typeof UsersTable.$inferSelect;
+export type UserDetails = typeof UsersTable.$inferInsert;
 
 export const SessionsTable = pgTable("sessions", {
   id: uuid("id").defaultRandom().primaryKey(),

@@ -3,8 +3,7 @@ import { safeAsync } from "@spill-it/utils/safe";
 import { addDays, isBefore } from "date-fns";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
-import { SessionsTable } from "../schema";
-import { User } from "./users";
+import { SessionsTable, User } from "../schema";
 
 type Session = typeof SessionsTable.$inferSelect;
 type SessionDetails = typeof SessionsTable.$inferInsert;
