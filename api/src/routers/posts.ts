@@ -78,7 +78,7 @@ export const PostsRouter = Router();
     logger.info("Parsing output...");
     const outputParsing = signature.output.safeParse({
       data: post,
-    });
+    } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -131,7 +131,7 @@ export const PostsRouter = Router();
     logger.info("Parsing output...");
     const outputParsing = signature.output.safeParse({
       data: posts,
-    });
+    } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -201,7 +201,7 @@ export const PostsRouter = Router();
     const outputParsing = signature.output.safeParse({
       data: post,
       links: { self: link },
-    });
+    } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -273,7 +273,7 @@ export const PostsRouter = Router();
     }
 
     logger.info("Parsing output...");
-    const outputParsing = signature.output.safeParse({});
+    const outputParsing = signature.output.safeParse({} satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);

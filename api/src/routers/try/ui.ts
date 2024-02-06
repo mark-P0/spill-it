@@ -33,7 +33,7 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
     logger.info("Parsing output...");
     const outputParsing = signature.output.safeParse({
       redirect: authUrl,
-    });
+    } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -84,7 +84,7 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
       headers: {
         Authorization: headerAuth,
       },
-    });
+    } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);

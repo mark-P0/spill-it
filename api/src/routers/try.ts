@@ -31,7 +31,7 @@ export const TryRouter = Router();
     const { who = "world" } = input.query;
     const outputParsing = signature.output.safeParse({
       hello: `${who}!`,
-    });
+    } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -68,7 +68,7 @@ export const TryRouter = Router();
     logger.info("Parsing output...");
     const outputParsing = signature.output.safeParse({
       data: samples,
-    });
+    } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
