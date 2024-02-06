@@ -36,10 +36,11 @@ export const LoginGoogleRedirectRoute: RouteObject = {
           }),
         },
       });
-      const { data } = result.success
+      const { Authorization } = result.success
         ? result.value
         : raise("Failed retrieving session ID", result.error);
-      const { scheme, id } = data;
+      const { scheme, params } = Authorization;
+      const { id } = params;
 
       // TODO Create util wrapper for local storage, also using Zod?
       // TODO Find better alternative to local storage...
