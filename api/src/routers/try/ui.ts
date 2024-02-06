@@ -17,11 +17,11 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
 
 {
   const details = endpointDetails("/try/ui/login/google", "GET");
-  const [ep, method, signature, methodLower] = details;
+  const [ep, , signature, method] = details;
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  TryRouter[methodLower](ep, async (req, res, next) => {
+  TryRouter[method](ep, async (req, res, next) => {
     logger.info("Building auth URL...");
     const authUrlResult = await safeAsync(() => buildAuthUrl(redirectUri));
     if (!authUrlResult.success) {
@@ -54,11 +54,11 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
 
 {
   const details = endpointDetails("/try/ui/login/google/redirect", "GET");
-  const [ep, method, signature, methodLower] = details;
+  const [ep, , signature, method] = details;
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  TryRouter[methodLower](ep, async (req, res, next) => {
+  TryRouter[method](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const parsingInput = signature.input.safeParse(req);
     if (!parsingInput.success) {

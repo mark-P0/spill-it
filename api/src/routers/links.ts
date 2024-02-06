@@ -13,11 +13,11 @@ export const LinksRouter = Router();
 
 {
   const details = endpointDetails("/api/v0/links/google", "GET");
-  const [ep, method, signature, methodLower] = details;
+  const [ep, , signature, method] = details;
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  LinksRouter[methodLower](ep, async (req, res, next) => {
+  LinksRouter[method](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const parsingInput = signature.input.safeParse(req);
     if (!parsingInput.success) {

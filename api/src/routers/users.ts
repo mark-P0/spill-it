@@ -13,11 +13,11 @@ export const UsersRouter = Router();
 
 {
   const details = endpointDetails("/api/v0/users/me", "GET");
-  const [ep, method, signature, methodLower] = details;
+  const [ep, , signature, method] = details;
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  UsersRouter[methodLower](ep, async (req, res, next) => {
+  UsersRouter[method](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const inputParsing = signature.input.safeParse(req);
     if (!inputParsing.success) {

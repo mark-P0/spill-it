@@ -26,11 +26,11 @@ export const SessionsRouter = Router();
 /** Get a session ID using Google authorization code */
 {
   const details = endpointDetails("/api/v0/sessions", "GET");
-  const [ep, method, signature, methodLower] = details;
+  const [ep, , signature, method] = details;
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  SessionsRouter[methodLower](ep, async (req, res, next) => {
+  SessionsRouter[method](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const parsingInput = signature.input.safeParse(req);
     if (!parsingInput.success) {

@@ -16,11 +16,11 @@ const logger = localizeLogger(__filename);
 
 {
   const details = endpointDetails("/try/unprotected", "GET");
-  const [ep, method, signature, methodLower] = details;
+  const [ep, , signature, method] = details;
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  TryRouter[methodLower](ep, async (req, res, next) => {
+  TryRouter[method](ep, async (req, res, next) => {
     logger.info("Parsing output...");
     const outputParsing = signature.output.safeParse({
       data: {
@@ -48,11 +48,11 @@ const logger = localizeLogger(__filename);
 
 {
   const details = endpointDetails("/try/protected", "GET");
-  const [ep, method, signature, methodLower] = details;
+  const [ep, , signature, method] = details;
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  TryRouter[methodLower](ep, async (req, res, next) => {
+  TryRouter[method](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const parsingInput = signature.input.safeParse(req);
     if (!parsingInput.success) {

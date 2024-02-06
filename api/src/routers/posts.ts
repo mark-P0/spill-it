@@ -21,11 +21,11 @@ export const PostsRouter = Router();
 
 {
   const details = endpointDetails("/api/v0/posts/:postId", "GET");
-  const [ep, method, signature, methodLower] = details;
+  const [ep, , signature, method] = details;
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  PostsRouter[methodLower](ep, async (req, res, next) => {
+  PostsRouter[method](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const inputParsing = signature.input.safeParse(req);
     if (!inputParsing.success) {
@@ -99,11 +99,11 @@ export const PostsRouter = Router();
 
 {
   const details = endpointDetails("/api/v0/posts", "GET");
-  const [ep, method, signature, methodLower] = details;
+  const [ep, , signature, method] = details;
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  PostsRouter[methodLower](ep, async (req, res, next) => {
+  PostsRouter[method](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const inputParsing = signature.input.safeParse(req);
     if (!inputParsing.success) {
@@ -152,11 +152,11 @@ export const PostsRouter = Router();
 
 {
   const details = endpointDetails("/api/v0/posts", "POST");
-  const [ep, method, signature, methodLower] = details;
+  const [ep, , signature, method] = details;
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  PostsRouter[methodLower](ep, async (req, res, next) => {
+  PostsRouter[method](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const inputParsing = signature.input.safeParse(req);
     if (!inputParsing.success) {
@@ -222,11 +222,11 @@ export const PostsRouter = Router();
 
 {
   const details = endpointDetails("/api/v0/posts", "DELETE");
-  const [ep, method, signature, methodLower] = details;
+  const [ep, , signature, method] = details;
   type Input = z.infer<typeof signature.input>;
   type Output = z.infer<typeof signature.output>;
 
-  PostsRouter[methodLower](ep, async (req, res, next) => {
+  PostsRouter[method](ep, async (req, res, next) => {
     logger.info("Parsing input...");
     const inputParsing = signature.input.safeParse(req);
     if (!inputParsing.success) {
