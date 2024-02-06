@@ -2,6 +2,7 @@ import {
   zodPost,
   zodPostWithAuthor,
   zodSample,
+  zodSession,
   zodUser,
 } from "@spill-it/db/schema";
 import { z } from "zod";
@@ -15,9 +16,11 @@ export const endpointMap = {
         }),
       }),
       output: z.object({
-        data: z.object({
+        Authorization: z.object({
           scheme: z.string(),
-          id: z.string(),
+          params: z.object({
+            id: zodSession.shape.id,
+          }),
         }),
       }),
     },
@@ -79,7 +82,7 @@ export const endpointMap = {
           Authorization: z.string(),
         }),
         query: z.object({
-          id: z.string().uuid() satisfies typeof zodPost.shape.id,
+          id: zodPost.shape.id,
         }),
       }),
       output: z.object({}),

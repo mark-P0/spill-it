@@ -116,11 +116,12 @@ export const SessionsRouter = Router();
     session satisfies NonNullable<typeof session>;
 
     logger.info("Parsing output...");
-    const sessionId = session.id;
     const outputParsing = signature.output.safeParse({
-      data: {
+      Authorization: {
         scheme: "SPILLITSESS" satisfies AuthScheme,
-        id: sessionId,
+        params: {
+          id: session.id,
+        },
       },
     } satisfies Output);
     if (!outputParsing.success) {
