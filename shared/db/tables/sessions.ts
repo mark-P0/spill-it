@@ -34,22 +34,16 @@ export async function readUserSession(
   return session;
 }
 
-export async function readSessionFromUUID(
-  uuid: Session["uuid"],
-): Promise<Session | null> {
+export async function readSession(id: Session["id"]): Promise<Session | null> {
   const result = await safeAsync(
     () =>
-      db
-        .select()
-        .from(SessionsTable)
-        .where(eq(SessionsTable.uuid, uuid))
-        .limit(2), // There should only be at most 1. If there are 2 (or more), something has gone wrong...
+      db.select().from(SessionsTable).where(eq(SessionsTable.id, id)).limit(2), // There should only be at most 1. If there are 2 (or more), something has gone wrong...
   );
   const sessions = result.success
     ? result.value
     : raise("Failed reading sessions table", result.error);
 
-  if (sessions.length > 1) raise("Multiple sessions for a UUID...?");
+  if (sessions.length > 1) raise("Multiple sessions for an ID...?");
   const session = sessions[0] ?? null;
 
   return session;

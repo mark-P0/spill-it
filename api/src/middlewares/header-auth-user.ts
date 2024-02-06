@@ -1,8 +1,5 @@
 import { parseHeaderAuth } from "@spill-it/auth/headers";
-import {
-  isSessionExpired,
-  readSessionFromUUID,
-} from "@spill-it/db/tables/sessions";
+import { isSessionExpired, readSession } from "@spill-it/db/tables/sessions";
 import { User, readUser } from "@spill-it/db/tables/users";
 import { formatError } from "@spill-it/utils/errors";
 import { Result, safe, safeAsync } from "@spill-it/utils/safe";
@@ -33,7 +30,7 @@ export async function convertHeaderAuthToUser(
 
   logger.info("Fetching session info...");
   const { id } = headerAuth.params;
-  const resultSession = await safeAsync(() => readSessionFromUUID(id));
+  const resultSession = await safeAsync(() => readSession(id));
   if (!resultSession.success) {
     logger.error(formatError(resultSession.error));
     const error = new StatusCodeError(StatusCodes.BAD_GATEWAY);
