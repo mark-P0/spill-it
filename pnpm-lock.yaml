@@ -17,9 +17,6 @@ importers:
       '@spill-it/endpoints':
         specifier: workspace:^
         version: link:../shared/endpoints
-      '@spill-it/header-auth':
-        specifier: workspace:^
-        version: link:../shared/header-auth
       '@spill-it/utils':
         specifier: workspace:^
         version: link:../shared/utils
@@ -152,15 +149,6 @@ importers:
         specifier: ^3.22.4
         version: 3.22.4
 
-  shared/header-auth:
-    dependencies:
-      '@spill-it/utils':
-        specifier: workspace:^
-        version: link:../utils
-      zod:
-        specifier: ^3.22.4
-        version: 3.22.4
-
   shared/utils:
     dependencies:
       superjson:
@@ -175,9 +163,6 @@ importers:
       '@spill-it/endpoints':
         specifier: workspace:^
         version: link:../shared/endpoints
-      '@spill-it/header-auth':
-        specifier: workspace:^
-        version: link:../shared/header-auth
       '@spill-it/utils':
         specifier: workspace:^
         version: link:../shared/utils
