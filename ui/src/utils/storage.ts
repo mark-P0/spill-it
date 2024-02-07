@@ -26,3 +26,8 @@ export function getFromStorage<T extends Key>(key: T): Value<T> {
 
   return value;
 }
+
+export function deleteFromStorage(key: Key) {
+  // TODO Do something if key does not exist?
+  localStorage.removeItem(key);
+}
