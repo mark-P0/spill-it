@@ -22,15 +22,15 @@ export async function convertHeaderAuthToUser(
   authorization: string,
 ): Promise<Result<User, StatusCodeError>> {
   logger.info("Parsing header authorization...");
-  const resultHeaderAuth = safe(() =>
+  const headerAuthResult = safe(() =>
     parseHeaderAuth("SPILLITSESS", authorization),
   );
-  if (!resultHeaderAuth.success) {
-    logger.error(formatError(resultHeaderAuth.error));
+  if (!headerAuthResult.success) {
+    logger.error(formatError(headerAuthResult.error));
     const error = new StatusCodeError(StatusCodes.BAD_REQUEST);
     return { success: false, error };
   }
-  const headerAuth = resultHeaderAuth.value;
+  const headerAuth = headerAuthResult.value;
 
   logger.info("Verifying session signature...");
   const { id, signature } = headerAuth.params;
@@ -42,13 +42,13 @@ export async function convertHeaderAuthToUser(
   }
 
   logger.info("Fetching session info...");
-  const resultSession = await safeAsync(() => readSessionWithUser(id));
-  if (!resultSession.success) {
-    logger.error(formatError(resultSession.error));
+  const sessionResult = await safeAsync(() => readSessionWithUser(id));
+  if (!sessionResult.success) {
+    logger.error(formatError(sessionResult.error));
     const error = new StatusCodeError(StatusCodes.BAD_GATEWAY);
     return { success: false, error };
   }
-  const session = resultSession.value;
+  const session = sessionResult.value;
 
   logger.info("Verifying session...");
   if (session === null) {

@@ -19,21 +19,21 @@ export const LinksRouter = Router();
 
   LinksRouter[method](ep, async (req, res, next) => {
     logger.info("Parsing input...");
-    const parsingInput = signature.input.safeParse(req);
-    if (!parsingInput.success) {
-      logger.error(formatError(parsingInput.error));
+    const inputParsing = signature.input.safeParse(req);
+    if (!inputParsing.success) {
+      logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = parsingInput.data;
+    const input = inputParsing.data;
 
     logger.info("Building auth URL...");
     const { redirectUri } = input.query;
-    const resultAuthUrl = await safeAsync(() => buildAuthUrl(redirectUri));
-    if (!resultAuthUrl.success) {
-      logger.error(formatError(resultAuthUrl.error));
+    const authUrlResult = await safeAsync(() => buildAuthUrl(redirectUri));
+    if (!authUrlResult.success) {
+      logger.error(formatError(authUrlResult.error));
       return res.sendStatus(StatusCodes.BAD_GATEWAY);
     }
-    const authUrl = resultAuthUrl.value;
+    const authUrl = authUrlResult.value;
 
     logger.info("Parsing output...");
     const outputParsing = signature.output.safeParse({
