@@ -1,3 +1,4 @@
+import { zodSession } from "@spill-it/db/schema";
 import { raise } from "@spill-it/utils/errors";
 import { safe } from "@spill-it/utils/safe";
 import { z } from "zod";
@@ -13,8 +14,8 @@ function splitAtFirstInstance(str: string, sep: string): [string, string] {
 }
 
 const schemeMap = {
-  SPILLITGOOGLE: z.object({ code: z.string(), redirectUri: z.string() }),
-  SPILLITSESS: z.object({ id: z.string().uuid() }),
+  SPILLITGOOGLE: z.object({ code: z.string(), redirectUri: z.string().url() }),
+  SPILLITSESS: z.object({ id: zodSession.shape.id, signature: z.string() }),
 };
 type SchemeMap = typeof schemeMap;
 export type AuthScheme = keyof SchemeMap;

@@ -90,6 +90,9 @@ importers:
 
   shared/auth:
     dependencies:
+      '@spill-it/db':
+        specifier: workspace:^
+        version: link:../db
       '@spill-it/utils':
         specifier: workspace:^
         version: link:../utils

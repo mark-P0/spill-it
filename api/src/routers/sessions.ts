@@ -1,5 +1,6 @@
 import { convertCodeIntoGoogleInfo } from "@spill-it/auth/google";
 import { buildHeaderAuth, parseHeaderAuth } from "@spill-it/auth/headers";
+import { sign } from "@spill-it/auth/signing";
 import {
   createSession,
   deleteSession,
@@ -117,7 +118,10 @@ export const SessionsRouter = Router();
 
     logger.info("Parsing output...");
     const outputParsing = signature.output.safeParse({
-      Authorization: buildHeaderAuth("SPILLITSESS", { id: session.id }),
+      Authorization: buildHeaderAuth("SPILLITSESS", {
+        id: session.id,
+        signature: sign(session.id),
+      }),
     } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
