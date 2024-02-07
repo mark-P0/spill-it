@@ -1,8 +1,6 @@
 import { PostWithAuthor } from "@spill-it/db/schema";
-import { safe } from "@spill-it/utils/safe";
 import { useCallback, useEffect, useState } from "react";
 import { fetchAPI } from "../../utils/fetch-api";
-import { buildHeaderAuthFromStorage } from "../../utils/is-logged-in";
 import { createNewContext } from "../../utils/react";
 
 export const [useHomeContext, HomeProvider] = createNewContext(() => {
@@ -12,13 +10,12 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
   const [postToDelete, setPostToDelete] = useState<PostWithAuthor | null>(null);
 
   const refreshPosts = useCallback(async () => {
-    const headerAuthResult = safe(() => buildHeaderAuthFromStorage());
-    if (!headerAuthResult.success) {
-      console.error(headerAuthResult.error);
+    const headerAuth = localStorage.getItem("SESS");
+    if (headerAuth === null) {
+      console.error("Header auth does not exist...?");
       setPosts("error");
       return;
     }
-    const headerAuth = headerAuthResult.value;
 
     const fetchResult = await fetchAPI("/api/v0/posts", "GET", {
       headers: { Authorization: headerAuth },
