@@ -21,7 +21,7 @@ function LoadingCursorAbsoluteOverlay() {
 }
 
 function PostForm() {
-  const { setToastAttrs } = useToastContext();
+  const { showOnToast } = useToastContext();
   const { refreshPosts } = useHomeContext();
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,10 +37,7 @@ function PostForm() {
     const headerAuthResult = safe(() => getFromStorage("SESS"));
     if (!headerAuthResult.success) {
       console.error(headerAuthResult.error);
-      setToastAttrs({
-        content: "😫 We spilt too much! Please try again.",
-        level: "warn",
-      });
+      showOnToast("😫 We spilt too much! Please try again.", "warn");
       setIsSubmitting(false);
       return;
     }
@@ -52,19 +49,13 @@ function PostForm() {
     });
     if (!fetchResult.success) {
       console.error(fetchResult.error);
-      setToastAttrs({
-        content: "😫 We spilt too much! Please try again.",
-        level: "warn",
-      });
+      showOnToast("😫 We spilt too much! Please try again.", "warn");
       setIsSubmitting(false);
       return;
     }
 
     refreshPosts();
-    setToastAttrs({
-      content: "Spilt! 😋",
-      level: "info",
-    });
+    showOnToast("Spilt! 😋", "info");
     setIsSubmitting(false);
     reset();
   }
@@ -104,7 +95,7 @@ function PostForm() {
 }
 
 function DeletePostModalContent() {
-  const { setToastAttrs } = useToastContext();
+  const { showOnToast } = useToastContext();
   const { closeModal, makeModalCancellable } = useModalContext();
   const { postToDelete, setPostToDelete, refreshPosts } = useHomeContext();
   const [isDeleting, setIsDeleting] = useState(false);
@@ -126,10 +117,7 @@ function DeletePostModalContent() {
 
     if (postToDelete === null) {
       console.error("Post to delete does not exist...?");
-      setToastAttrs({
-        content: "😫 We spilt too much! Please try again.",
-        level: "warn",
-      });
+      showOnToast("😫 We spilt too much! Please try again.", "warn");
       finalizeDeleting();
       return;
     }
@@ -137,10 +125,7 @@ function DeletePostModalContent() {
     const headerAuthResult = safe(() => getFromStorage("SESS"));
     if (!headerAuthResult.success) {
       console.error(headerAuthResult.error);
-      setToastAttrs({
-        content: "😫 We spilt too much! Please try again.",
-        level: "warn",
-      });
+      showOnToast("😫 We spilt too much! Please try again.", "warn");
       finalizeDeleting();
       return;
     }
@@ -154,19 +139,13 @@ function DeletePostModalContent() {
     });
     if (!fetchResult.success) {
       console.error(fetchResult.error);
-      setToastAttrs({
-        content: "😫 We spilt too much! Please try again.",
-        level: "warn",
-      });
+      showOnToast("😫 We spilt too much! Please try again.", "warn");
       finalizeDeleting();
       return;
     }
 
     refreshPosts();
-    setToastAttrs({
-      content: "Spill cleaned up 😔",
-      level: "info",
-    });
+    showOnToast("Spill cleaned 🧹", "info");
     finalizeDeleting();
   }
 
@@ -263,18 +242,15 @@ function PostCard(props: { post: PostWithAuthor }) {
   );
 }
 function PostsList() {
-  const { setToastAttrs } = useToastContext();
+  const { showOnToast } = useToastContext();
   const { posts } = useHomeContext();
 
   useEffect(() => {
     if (posts !== "error") return;
 
     // TODO Allow retrying from toast?
-    setToastAttrs({
-      content: "🥶 We spilt things along the way",
-      level: "warn",
-    });
-  }, [posts, setToastAttrs]);
+    showOnToast("🥶 We spilt things along the way", "warn");
+  }, [posts, showOnToast]);
   if (posts === "error") return null; // The "output" is the toast above
 
   if (posts === "fetching") return "fetching"; // TODO Use loading component?
