@@ -10,6 +10,8 @@ export const redirectUri = new URL(endpoint("/login/google/redirect"), uiHost)
 
 export type WelcomeRouteLoader = typeof loadWelcomeRoute;
 export async function loadWelcomeRoute() {
+  document.title = "Welcome! ✨ Spill.it!";
+
   /** Redirect if already logged in */
   {
     const canShowHome = await isLoggedIn();
