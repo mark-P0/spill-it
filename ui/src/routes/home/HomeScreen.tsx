@@ -134,9 +134,9 @@ function DeletePostModalContent() {
       return;
     }
 
-    const headerAuth = localStorage.getItem("SESS");
-    if (headerAuth === null) {
-      console.error("Header auth does not exist...?");
+    const headerAuthResult = safe(() => getFromStorage("SESS"));
+    if (!headerAuthResult.success) {
+      console.error(headerAuthResult.error);
       setToastAttrs({
         content: "😫 We spilt too much! Please try again.",
         level: "warn",
@@ -144,6 +144,7 @@ function DeletePostModalContent() {
       finalizeDeleting();
       return;
     }
+    const headerAuth = headerAuthResult.value;
 
     const fetchResult = await fetchAPI("/api/v0/posts", "DELETE", {
       headers: { Authorization: headerAuth },
