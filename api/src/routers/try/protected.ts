@@ -54,31 +54,31 @@ const logger = localizeLogger(__filename);
 
   TryRouter[method](ep, async (req, res, next) => {
     logger.info("Parsing input...");
-    const parsingInput = signature.input.safeParse(req);
-    if (!parsingInput.success) {
-      logger.error(formatError(parsingInput.error));
+    const inputParsing = signature.input.safeParse(req);
+    if (!inputParsing.success) {
+      logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = parsingInput.data;
+    const input = inputParsing.data;
 
     const { headers } = input;
-    const resultHeaderAuth = safe(() =>
+    const headerAuthResult = safe(() =>
       parseHeaderAuth("SPILLITSESS", headers.Authorization),
     );
-    if (!resultHeaderAuth.success) {
-      logger.error(formatError(resultHeaderAuth.error));
+    if (!headerAuthResult.success) {
+      logger.error(formatError(headerAuthResult.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const headerAuth = resultHeaderAuth.value;
+    const headerAuth = headerAuthResult.value;
 
     logger.info("Fetching session info...");
     const { id } = headerAuth.params;
-    const resultSession = await safeAsync(() => readSessionWithUser(id));
-    if (!resultSession.success) {
-      logger.error(formatError(resultSession.error));
+    const sessionResult = await safeAsync(() => readSessionWithUser(id));
+    if (!sessionResult.success) {
+      logger.error(formatError(sessionResult.error));
       return res.sendStatus(StatusCodes.BAD_GATEWAY);
     }
-    const session = resultSession.value;
+    const session = sessionResult.value;
 
     logger.info("Verifying session...");
     if (session === null) {

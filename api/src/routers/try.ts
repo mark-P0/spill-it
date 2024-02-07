@@ -20,12 +20,12 @@ export const TryRouter = Router();
 
   TryRouter[method](ep, (req, res, next) => {
     logger.info("Parsing input...");
-    const parsingInput = signature.input.safeParse(req);
-    if (!parsingInput.success) {
-      logger.error(formatError(parsingInput.error));
+    const inputParsing = signature.input.safeParse(req);
+    if (!inputParsing.success) {
+      logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = parsingInput.data;
+    const input = inputParsing.data;
 
     logger.info("Parsing output...");
     const { who = "world" } = input.query;
@@ -58,12 +58,12 @@ export const TryRouter = Router();
 
   TryRouter[method](ep, async (req, res, next) => {
     logger.info("Getting samples from database...");
-    const resultSamples = await safeAsync(() => readSamplesAll());
-    if (!resultSamples.success) {
-      logger.error(formatError(resultSamples.error));
+    const samplesResult = await safeAsync(() => readSamplesAll());
+    if (!samplesResult.success) {
+      logger.error(formatError(samplesResult.error));
       return res.sendStatus(StatusCodes.BAD_GATEWAY);
     }
-    const samples = resultSamples.value;
+    const samples = samplesResult.value;
 
     logger.info("Parsing output...");
     const outputParsing = signature.output.safeParse({

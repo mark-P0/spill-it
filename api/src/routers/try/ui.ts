@@ -60,23 +60,23 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
 
   TryRouter[method](ep, async (req, res, next) => {
     logger.info("Parsing input...");
-    const parsingInput = signature.input.safeParse(req);
-    if (!parsingInput.success) {
-      logger.error(formatError(parsingInput.error));
+    const inputParsing = signature.input.safeParse(req);
+    if (!inputParsing.success) {
+      logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = parsingInput.data;
+    const input = inputParsing.data;
 
     logger.info("Building header auth...");
     const { code } = input.query;
-    const resultHeaderAuth = safe(() =>
+    const headerAuthResult = safe(() =>
       buildHeaderAuth("SPILLITGOOGLE", { code, redirectUri }),
     );
-    if (!resultHeaderAuth.success) {
-      logger.error(formatError(resultHeaderAuth.error));
+    if (!headerAuthResult.success) {
+      logger.error(formatError(headerAuthResult.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const headerAuth = resultHeaderAuth.value;
+    const headerAuth = headerAuthResult.value;
 
     logger.info("Parsing output...");
     const outputParsing = signature.output.safeParse({
