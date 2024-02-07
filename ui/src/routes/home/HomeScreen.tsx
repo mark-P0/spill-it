@@ -1,9 +1,11 @@
 import { PostWithAuthor } from "@spill-it/db/schema";
+import { safe } from "@spill-it/utils/safe";
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
 import { FormEvent, useEffect, useState } from "react";
 import { BsTrashFill } from "react-icons/bs";
 import { fetchAPI } from "../../utils/fetch-api";
+import { getFromStorage } from "../../utils/storage";
 import { Screen } from "../_app/Screen";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
@@ -32,9 +34,9 @@ function PostForm() {
     event.preventDefault();
     setIsSubmitting(true);
 
-    const headerAuth = localStorage.getItem("SESS");
-    if (headerAuth === null) {
-      console.error("Header auth does not exist...?");
+    const headerAuthResult = safe(() => getFromStorage("SESS"));
+    if (!headerAuthResult.success) {
+      console.error(headerAuthResult.error);
       setToastAttrs({
         content: "😫 We spilt too much! Please try again.",
         level: "warn",
@@ -42,6 +44,7 @@ function PostForm() {
       setIsSubmitting(false);
       return;
     }
+    const headerAuth = headerAuthResult.value;
 
     const fetchResult = await fetchAPI("/api/v0/posts", "POST", {
       headers: { Authorization: headerAuth },

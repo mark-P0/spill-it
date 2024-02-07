@@ -1,7 +1,12 @@
+import { safe } from "@spill-it/utils/safe";
 import { fetchAPI } from "./fetch-api";
+import { getFromStorage } from "./storage";
 
 export async function isLoggedIn(): Promise<boolean> {
-  const headerAuth = localStorage.getItem("SESS");
+  const headerAuthResult = safe(() => getFromStorage("SESS"));
+  if (!headerAuthResult.success) return false;
+  const headerAuth = headerAuthResult.value;
+
   if (headerAuth === null) return false;
 
   const result = await fetchAPI("/api/v0/users/me", "GET", {
