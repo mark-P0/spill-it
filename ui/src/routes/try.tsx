@@ -44,6 +44,13 @@ const loadRoute = (() => {
   };
 })();
 
+const toastRoute: RouteObject = (() => {
+  return {
+    path: "/toast",
+    element: <Screen></Screen>,
+  };
+})();
+
 const modalRoute: RouteObject = (() => {
   function ScreenModalContent() {
     const { isCancellable, makeModalCancellable } = useModalContext();
@@ -85,5 +92,6 @@ export const tryRoutes: RouteObject[] = [
   queryRoute,
   sleepRoute,
   loadRoute,
+  toastRoute,
   modalRoute,
 ];
