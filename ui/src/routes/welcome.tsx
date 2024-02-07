@@ -38,13 +38,11 @@ export const LoginGoogleRedirectRoute: RouteObject = {
       });
       const { Authorization } = result.success
         ? result.value
-        : raise("Failed retrieving session ID", result.error);
-      const { scheme, params } = Authorization;
-      const { id } = params;
+        : raise("Failed retrieving session authorization", result.error);
 
       // TODO Create util wrapper for local storage, also using Zod?
       // TODO Find better alternative to local storage...
-      localStorage.setItem(scheme, id);
+      localStorage.setItem("SESS", Authorization);
     }
 
     return redirect(endpoint("/"));
