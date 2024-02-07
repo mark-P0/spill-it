@@ -10,12 +10,14 @@ type Key = keyof StorageMap;
 type Value<T extends Key> = z.infer<StorageMap[T]>;
 
 export function setOnStorage<T extends Key>(key: T, value: Value<T>) {
-  localStorage.setItem(key, value);
+  const encoded = btoa(value);
+  localStorage.setItem(key, encoded);
 }
 
 export function getFromStorage<T extends Key>(key: T): Value<T> {
-  const rawValue =
+  const encoded =
     localStorage.getItem(key) ?? raise("Key does not exist on storage");
+  const rawValue = atob(encoded);
 
   const valueParsing = storageMap[key].safeParse(rawValue);
   const value = valueParsing.success
