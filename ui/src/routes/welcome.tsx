@@ -4,6 +4,7 @@ import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";
 import { endpoint } from "../utils/endpoints";
 import { fetchAPI } from "../utils/fetch-api";
+import { setOnStorage } from "../utils/storage";
 import { WelcomeScreen } from "./welcome/WelcomeScreen";
 import { loadWelcomeRoute, redirectUri } from "./welcome/load-welcome-route";
 
@@ -40,9 +41,7 @@ export const LoginGoogleRedirectRoute: RouteObject = {
         ? result.value
         : raise("Failed retrieving session authorization", result.error);
 
-      // TODO Create util wrapper for local storage, also using Zod?
-      // TODO Find better alternative to local storage...
-      localStorage.setItem("SESS", Authorization);
+      setOnStorage("SESS", Authorization);
     }
 
     return redirect(endpoint("/"));
