@@ -7,6 +7,7 @@ const parsing = z
     ...{
       AUTH_GOOGLE_CLIENT_ID: z.string(),
       AUTH_GOOGLE_CLIENT_SECRET: z.string(),
+      HMAC_KEY: z.string(),
     },
   })
   .safeParse(process.env);
