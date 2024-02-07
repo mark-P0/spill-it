@@ -3,7 +3,9 @@ import { safe } from "@spill-it/utils/safe";
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
 import { FormEvent, useEffect, useState } from "react";
-import { BsTrashFill } from "react-icons/bs";
+import { BsBoxArrowLeft, BsTrashFill } from "react-icons/bs";
+import { Link } from "react-router-dom";
+import { endpoint } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { getFromStorage } from "../../utils/storage";
 import { Screen } from "../_app/Screen";
@@ -180,7 +182,7 @@ function DeletePostModalContent() {
             className={clsx(
               "rounded-full px-6 py-3",
               "disabled:opacity-50",
-              "outline outline-1 outline-white/50",
+              "outline outline-1 outline-fuchsia-500",
               ...["transition", "hover:bg-white/10", "active:scale-95"],
             )}
           >
@@ -233,7 +235,7 @@ function PostCard(props: { post: PostWithAuthor }) {
       <div>
         <button
           onClick={promptDelete}
-          className="rounded-full p-1 transition hover:bg-white/25 active:scale-90"
+          className="rounded-full p-2 transition hover:bg-white/25 active:scale-90"
         >
           <BsTrashFill />
         </button>
@@ -265,11 +267,74 @@ function PostsList() {
   );
 }
 
+function LogoutModalContent() {
+  const { closeModal } = useModalContext();
+
+  return (
+    <ModalContent>
+      <h2 className="text-xl font-bold tracking-wide">
+        Do you really want to log out?
+      </h2>
+
+      <form className="grid gap-3 mt-6">
+        <Link
+          to={endpoint("/logout")}
+          className={clsx(
+            "text-center",
+            "rounded-full px-6 py-3",
+            "disabled:opacity-50",
+            "font-bold tracking-wide",
+            ...[
+              "transition",
+              "bg-fuchsia-500 hover:bg-fuchsia-600",
+              "active:scale-95",
+            ],
+          )}
+        >
+          Yes 👋
+        </Link>
+        <button
+          type="button"
+          onClick={closeModal}
+          className={clsx(
+            "rounded-full px-6 py-3",
+            "disabled:opacity-50",
+            "outline outline-1 outline-fuchsia-500",
+            ...["transition", "hover:bg-white/10", "active:scale-95"],
+          )}
+        >
+          No 🙅‍♀️
+        </button>
+      </form>
+    </ModalContent>
+  );
+}
+
+function LogoutButton() {
+  const { showOnModal } = useModalContext();
+
+  function promptLogout() {
+    showOnModal(<LogoutModalContent />);
+  }
+
+  return (
+    <button
+      onClick={promptLogout}
+      className="rounded-full p-2 transition hover:bg-white/25 active:scale-90"
+    >
+      <BsBoxArrowLeft />
+    </button>
+  );
+}
+
 export function HomeScreen() {
   return (
     <HomeProvider>
       <Screen className="grid auto-rows-min gap-6 p-6">
-        <h1 className="text-3xl">Home</h1>
+        <header className="flex justify-between items-center">
+          <h1 className="text-3xl">Home</h1>
+          <LogoutButton />
+        </header>
         <PostForm />
 
         <main>
