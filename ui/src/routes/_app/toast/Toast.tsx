@@ -3,20 +3,18 @@ import { randomKey } from "../../../utils/react";
 import { useToastContext } from "./ToastContext";
 
 export function Toast() {
-  const { toastAttrs, setToastAttrs } = useToastContext();
+  const { content, level, showOnToast } = useToastContext();
 
-  function removeToastComponent() {
-    setToastAttrs(null);
+  function discardSelf() {
+    showOnToast(null);
   }
 
-  if (toastAttrs === null) return null;
-  const { content, level } = toastAttrs;
-
+  if (content === null) return null;
   return (
     <dialog
       key={randomKey()} // Ensure "new" toast every time content is changed
       open
-      onAnimationEnd={removeToastComponent}
+      onAnimationEnd={discardSelf}
       className={clsx(
         "fixed bottom-[5%]",
         "flex gap-4",
@@ -30,7 +28,7 @@ export function Toast() {
       <span className="text-sm tracking-wider">{content}</span>
 
       <button
-        onClick={removeToastComponent}
+        onClick={discardSelf}
         className={clsx(
           "font-bold text-sm uppercase tracking-widest",
           "opacity-50 hover:opacity-100 transition",
