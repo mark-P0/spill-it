@@ -242,7 +242,7 @@ function PostCard(props: { post: PostWithAuthor }) {
         />
       </div>
       <div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-baseline gap-3">
           {/* TODO Link to profile? */}
           <h3 className="font-bold">{author.username}</h3>
           <p className="text-xs uppercase tracking-wide opacity-50">
