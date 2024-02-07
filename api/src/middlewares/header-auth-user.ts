@@ -1,4 +1,5 @@
 import { parseHeaderAuth } from "@spill-it/auth/headers";
+import { isSignatureValid } from "@spill-it/auth/signing";
 import { User } from "@spill-it/db/schema";
 import {
   isSessionExpired,
@@ -31,8 +32,16 @@ export async function convertHeaderAuthToUser(
   }
   const headerAuth = resultHeaderAuth.value;
 
+  logger.info("Verifying session signature...");
+  const { id, signature } = headerAuth.params;
+  const isValidSignature = isSignatureValid(id, signature);
+  if (!isValidSignature) {
+    logger.error("Invalid signature");
+    const error = new StatusCodeError(StatusCodes.UNAUTHORIZED);
+    return { success: false, error };
+  }
+
   logger.info("Fetching session info...");
-  const { id } = headerAuth.params;
   const resultSession = await safeAsync(() => readSessionWithUser(id));
   if (!resultSession.success) {
     logger.error(formatError(resultSession.error));

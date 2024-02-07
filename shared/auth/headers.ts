@@ -15,7 +15,7 @@ function splitAtFirstInstance(str: string, sep: string): [string, string] {
 
 const schemeMap = {
   SPILLITGOOGLE: z.object({ code: z.string(), redirectUri: z.string().url() }),
-  SPILLITSESS: z.object({ id: zodSession.shape.id }),
+  SPILLITSESS: z.object({ id: zodSession.shape.id, signature: z.string() }),
 };
 type SchemeMap = typeof schemeMap;
 export type AuthScheme = keyof SchemeMap;
