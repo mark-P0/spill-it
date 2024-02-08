@@ -1,11 +1,24 @@
+import { buildAuthUrl } from "@spill-it/auth/google";
 import clsx from "clsx";
-import { useTypedLoaderData } from "../../utils/react";
+import { useEffect, useState } from "react";
+import { env } from "../../utils/env";
 import { Screen } from "../_app/Screen";
-import { loadWelcomeRoute } from "./load-welcome-route";
+import { redirectUri } from "./load-welcome-route";
 
 function GoogleLoginButtonLink() {
-  const { link } = useTypedLoaderData<typeof loadWelcomeRoute>();
+  const [link, setLink] = useState<string | null>(null);
+  async function initializeLink() {
+    const link = await buildAuthUrl(
+      env.VITE_AUTH_GOOGLE_CLIENT_ID,
+      redirectUri,
+    );
+    setLink(link);
+  }
+  useEffect(() => {
+    initializeLink();
+  }, []);
 
+  if (link === null) return null;
   return (
     <a
       href={link}

@@ -19,6 +19,7 @@ const parsing = z
      * Prefixed with `VITE` to be included in the build
      */
     ...{
+      VITE_AUTH_GOOGLE_CLIENT_ID: z.string(),
       VITE_HOST_API_DEV: z.string().url(),
       VITE_HOST_API_PROD: z.string().url(),
       VITE_HOST_UI_DEV: z.string().url(),
