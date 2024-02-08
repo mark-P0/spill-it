@@ -130,7 +130,7 @@ export const SessionsRouter = Router();
     const outputParsing = signature.output.safeParse({
       Authorization: buildHeaderAuth("SPILLITSESS", {
         id: session.id,
-        signature: sign(session.id),
+        signature: sign(env.HMAC_KEY, session.id),
       }),
     } satisfies Output);
     if (!outputParsing.success) {

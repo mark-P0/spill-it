@@ -1,5 +1,4 @@
 import { createHmac, createSecretKey, generateKeySync } from "crypto";
-import { env } from "./utils/env";
 
 /**
  * https://security.stackexchange.com/questions/95972/what-are-requirements-for-hmac-secret-key
@@ -26,19 +25,19 @@ export function createHMACKey(bitLength: number = 128) {
 }
 
 /**
- * Node prefers passing in keys as a `KeyObject` instead of regular strings
- * - https://nodejs.org/api/crypto.html#class-keyobject
- * - https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options
- * - https://stackoverflow.com/questions/74228565/what-are-differences-between-createsign-and-privateencrypt-in-nodecryp
- */
-const keyObj = createSecretKey(env.HMAC_KEY, "hex");
-
-/**
  * Create a signature for the given `value` using a secret key
  * - https://stackoverflow.com/a/7480211
  * - https://stackoverflow.com/a/72765383
  */
-export function sign(value: string): string {
+export function sign(key: string, value: string): string {
+  /**
+   * Node prefers passing in keys as a `KeyObject` instead of regular strings
+   * - https://nodejs.org/api/crypto.html#class-keyobject
+   * - https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options
+   * - https://stackoverflow.com/questions/74228565/what-are-differences-between-createsign-and-privateencrypt-in-nodecryp
+   */
+  const keyObj = createSecretKey(key, "hex");
+
   return createHmac("SHA256", keyObj).update(value).digest("hex");
 }
 
@@ -47,7 +46,11 @@ export function sign(value: string): string {
  *
  * Basically sign the value again and check if it matches the incoming signature
  */
-export function isSignatureValid(value: string, signature: string): boolean {
-  const actualSignature = sign(value);
+export function isSignatureValid(
+  key: string,
+  value: string,
+  signature: string,
+): boolean {
+  const actualSignature = sign(key, value);
   return signature === actualSignature;
 }

@@ -8,6 +8,7 @@ import {
 import { formatError } from "@spill-it/utils/errors";
 import { Result, safe, safeAsync } from "@spill-it/utils/safe";
 import { StatusCodes } from "http-status-codes";
+import { env } from "../utils/env";
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(__filename);
@@ -34,7 +35,7 @@ export async function convertHeaderAuthToUser(
 
   logger.info("Verifying session signature...");
   const { id, signature } = headerAuth.params;
-  const isValidSignature = isSignatureValid(id, signature);
+  const isValidSignature = isSignatureValid(env.HMAC_KEY, id, signature);
   if (!isValidSignature) {
     logger.error("Invalid signature");
     const error = new StatusCodeError(StatusCodes.UNAUTHORIZED);
