@@ -1,9 +1,6 @@
 import clsx from "clsx";
 import { ComponentProps, useEffect, useState } from "react";
-import {
-  removeBodyClasses,
-  restoreBodyClasses,
-} from "../../utils/body-classes";
+import { removeBodyClasses, restoreBodyClasses } from "../../utils/dom";
 import { Modal } from "./modal/Modal";
 import { ModalProvider } from "./modal/ModalContext";
 import { Toast } from "./toast/Toast";
