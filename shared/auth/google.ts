@@ -7,7 +7,6 @@ import { raise } from "@spill-it/utils/errors";
 import { safeAsync } from "@spill-it/utils/safe";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import { z } from "zod";
-import { env } from "./utils/env";
 
 // TODO Cache this? Is it cached by default?
 /**
@@ -44,6 +43,7 @@ async function fetchDiscoveryDocument(
  * - https://developers.google.com/identity/openid-connect/openid-connect#authenticationuriparameters
  */
 export async function buildAuthUrl(
+  googleClientId: string,
   redirectUri: string,
   scopes = ["openid", "email", "profile"],
   includeGrantedScopes = true,
@@ -51,7 +51,7 @@ export async function buildAuthUrl(
   const { authorization_endpoint } = await fetchDiscoveryDocument();
   const url = new URL(authorization_endpoint);
 
-  url.searchParams.set("client_id", env.AUTH_GOOGLE_CLIENT_ID);
+  url.searchParams.set("client_id", googleClientId);
   url.searchParams.set("response_type", "code");
   url.searchParams.set("scope", scopes.join(" "));
   url.searchParams.set("redirect_uri", redirectUri);
@@ -65,14 +65,19 @@ export async function buildAuthUrl(
 }
 
 /** https://developers.google.com/identity/openid-connect/openid-connect#exchangecode */
-async function exchangeCodeForTokens(code: string, redirectUri: string) {
+export async function exchangeCodeForTokens(
+  googleClientId: string,
+  googleClientSecret: string,
+  code: string,
+  redirectUri: string,
+) {
   const { token_endpoint } = await fetchDiscoveryDocument();
   const url = new URL(token_endpoint);
 
   const params = new URLSearchParams();
   params.set("code", code);
-  params.set("client_id", env.AUTH_GOOGLE_CLIENT_ID);
-  params.set("client_secret", env.AUTH_GOOGLE_CLIENT_SECRET);
+  params.set("client_id", googleClientId);
+  params.set("client_secret", googleClientSecret);
   params.set("redirect_uri", redirectUri);
   params.set("grant_type", "authorization_code");
 
@@ -105,7 +110,7 @@ async function exchangeCodeForTokens(code: string, redirectUri: string) {
  * - https://developers.google.com/identity/openid-connect/openid-connect#obtainuserinfo
  * - https://github.com/panva/jose/blob/main/docs/functions/jwt_verify.jwtVerify.md
  */
-async function extractGoogleInfoFromJwt(jwt: string) {
+export async function extractGoogleInfoFromJwt(jwt: string) {
   const { jwks_uri } = await fetchDiscoveryDocument();
 
   const jwks = createRemoteJWKSet(new URL(jwks_uri));
@@ -126,13 +131,4 @@ async function extractGoogleInfoFromJwt(jwt: string) {
     : raise("Unexpected Google JWT", parsing.error);
 
   return { googleId: sub, name, picture };
-}
-
-export async function convertCodeIntoGoogleInfo(
-  code: string,
-  redirectUri: string,
-) {
-  const tokens = await exchangeCodeForTokens(code, redirectUri);
-  const googleInfo = await extractGoogleInfoFromJwt(tokens.id_token);
-  return googleInfo;
 }

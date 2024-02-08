@@ -6,7 +6,7 @@ import { jsonPack } from "@spill-it/utils/json";
 import { safe, safeAsync } from "@spill-it/utils/safe";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { apiHost } from "../../utils/env";
+import { apiHost, env } from "../../utils/env";
 import { localizeLogger } from "../../utils/logger";
 import { TryRouter } from "../try";
 
@@ -23,7 +23,9 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
 
   TryRouter[method](ep, async (req, res, next) => {
     logger.info("Building auth URL...");
-    const authUrlResult = await safeAsync(() => buildAuthUrl(redirectUri));
+    const authUrlResult = await safeAsync(() =>
+      buildAuthUrl(env.AUTH_GOOGLE_CLIENT_ID, redirectUri),
+    );
     if (!authUrlResult.success) {
       logger.error(formatError(authUrlResult.error));
       return res.sendStatus(StatusCodes.BAD_GATEWAY);

@@ -1,4 +1,7 @@
-import { convertCodeIntoGoogleInfo } from "@spill-it/auth/google";
+import {
+  exchangeCodeForTokens,
+  extractGoogleInfoFromJwt,
+} from "@spill-it/auth/google";
 import { buildHeaderAuth, parseHeaderAuth } from "@spill-it/auth/headers";
 import { sign } from "@spill-it/auth/signing";
 import {
@@ -18,7 +21,7 @@ import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-
+import { env } from "../utils/env";
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(__filename);
@@ -52,9 +55,16 @@ export const SessionsRouter = Router();
 
     logger.info("Fetching Google info...");
     const { code, redirectUri } = headerAuth.params;
-    const infoResult = await safeAsync(() =>
-      convertCodeIntoGoogleInfo(code, redirectUri),
-    );
+    const infoResult = await safeAsync(async () => {
+      const tokens = await exchangeCodeForTokens(
+        env.AUTH_GOOGLE_CLIENT_ID,
+        env.AUTH_GOOGLE_CLIENT_SECRET,
+        code,
+        redirectUri,
+      );
+      const googleInfo = await extractGoogleInfoFromJwt(tokens.id_token);
+      return googleInfo;
+    });
     if (!infoResult.success) {
       logger.error(formatError(infoResult.error));
       return res.sendStatus(StatusCodes.UNAUTHORIZED);

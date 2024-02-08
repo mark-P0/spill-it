@@ -6,6 +6,7 @@ import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
+import { env } from "../utils/env";
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(__filename);
@@ -28,7 +29,9 @@ export const LinksRouter = Router();
 
     logger.info("Building auth URL...");
     const { redirectUri } = input.query;
-    const authUrlResult = await safeAsync(() => buildAuthUrl(redirectUri));
+    const authUrlResult = await safeAsync(() =>
+      buildAuthUrl(env.AUTH_GOOGLE_CLIENT_ID, redirectUri),
+    );
     if (!authUrlResult.success) {
       logger.error(formatError(authUrlResult.error));
       return res.sendStatus(StatusCodes.BAD_GATEWAY);
