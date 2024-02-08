@@ -202,7 +202,7 @@ function DeletePostModalContent() {
             className={clsx(
               "rounded-full px-6 py-3",
               "disabled:opacity-50",
-              "outline outline-1 outline-fuchsia-500",
+              "outline outline-1 outline-white/25",
               ...["transition", "hover:bg-white/10", "active:scale-95"],
             )}
           >
@@ -343,7 +343,7 @@ function LogoutModalContent() {
           className={clsx(
             "rounded-full px-6 py-3",
             "disabled:opacity-50",
-            "outline outline-1 outline-fuchsia-500",
+            "outline outline-1 outline-white/25",
             ...["transition", "hover:bg-white/10", "active:scale-95"],
           )}
         >
