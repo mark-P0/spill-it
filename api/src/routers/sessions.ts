@@ -126,11 +126,20 @@ export const SessionsRouter = Router();
     }
     session satisfies NonNullable<typeof session>;
 
+    logger.info("Signing session ID...");
+    const sessionId = session.id;
+    const sessionIdSignatureResult = safe(() => sign(env.HMAC_KEY, sessionId));
+    if (!sessionIdSignatureResult.success) {
+      logger.error(formatError(sessionIdSignatureResult.error));
+      return res.sendStatus(StatusCodes.BAD_GATEWAY);
+    }
+    const sessionIdSignature = sessionIdSignatureResult.value;
+
     logger.info("Parsing output...");
     const outputParsing = signature.output.safeParse({
       Authorization: buildHeaderAuth("SPILLITSESS", {
-        id: session.id,
-        signature: sign(env.HMAC_KEY, session.id),
+        id: sessionId,
+        signature: sessionIdSignature,
       }),
     } satisfies Output);
     if (!outputParsing.success) {

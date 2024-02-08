@@ -35,7 +35,16 @@ export async function convertHeaderAuthToUser(
 
   logger.info("Verifying session signature...");
   const { id, signature } = headerAuth.params;
-  const isValidSignature = isSignatureValid(env.HMAC_KEY, id, signature);
+  const isValidSignatureResult = safe(() =>
+    isSignatureValid(env.HMAC_KEY, id, signature),
+  );
+  if (!isValidSignatureResult.success) {
+    logger.error(formatError(isValidSignatureResult.error));
+    const error = new StatusCodeError(StatusCodes.INTERNAL_SERVER_ERROR);
+    return { success: false, error };
+  }
+  const isValidSignature = isValidSignatureResult.value;
+
   if (!isValidSignature) {
     logger.error("Invalid signature");
     const error = new StatusCodeError(StatusCodes.UNAUTHORIZED);
