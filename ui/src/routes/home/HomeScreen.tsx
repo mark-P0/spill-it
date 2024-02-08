@@ -98,8 +98,13 @@ function PostForm() {
           className={clsx(
             "ml-auto",
             "rounded-full px-6 py-3",
-            "bg-rose-500 disabled:opacity-50",
+            "disabled:opacity-50",
             "font-bold tracking-wide",
+            ...[
+              "transition",
+              "bg-rose-500 enabled:hover:bg-rose-600",
+              "active:scale-95",
+            ],
           )}
         >
           {isSubmitting ? <>Spilling...</> : <>Spill! 🍵</>}
@@ -260,15 +265,33 @@ function PostCard(props: { post: PostWithAuthor }) {
 }
 function PostsList() {
   const { showOnToast } = useToastContext();
-  const { posts } = useHomeContext();
+  const { posts, refreshPosts } = useHomeContext();
 
   useEffect(() => {
     if (posts !== "error") return;
-
-    // TODO Allow retrying from toast?
     showOnToast("🥶 We spilt things along the way", "warn");
   }, [posts, showOnToast]);
-  if (posts === "error") return null; // The "output" is the toast above
+  if (posts === "error") {
+    return (
+      <div className="grid place-items-center">
+        <button
+          onClick={refreshPosts}
+          className={clsx(
+            "rounded-full px-6 py-3",
+            "disabled:opacity-50",
+            "font-bold tracking-wide",
+            ...[
+              "transition",
+              "bg-fuchsia-500 enabled:hover:bg-fuchsia-600",
+              "active:scale-95",
+            ],
+          )}
+        >
+          Load Posts 🔁
+        </button>
+      </div>
+    );
+  }
 
   if (posts === "fetching") {
     return (
