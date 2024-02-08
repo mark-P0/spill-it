@@ -1,12 +1,9 @@
 import { raise } from "@spill-it/utils/errors";
 import { redirect } from "react-router-dom";
 import { endpoint } from "../../utils/endpoints";
-import { uiHost } from "../../utils/env";
 import { fetchAPI } from "../../utils/fetch-api";
 import { isLoggedIn } from "../../utils/is-logged-in";
-
-export const redirectUri = new URL(endpoint("/login/google/redirect"), uiHost)
-  .href;
+import { redirectUri } from "./redirect-uri";
 
 export type WelcomeRouteLoader = typeof loadWelcomeRoute;
 export async function loadWelcomeRoute() {

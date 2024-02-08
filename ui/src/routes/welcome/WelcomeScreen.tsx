@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { env } from "../../utils/env";
 import { Screen } from "../_app/Screen";
-import { redirectUri } from "./load-welcome-route";
+import { redirectUri } from "./redirect-uri";
 
 function GoogleLoginButtonLink() {
   const [link, setLink] = useState<string | null>(null);

@@ -6,7 +6,8 @@ import { endpoint } from "../utils/endpoints";
 import { fetchAPI } from "../utils/fetch-api";
 import { setOnStorage } from "../utils/storage";
 import { WelcomeScreen } from "./welcome/WelcomeScreen";
-import { loadWelcomeRoute, redirectUri } from "./welcome/load-welcome-route";
+import { loadWelcomeRoute } from "./welcome/load-welcome-route";
+import { redirectUri } from "./welcome/redirect-uri";
 
 export const WelcomeRoute: RouteObject = {
   path: endpoint("/welcome"),
