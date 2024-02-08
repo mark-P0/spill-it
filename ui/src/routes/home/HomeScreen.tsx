@@ -22,6 +22,21 @@ function LoadingCursorAbsoluteOverlay() {
   return <div className="absolute w-full h-full cursor-wait"></div>;
 }
 
+function LoadingIndicator() {
+  return (
+    <figure className="relative">
+      <figcaption className="sr-only">Loading...</figcaption>
+
+      <div className="absolute animate-[ping_1.5s_ease-out_infinite]">
+        <div className="w-9 aspect-square rounded-full animate-palette"></div>
+      </div>
+      <div className="absolute">
+        <div className="w-9 aspect-square rounded-full animate-palette"></div>
+      </div>
+    </figure>
+  );
+}
+
 function PostForm() {
   const { showOnToast } = useToastContext();
   const { refreshPosts } = useHomeContext();
@@ -255,7 +270,13 @@ function PostsList() {
   }, [posts, showOnToast]);
   if (posts === "error") return null; // The "output" is the toast above
 
-  if (posts === "fetching") return "fetching"; // TODO Use loading component?
+  if (posts === "fetching") {
+    return (
+      <div className="grid place-items-center">
+        <LoadingIndicator />
+      </div>
+    );
+  }
   return (
     <ol className="grid gap-3">
       {posts.map((post) => (
