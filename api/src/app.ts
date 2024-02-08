@@ -8,7 +8,6 @@ import helmet from "helmet";
 import { StatusCodes } from "http-status-codes";
 import morgan from "morgan";
 import path from "path";
-import { LinksRouter } from "./routers/links";
 import { PostsRouter } from "./routers/posts";
 import { SessionsRouter } from "./routers/sessions";
 import { TryRouter } from "./routers/try";
@@ -133,7 +132,6 @@ app.use(express.static(path.join(__dirname, "public")));
   logger.debug('Using "try" routes...');
   app.use(TryRouter);
 
-  app.use(LinksRouter);
   app.use(SessionsRouter);
   app.use(UsersRouter);
   app.use(PostsRouter);
