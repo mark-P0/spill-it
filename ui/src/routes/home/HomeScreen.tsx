@@ -265,13 +265,13 @@ function PostCard(props: { post: PostWithAuthor }) {
 }
 function PostsList() {
   const { showOnToast } = useToastContext();
-  const { posts, refreshPosts } = useHomeContext();
+  const { postsStatus, posts, refreshPosts } = useHomeContext();
 
   useEffect(() => {
-    if (posts !== "error") return;
+    if (postsStatus !== "error") return;
     showOnToast("🥶 We spilt things along the way", "warn");
-  }, [posts, showOnToast]);
-  if (posts === "error") {
+  }, [postsStatus, showOnToast]);
+  if (postsStatus === "error") {
     return (
       <div className="grid place-items-center">
         <button
@@ -293,7 +293,7 @@ function PostsList() {
     );
   }
 
-  if (posts === "fetching") {
+  if (postsStatus === "fetching") {
     return (
       <div className="grid place-items-center">
         <LoadingIndicator />
