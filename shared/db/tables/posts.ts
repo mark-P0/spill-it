@@ -1,8 +1,9 @@
 import { raise } from "@spill-it/utils/errors";
 import { safeAsync } from "@spill-it/utils/safe";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, lt } from "drizzle-orm";
 import { db } from "../db";
 import { Post, PostDetails, PostWithAuthor, PostsTable } from "../schema";
+import { POST_CT_CAP } from "../utils/constants";
 
 export async function createPost(details: PostDetails): Promise<Post> {
   const result = await safeAsync(() =>
@@ -39,6 +40,31 @@ export async function readPostsOfUser(
     db.query.PostsTable.findMany({
       where: eq(PostsTable.userId, userId),
       orderBy: desc(PostsTable.timestamp),
+      with: { author: true },
+    }),
+  );
+  const posts = result.success
+    ? result.value
+    : raise("Failed reading posts of user", result.error);
+
+  return posts;
+}
+
+export async function readPostsOfUserBeforeTimestamp(
+  userId: PostWithAuthor["userId"],
+  timestamp: PostWithAuthor["timestamp"],
+  ct: number,
+): Promise<PostWithAuthor[]> {
+  if (ct > POST_CT_CAP) raise("Requested post count greater than set cap");
+
+  const result = await safeAsync(() =>
+    db.query.PostsTable.findMany({
+      where: and(
+        eq(PostsTable.userId, userId), // Posts of user
+        lt(PostsTable.timestamp, timestamp), // Before a particular time
+      ),
+      limit: ct, // Limited to a specific count
+      orderBy: desc(PostsTable.timestamp), // Sorted from most to least recent
       with: { author: true },
     }),
   );

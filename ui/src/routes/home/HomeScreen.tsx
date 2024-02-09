@@ -1,8 +1,8 @@
 import { PostWithAuthor } from "@spill-it/db/schema";
-import { safe } from "@spill-it/utils/safe";
+import { safe, safeAsync } from "@spill-it/utils/safe";
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { BsBoxArrowLeft, BsTrashFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { endpoint } from "../../utils/endpoints";
@@ -13,6 +13,7 @@ import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
 import { useToastContext } from "../_app/toast/ToastContext";
 import { HomeProvider, useHomeContext } from "./HomeContext";
+import { Controller } from "./controller";
 
 /**
  * More reliable for showing a cursor over a whole element
@@ -39,7 +40,7 @@ function LoadingIndicator() {
 
 function PostForm() {
   const { showOnToast } = useToastContext();
-  const { refreshPosts } = useHomeContext();
+  const { extendPostsWithRecent } = useHomeContext();
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -71,7 +72,7 @@ function PostForm() {
       return;
     }
 
-    refreshPosts();
+    extendPostsWithRecent();
     showOnToast("Spilt! 😋", "info");
     setIsSubmitting(false);
     reset();
@@ -116,20 +117,14 @@ function PostForm() {
   );
 }
 
-function DeletePostModalContent() {
+function DeletePostModalContent(props: { postToDelete: PostWithAuthor }) {
   const { showOnToast } = useToastContext();
   const { closeModal, makeModalCancellable } = useModalContext();
-  const { postToDelete, setPostToDelete, refreshPosts } = useHomeContext();
+  const { deletePost } = useHomeContext();
+  const { postToDelete } = props;
   const [isDeleting, setIsDeleting] = useState(false);
 
-  function finalizeDeleting() {
-    setIsDeleting(false);
-    makeModalCancellable(true);
-    setPostToDelete(null);
-    closeModal();
-  }
-
-  async function deletePost() {
+  async function triggerDelete() {
     if (isDeleting) {
       console.warn("Cannot delete if already deleting...");
       return;
@@ -137,38 +132,14 @@ function DeletePostModalContent() {
     setIsDeleting(true);
     makeModalCancellable(false);
 
-    if (postToDelete === null) {
-      console.error("Post to delete does not exist...?");
+    const deleteResult = await safeAsync(() => deletePost(postToDelete));
+    if (!deleteResult.success) {
       showOnToast("😫 We spilt too much! Please try again.", "warn");
-      finalizeDeleting();
-      return;
     }
 
-    const headerAuthResult = safe(() => getFromStorage("SESS"));
-    if (!headerAuthResult.success) {
-      console.error(headerAuthResult.error);
-      showOnToast("😫 We spilt too much! Please try again.", "warn");
-      finalizeDeleting();
-      return;
-    }
-    const headerAuth = headerAuthResult.value;
-
-    const fetchResult = await fetchAPI("/api/v0/posts", "DELETE", {
-      headers: { Authorization: headerAuth },
-      query: {
-        id: postToDelete.id,
-      },
-    });
-    if (!fetchResult.success) {
-      console.error(fetchResult.error);
-      showOnToast("😫 We spilt too much! Please try again.", "warn");
-      finalizeDeleting();
-      return;
-    }
-
-    refreshPosts();
-    showOnToast("Spill cleaned 🧹", "info");
-    finalizeDeleting();
+    setIsDeleting(false);
+    makeModalCancellable(true);
+    closeModal();
   }
 
   return (
@@ -182,7 +153,7 @@ function DeletePostModalContent() {
         <fieldset disabled={isDeleting} className="relative grid gap-3 mt-6">
           <button
             type="button"
-            onClick={deletePost}
+            onClick={triggerDelete}
             className={clsx(
               "rounded-full px-6 py-3",
               "disabled:opacity-50",
@@ -224,13 +195,11 @@ function formatPostDate(date: PostWithAuthor["timestamp"]): string {
 }
 function PostCard(props: { post: PostWithAuthor }) {
   const { showOnModal } = useModalContext();
-  const { setPostToDelete } = useHomeContext();
   const { post } = props;
   const { content, timestamp, author } = post;
 
   function promptDelete() {
-    setPostToDelete(post);
-    showOnModal(<DeletePostModalContent />);
+    showOnModal(<DeletePostModalContent postToDelete={post} />);
   }
 
   return (
@@ -263,19 +232,72 @@ function PostCard(props: { post: PostWithAuthor }) {
     </article>
   );
 }
+
+function useObserver<T extends Element>() {
+  const [isIntersecting, setIsIntersecting] = useState(false);
+
+  const elementRef = useRef<T | null>(null);
+  useEffect(() => {
+    const element = elementRef.current;
+    if (element === null) {
+      console.warn("Element to be observed does not exist...?");
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.length > 1) {
+        console.warn("Multiple elements observed...?");
+        return;
+      }
+
+      const entry = entries[0];
+      if (entry === undefined) {
+        console.warn("Observed element does not exist...?");
+        return;
+      }
+
+      // TODO Also have state for entry?
+      setIsIntersecting(entry.isIntersecting);
+    });
+
+    observer.observe(element);
+    return () => {
+      observer.unobserve(element);
+    };
+  }, []);
+
+  return [elementRef, isIntersecting] as const;
+}
+function PostsListEndObserver() {
+  const [divRef, isIntersecting] = useObserver<HTMLDivElement>();
+
+  const { extendPosts } = useHomeContext();
+  useEffect(() => {
+    if (!isIntersecting) return;
+    const ctl: Controller = { shouldProceed: true };
+    extendPosts(ctl);
+    return () => {
+      ctl.shouldProceed = false;
+    };
+  }, [isIntersecting, extendPosts]);
+
+  return <div ref={divRef}>{isIntersecting && <LoadingIndicator />}</div>;
+}
+
 function PostsList() {
   const { showOnToast } = useToastContext();
-  const { posts, refreshPosts } = useHomeContext();
+  const { postsStatus, posts, hasNextPosts, initializePosts } =
+    useHomeContext();
 
   useEffect(() => {
-    if (posts !== "error") return;
+    if (postsStatus !== "error") return;
     showOnToast("🥶 We spilt things along the way", "warn");
-  }, [posts, showOnToast]);
-  if (posts === "error") {
+  }, [postsStatus, showOnToast]);
+  if (postsStatus === "error") {
     return (
       <div className="grid place-items-center">
         <button
-          onClick={refreshPosts}
+          onClick={initializePosts}
           className={clsx(
             "rounded-full px-6 py-3",
             "disabled:opacity-50",
@@ -293,7 +315,7 @@ function PostsList() {
     );
   }
 
-  if (posts === "fetching") {
+  if (postsStatus === "fetching") {
     return (
       <div className="grid place-items-center">
         <LoadingIndicator />
@@ -307,6 +329,18 @@ function PostsList() {
           <PostCard post={post} />
         </li>
       ))}
+      <li className="grid place-items-center mt-6 mb-3">
+        {hasNextPosts ? (
+          <PostsListEndObserver />
+        ) : (
+          <p>
+            <span className="italic tracking-wide text-white/50">
+              More tea later, maybe
+            </span>{" "}
+            😋
+          </p>
+        )}
+      </li>
     </ol>
   );
 }

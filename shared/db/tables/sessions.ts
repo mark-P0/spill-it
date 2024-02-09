@@ -67,6 +67,7 @@ export async function readSessionWithUser(
   return session;
 }
 
+// TODO Move date functions to common file?
 const today = () => new Date();
 const tomorrow = () => addDays(today(), 1);
 const defaultExpiry = () => tomorrow();

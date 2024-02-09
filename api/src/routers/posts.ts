@@ -2,8 +2,9 @@ import {
   createPost,
   deletePost,
   readPost,
-  readPostsOfUser,
+  readPostsOfUserBeforeTimestamp,
 } from "@spill-it/db/tables/posts";
+import { POST_CT_CAP } from "@spill-it/db/utils/constants";
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
@@ -112,8 +113,22 @@ export const PostsRouter = Router();
     }
     const input = inputParsing.data;
 
+    const { headers, query } = input;
+    const { beforeISODateStr, size } = query;
+
+    if (size > POST_CT_CAP) {
+      logger.error("Requested post count greater than set cap");
+      return res.sendStatus(StatusCodes.BAD_REQUEST);
+    }
+
+    const beforeISODateResult = safe(() => new Date(beforeISODateStr));
+    if (!beforeISODateResult.success) {
+      logger.error(formatError(beforeISODateResult.error));
+      return res.sendStatus(StatusCodes.BAD_REQUEST);
+    }
+    const beforeISODate = beforeISODateResult.value;
+
     logger.info("Converting header authorization to user info...");
-    const { headers } = input;
     const userResult = await convertHeaderAuthToUser(headers.Authorization);
     if (!userResult.success) {
       return res.sendStatus(userResult.error.statusCode);
@@ -121,7 +136,9 @@ export const PostsRouter = Router();
     const user = userResult.value;
 
     logger.info("Fetching user posts...");
-    const postsResult = await safeAsync(() => readPostsOfUser(user.id));
+    const postsResult = await safeAsync(() =>
+      readPostsOfUserBeforeTimestamp(user.id, beforeISODate, size),
+    );
     if (!postsResult.success) {
       logger.error(formatError(postsResult.error));
       return res.sendStatus(StatusCodes.BAD_GATEWAY);
