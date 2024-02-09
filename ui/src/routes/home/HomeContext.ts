@@ -5,6 +5,9 @@ import { fetchAPI } from "../../utils/fetch-api";
 import { createNewContext } from "../../utils/react";
 import { getFromStorage } from "../../utils/storage";
 
+const today = () => new Date();
+const POSTS_IN_VIEW_CT = 8;
+
 export const [useHomeContext, HomeProvider] = createNewContext(() => {
   const [posts, setPosts] = useState<PostWithAuthor[] | "fetching" | "error">(
     "fetching",
@@ -22,6 +25,10 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
 
     const fetchResult = await fetchAPI("/api/v0/posts", "GET", {
       headers: { Authorization: headerAuth },
+      query: {
+        beforeISODateStr: today().toISOString(),
+        size: POSTS_IN_VIEW_CT,
+      },
     });
     if (!fetchResult.success) {
       console.error(fetchResult.error);
