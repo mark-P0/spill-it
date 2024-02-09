@@ -4,12 +4,26 @@ import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";
 import { endpoint } from "../utils/endpoints";
 import { fetchAPI } from "../utils/fetch-api";
+import { isLoggedIn } from "../utils/is-logged-in";
 import { setOnStorage } from "../utils/storage";
 import { WelcomeScreen } from "./welcome/WelcomeScreen";
 import { redirectUri } from "./welcome/redirect-uri";
 
 export const WelcomeRoute: RouteObject = {
   path: endpoint("/welcome"),
+  async loader() {
+    document.title = "Welcome! ✨ Spill.it!";
+
+    /** Redirect if already logged in */
+    {
+      const canShowHome = await isLoggedIn();
+      if (canShowHome) {
+        return redirect(endpoint("/home"));
+      }
+    }
+
+    return null;
+  },
   element: <WelcomeScreen />,
 };
 
