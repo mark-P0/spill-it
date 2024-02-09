@@ -53,6 +53,38 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
     },
     [posts],
   );
+  const extendPostsWithRecent = useCallback(async () => {
+    const headerAuthResult = safe(() => getFromStorage("SESS"));
+    if (!headerAuthResult.success) {
+      console.error(headerAuthResult.error);
+      setPostsStatus("error");
+      return;
+    }
+    const headerAuth = headerAuthResult.value;
+
+    const recentPostsResult = await fetchAPI("/api/v0/posts", "GET", {
+      headers: { Authorization: headerAuth },
+      query: {
+        beforeISODateStr: tomorrow().toISOString(),
+        size: POSTS_IN_VIEW_CT, // TODO Is this enough? Too much?
+      },
+    });
+    if (!recentPostsResult.success) {
+      console.error(recentPostsResult.error);
+      setPostsStatus("error");
+      return;
+    }
+    const recentPosts = recentPostsResult.value.data;
+
+    const postIds = new Set<PostWithAuthor["id"]>();
+    const newPostsWithPossibleRepeats = [...recentPosts, ...posts]; // TODO Only check at the end of recents and start of current?
+    const newPosts = newPostsWithPossibleRepeats.filter((post) => {
+      if (postIds.has(post.id)) return false; // Remove post if it is already "seen"
+      postIds.add(post.id); // Mark post as "seen"
+      return true; // Keep post
+    });
+    setPosts(newPosts);
+  }, [posts]);
   const refreshPosts = useCallback(async () => {
     setPostsStatus("fetching");
 
@@ -92,7 +124,8 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
 
   return {
     postsStatus,
-    ...{ posts, refreshPosts, extendPosts, hasNextPosts },
+    ...{ posts, refreshPosts },
+    ...{ hasNextPosts, extendPosts, extendPostsWithRecent },
     ...{ postToDelete, setPostToDelete },
   };
 });

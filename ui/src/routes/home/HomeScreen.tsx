@@ -40,7 +40,7 @@ function LoadingIndicator() {
 
 function PostForm() {
   const { showOnToast } = useToastContext();
-  const { refreshPosts } = useHomeContext();
+  const { extendPostsWithRecent } = useHomeContext();
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -72,7 +72,7 @@ function PostForm() {
       return;
     }
 
-    refreshPosts();
+    extendPostsWithRecent();
     showOnToast("Spilt! 😋", "info");
     setIsSubmitting(false);
     reset();
