@@ -1,7 +1,7 @@
 import { PostWithAuthor } from "@spill-it/db/schema";
 import { safe } from "@spill-it/utils/safe";
 import { addDays } from "date-fns";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { fetchAPI } from "../../utils/fetch-api";
 import { createNewContext } from "../../utils/react";
 import { getFromStorage } from "../../utils/storage";
@@ -12,11 +12,43 @@ const today = () => new Date();
 const tomorrow = () => addDays(today(), 1);
 const POSTS_IN_VIEW_CT = 8;
 
+type PostStatus = "fetching" | "error" | "ok";
 export const [useHomeContext, HomeProvider] = createNewContext(() => {
-  const [postsStatus, setPostsStatus] = useState<"fetching" | "error" | "ok">(
-    "ok",
-  );
+  const [postsStatus, setPostsStatus] = useState<PostStatus>("fetching");
+
   const [posts, setPosts] = useState<PostWithAuthor[]>([]);
+  const initializePosts = useCallback(async () => {
+    setPostsStatus("fetching");
+
+    const headerAuthResult = safe(() => getFromStorage("SESS"));
+    if (!headerAuthResult.success) {
+      console.error(headerAuthResult.error);
+      setPostsStatus("error");
+      return;
+    }
+    const headerAuth = headerAuthResult.value;
+
+    const fetchResult = await fetchAPI("/api/v0/posts", "GET", {
+      headers: { Authorization: headerAuth },
+      query: {
+        beforeISODateStr: tomorrow().toISOString(), // Use a "future" date to ensure most recent posts are also fetched
+        size: POSTS_IN_VIEW_CT,
+      },
+    });
+    if (!fetchResult.success) {
+      console.error(fetchResult.error);
+      setPostsStatus("error");
+      return;
+    }
+    const { data } = fetchResult.value;
+
+    setPostsStatus("ok");
+    setPosts(data);
+  }, []);
+  useEffect(() => {
+    initializePosts();
+  }, [initializePosts]);
+
   const [hasNextPosts, setHasNextPosts] = useState(true);
   const extendPosts = useCallback(
     async (ctl: Controller) => {
@@ -53,6 +85,7 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
     },
     [posts],
   );
+
   const extendPostsWithRecent = useCallback(async () => {
     const headerAuthResult = safe(() => getFromStorage("SESS"));
     if (!headerAuthResult.success) {
@@ -85,34 +118,7 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
     });
     setPosts(newPosts);
   }, [posts]);
-  const refreshPosts = useCallback(async () => {
-    setPostsStatus("fetching");
 
-    const headerAuthResult = safe(() => getFromStorage("SESS"));
-    if (!headerAuthResult.success) {
-      console.error(headerAuthResult.error);
-      setPostsStatus("error");
-      return;
-    }
-    const headerAuth = headerAuthResult.value;
-
-    const fetchResult = await fetchAPI("/api/v0/posts", "GET", {
-      headers: { Authorization: headerAuth },
-      query: {
-        beforeISODateStr: tomorrow().toISOString(), // Use a "future" date to ensure most recent posts are also fetched
-        size: POSTS_IN_VIEW_CT,
-      },
-    });
-    if (!fetchResult.success) {
-      console.error(fetchResult.error);
-      setPostsStatus("error");
-      return;
-    }
-    const { data } = fetchResult.value;
-
-    setPostsStatus("ok");
-    setPosts(data);
-  }, []);
   const deletePost = useCallback(
     async (post: PostWithAuthor) => {
       const headerAuthResult = safe(() => getFromStorage("SESS"));
@@ -139,15 +145,9 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
     [posts],
   );
 
-  // TODO Posts status also unnecessary?
-  // TODO Unnecessary?
-  // useEffect(() => {
-  //   extendPosts();
-  // }, []);
-
   return {
     postsStatus,
-    ...{ posts, refreshPosts },
+    ...{ posts, initializePosts },
     ...{ hasNextPosts, extendPosts, extendPostsWithRecent, deletePost },
   };
 });

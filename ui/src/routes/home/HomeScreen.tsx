@@ -286,7 +286,8 @@ function PostsListEndObserver() {
 
 function PostsList() {
   const { showOnToast } = useToastContext();
-  const { postsStatus, posts, refreshPosts, hasNextPosts } = useHomeContext();
+  const { postsStatus, posts, hasNextPosts, initializePosts } =
+    useHomeContext();
 
   useEffect(() => {
     if (postsStatus !== "error") return;
@@ -296,7 +297,7 @@ function PostsList() {
     return (
       <div className="grid place-items-center">
         <button
-          onClick={refreshPosts}
+          onClick={initializePosts}
           className={clsx(
             "rounded-full px-6 py-3",
             "disabled:opacity-50",
