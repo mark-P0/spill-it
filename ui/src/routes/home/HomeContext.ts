@@ -5,7 +5,7 @@ import { fetchAPI } from "../../utils/fetch-api";
 import { createNewContext } from "../../utils/react";
 import { getFromStorage } from "../../utils/storage";
 
-const today = () => new Date();
+const today = () => new Date(); // TODO Move date functions to common file?
 const POSTS_IN_VIEW_CT = 8;
 
 export const [useHomeContext, HomeProvider] = createNewContext(() => {
