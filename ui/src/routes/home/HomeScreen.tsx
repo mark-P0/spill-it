@@ -24,13 +24,13 @@ function LoadingCursorAbsoluteOverlay() {
 
 function LoadingIndicator() {
   return (
-    <figure className="relative">
+    <figure className="grid">
       <figcaption className="sr-only">Loading...</figcaption>
 
-      <div className="absolute animate-[ping_1.5s_ease-out_infinite]">
+      <div className="row-[1] col-[1] animate-[ping_1.5s_ease-out_infinite]">
         <div className="w-9 aspect-square rounded-full animate-palette"></div>
       </div>
-      <div className="absolute">
+      <div className="row-[1] col-[1]">
         <div className="w-9 aspect-square rounded-full animate-palette"></div>
       </div>
     </figure>
