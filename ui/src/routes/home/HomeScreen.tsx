@@ -2,7 +2,7 @@ import { PostWithAuthor } from "@spill-it/db/schema";
 import { safe } from "@spill-it/utils/safe";
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { BsBoxArrowLeft, BsTrashFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { endpoint } from "../../utils/endpoints";
@@ -263,6 +263,52 @@ function PostCard(props: { post: PostWithAuthor }) {
     </article>
   );
 }
+
+function useObserver<T extends Element>() {
+  const [isIntersecting, setIsIntersecting] = useState(false);
+
+  const elementRef = useRef<T | null>(null);
+  useEffect(() => {
+    const element = elementRef.current;
+    if (element === null) {
+      console.warn("Element to be observed does not exist...?");
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.length > 1) {
+        console.warn("Multiple elements observed...?");
+        return;
+      }
+
+      const entry = entries[0];
+      if (entry === undefined) {
+        console.warn("Observed element does not exist...?");
+        return;
+      }
+
+      // TODO Also have state for entry?
+      setIsIntersecting(entry.isIntersecting);
+    });
+
+    observer.observe(element);
+    return () => {
+      observer.unobserve(element);
+    };
+  }, []);
+
+  return [elementRef, isIntersecting] as const;
+}
+function PostsListEndObserver() {
+  const [divRef, isIntersecting] = useObserver<HTMLDivElement>();
+
+  return (
+    <div ref={divRef} className="grid place-items-center mt-3">
+      {isIntersecting && <LoadingIndicator />}
+    </div>
+  );
+}
+
 function PostsList() {
   const { showOnToast } = useToastContext();
   const { postsStatus, posts, refreshPosts } = useHomeContext();
@@ -307,6 +353,9 @@ function PostsList() {
           <PostCard post={post} />
         </li>
       ))}
+      <li>
+        <PostsListEndObserver />
+      </li>
     </ol>
   );
 }
