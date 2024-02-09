@@ -13,6 +13,7 @@ import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
 import { useToastContext } from "../_app/toast/ToastContext";
 import { HomeProvider, useHomeContext } from "./HomeContext";
+import { Controller } from "./controller";
 
 /**
  * More reliable for showing a cursor over a whole element
@@ -302,16 +303,22 @@ function useObserver<T extends Element>() {
 function PostsListEndObserver() {
   const [divRef, isIntersecting] = useObserver<HTMLDivElement>();
 
-  return (
-    <div ref={divRef} className="grid place-items-center mt-3">
-      {isIntersecting && <LoadingIndicator />}
-    </div>
-  );
+  const { extendPosts } = useHomeContext();
+  useEffect(() => {
+    if (!isIntersecting) return;
+    const ctl: Controller = { shouldProceed: true };
+    extendPosts(ctl);
+    return () => {
+      ctl.shouldProceed = false;
+    };
+  }, [isIntersecting, extendPosts]);
+
+  return <div ref={divRef}>{isIntersecting && <LoadingIndicator />}</div>;
 }
 
 function PostsList() {
   const { showOnToast } = useToastContext();
-  const { postsStatus, posts, refreshPosts } = useHomeContext();
+  const { postsStatus, posts, refreshPosts, hasNextPosts } = useHomeContext();
 
   useEffect(() => {
     if (postsStatus !== "error") return;
@@ -353,8 +360,17 @@ function PostsList() {
           <PostCard post={post} />
         </li>
       ))}
-      <li>
-        <PostsListEndObserver />
+      <li className="grid place-items-center mt-6 mb-3">
+        {hasNextPosts ? (
+          <PostsListEndObserver />
+        ) : (
+          <p>
+            <span className="italic tracking-wide text-white/50">
+              More tea later, maybe
+            </span>{" "}
+            😋
+          </p>
+        )}
       </li>
     </ol>
   );
