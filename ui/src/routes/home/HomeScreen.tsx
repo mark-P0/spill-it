@@ -1,5 +1,5 @@
 import { PostWithAuthor } from "@spill-it/db/schema";
-import { safe } from "@spill-it/utils/safe";
+import { safe, safeAsync } from "@spill-it/utils/safe";
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
 import { FormEvent, useEffect, useRef, useState } from "react";
@@ -117,20 +117,14 @@ function PostForm() {
   );
 }
 
-function DeletePostModalContent() {
+function DeletePostModalContent(props: { postToDelete: PostWithAuthor }) {
   const { showOnToast } = useToastContext();
   const { closeModal, makeModalCancellable } = useModalContext();
-  const { postToDelete, setPostToDelete, refreshPosts } = useHomeContext();
+  const { deletePost } = useHomeContext();
+  const { postToDelete } = props;
   const [isDeleting, setIsDeleting] = useState(false);
 
-  function finalizeDeleting() {
-    setIsDeleting(false);
-    makeModalCancellable(true);
-    setPostToDelete(null);
-    closeModal();
-  }
-
-  async function deletePost() {
+  async function triggerDelete() {
     if (isDeleting) {
       console.warn("Cannot delete if already deleting...");
       return;
@@ -138,38 +132,14 @@ function DeletePostModalContent() {
     setIsDeleting(true);
     makeModalCancellable(false);
 
-    if (postToDelete === null) {
-      console.error("Post to delete does not exist...?");
+    const deleteResult = await safeAsync(() => deletePost(postToDelete));
+    if (!deleteResult.success) {
       showOnToast("😫 We spilt too much! Please try again.", "warn");
-      finalizeDeleting();
-      return;
     }
 
-    const headerAuthResult = safe(() => getFromStorage("SESS"));
-    if (!headerAuthResult.success) {
-      console.error(headerAuthResult.error);
-      showOnToast("😫 We spilt too much! Please try again.", "warn");
-      finalizeDeleting();
-      return;
-    }
-    const headerAuth = headerAuthResult.value;
-
-    const fetchResult = await fetchAPI("/api/v0/posts", "DELETE", {
-      headers: { Authorization: headerAuth },
-      query: {
-        id: postToDelete.id,
-      },
-    });
-    if (!fetchResult.success) {
-      console.error(fetchResult.error);
-      showOnToast("😫 We spilt too much! Please try again.", "warn");
-      finalizeDeleting();
-      return;
-    }
-
-    refreshPosts();
-    showOnToast("Spill cleaned 🧹", "info");
-    finalizeDeleting();
+    setIsDeleting(false);
+    makeModalCancellable(true);
+    closeModal();
   }
 
   return (
@@ -183,7 +153,7 @@ function DeletePostModalContent() {
         <fieldset disabled={isDeleting} className="relative grid gap-3 mt-6">
           <button
             type="button"
-            onClick={deletePost}
+            onClick={triggerDelete}
             className={clsx(
               "rounded-full px-6 py-3",
               "disabled:opacity-50",
@@ -225,13 +195,11 @@ function formatPostDate(date: PostWithAuthor["timestamp"]): string {
 }
 function PostCard(props: { post: PostWithAuthor }) {
   const { showOnModal } = useModalContext();
-  const { setPostToDelete } = useHomeContext();
   const { post } = props;
   const { content, timestamp, author } = post;
 
   function promptDelete() {
-    setPostToDelete(post);
-    showOnModal(<DeletePostModalContent />);
+    showOnModal(<DeletePostModalContent postToDelete={post} />);
   }
 
   return (

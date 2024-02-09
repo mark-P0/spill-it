@@ -113,6 +113,31 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
     setPostsStatus("ok");
     setPosts(data);
   }, []);
+  const deletePost = useCallback(
+    async (post: PostWithAuthor) => {
+      const headerAuthResult = safe(() => getFromStorage("SESS"));
+      if (!headerAuthResult.success) {
+        throw headerAuthResult.error;
+      }
+      const headerAuth = headerAuthResult.value;
+
+      const fetchResult = await fetchAPI("/api/v0/posts", "DELETE", {
+        headers: { Authorization: headerAuth },
+        query: {
+          id: post.id,
+        },
+      });
+      /** Only proceed if the DELETE above succeeds... */
+      if (!fetchResult.success) {
+        throw fetchResult.error;
+      }
+
+      const deletedPostId = post.id;
+      const newPosts = posts.filter((post) => post.id !== deletedPostId); // Possible to be de-synced with database...
+      setPosts(newPosts);
+    },
+    [posts],
+  );
 
   // TODO Posts status also unnecessary?
   // TODO Unnecessary?
@@ -120,12 +145,9 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
   //   extendPosts();
   // }, []);
 
-  const [postToDelete, setPostToDelete] = useState<PostWithAuthor | null>(null);
-
   return {
     postsStatus,
     ...{ posts, refreshPosts },
-    ...{ hasNextPosts, extendPosts, extendPostsWithRecent },
-    ...{ postToDelete, setPostToDelete },
+    ...{ hasNextPosts, extendPosts, extendPostsWithRecent, deletePost },
   };
 });
