@@ -2,7 +2,7 @@ import { raise } from "@spill-it/utils/errors";
 import { safeAsync } from "@spill-it/utils/safe";
 import { eq, sql } from "drizzle-orm";
 import { db } from "../db";
-import { User, UsersTable } from "../schema";
+import { User, UsersTable } from "../schema/drizzle";
 
 export async function isGoogleUserExisting(googleId: string): Promise<boolean> {
   const user = await readUserWithGoogleId(googleId);

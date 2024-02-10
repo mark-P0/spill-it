@@ -45,7 +45,8 @@ export const SamplesTable = pgTable("samples", {
   fullName: text("fullName"),
   phone: varchar("phone", { length: 256 }),
 });
-export const zodSample = createSelectSchema(SamplesTable);
+const drizzleZodSample = createSelectSchema(SamplesTable);
+export type DrizzleZodSample = typeof drizzleZodSample;
 export type Sample = typeof SamplesTable.$inferSelect;
 export type SampleDetails = typeof SamplesTable.$inferInsert;
 
@@ -57,7 +58,8 @@ export const UsersTable = pgTable("users", {
   googleId: text("googleId"),
   loginCt: integer("loginCt").notNull(),
 });
-export const zodUser = createSelectSchema(UsersTable);
+const drizzleZodUser = createSelectSchema(UsersTable);
+export type DrizzleZodUser = typeof drizzleZodUser;
 export type User = typeof UsersTable.$inferSelect;
 export type UserDetails = typeof UsersTable.$inferInsert;
 
@@ -66,7 +68,8 @@ export const SessionsTable = pgTable("sessions", {
   userId: uuid("userId").notNull(),
   expiry: timestamp("expiry").notNull(),
 });
-export const zodSession = createSelectSchema(SessionsTable);
+const drizzleZodSession = createSelectSchema(SessionsTable);
+export type DrizzleZodSession = typeof drizzleZodSession;
 export type Session = typeof SessionsTable.$inferSelect;
 export type SessionDetails = typeof SessionsTable.$inferInsert;
 {
@@ -79,13 +82,14 @@ export const SessionsRelations = relations(SessionsTable, ({ one }) => ({
     references: [UsersTable.id],
   }),
 }));
-export const zodSessionWithUser = z.intersection(
-  zodSession,
+const drizzleZodSessionWithUser = z.intersection(
+  drizzleZodSession,
   z.object({
-    user: zodUser,
+    user: drizzleZodUser,
   }),
 );
-export type SessionWithUser = z.infer<typeof zodSessionWithUser>;
+export type DrizzleZodSessionWithUser = typeof drizzleZodSessionWithUser;
+export type SessionWithUser = z.infer<typeof drizzleZodSessionWithUser>;
 
 export const PostsTable = pgTable("posts", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -93,7 +97,8 @@ export const PostsTable = pgTable("posts", {
   timestamp: timestamp("timestamp").notNull().defaultNow(),
   content: text("content").notNull(),
 });
-export const zodPost = createSelectSchema(PostsTable);
+const drizzleZodPost = createSelectSchema(PostsTable);
+export type DrizzleZodPost = typeof drizzleZodPost;
 export type Post = typeof PostsTable.$inferSelect;
 export type PostDetails = typeof PostsTable.$inferInsert;
 {
@@ -106,10 +111,11 @@ export const PostsRelations = relations(PostsTable, ({ one }) => ({
     references: [UsersTable.id],
   }),
 }));
-export const zodPostWithAuthor = z.intersection(
-  zodPost,
+const drizzleZodPostWithAuthor = z.intersection(
+  drizzleZodPost,
   z.object({
-    author: zodUser,
+    author: drizzleZodUser,
   }),
 );
-export type PostWithAuthor = z.infer<typeof zodPostWithAuthor>;
+export type DrizzleZodPostWithAuthor = typeof drizzleZodPostWithAuthor;
+export type PostWithAuthor = z.infer<typeof drizzleZodPostWithAuthor>;

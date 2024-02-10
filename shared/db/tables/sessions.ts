@@ -3,7 +3,12 @@ import { safeAsync } from "@spill-it/utils/safe";
 import { addDays, isPast } from "date-fns";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
-import { Session, SessionWithUser, SessionsTable, User } from "../schema";
+import {
+  Session,
+  SessionWithUser,
+  SessionsTable,
+  User,
+} from "../schema/drizzle";
 
 export function isSessionExpired(session: Session) {
   return isPast(session.expiry);

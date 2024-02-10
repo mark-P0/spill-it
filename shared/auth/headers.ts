@@ -1,4 +1,4 @@
-import { zodSession } from "@spill-it/db/schema";
+import { zodSession } from "@spill-it/db/schema/zod";
 import { raise } from "@spill-it/utils/errors";
 import { safe } from "@spill-it/utils/safe";
 import { z } from "zod";

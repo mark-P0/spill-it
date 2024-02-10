@@ -1,4 +1,4 @@
-import { PostWithAuthor } from "@spill-it/db/schema";
+import { PostWithAuthor } from "@spill-it/db/schema/drizzle";
 import { safeAsync } from "@spill-it/utils/safe";
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";

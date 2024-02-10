@@ -7,7 +7,7 @@ import { env } from "./utils/env";
  * Drizzle Kit implicitly uses an `.env` file in the same directory as this file (?)
  */
 export default {
-  schema: "./schema.ts",
+  schema: "./schema/drizzle.ts",
   out: "./migrations/",
   driver: "pg",
   dbCredentials: {

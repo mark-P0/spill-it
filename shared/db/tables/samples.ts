@@ -1,7 +1,7 @@
 import { raise } from "@spill-it/utils/errors";
 import { safeAsync } from "@spill-it/utils/safe";
 import { db } from "../db";
-import { Sample, SampleDetails, SamplesTable } from "../schema";
+import { Sample, SampleDetails, SamplesTable } from "../schema/drizzle";
 
 // /* DELETEME */
 // (async () => {
