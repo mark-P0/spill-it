@@ -13,30 +13,8 @@ import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
 import { useToastContext } from "../_app/toast/ToastContext";
 import { HomeProvider, useHomeContext } from "./HomeContext";
+import { LoadingCursorAbsoluteOverlay, LoadingIndicator } from "./Loading";
 import { Controller } from "./controller";
-
-/**
- * More reliable for showing a cursor over a whole element
- * as interactive elements override it with their respective styles
- */
-function LoadingCursorAbsoluteOverlay() {
-  return <div className="absolute w-full h-full cursor-wait"></div>;
-}
-
-function LoadingIndicator() {
-  return (
-    <figure className="grid">
-      <figcaption className="sr-only">Loading...</figcaption>
-
-      <div className="row-[1] col-[1] animate-[ping_1.5s_ease-out_infinite]">
-        <div className="w-9 aspect-square rounded-full animate-palette"></div>
-      </div>
-      <div className="row-[1] col-[1]">
-        <div className="w-9 aspect-square rounded-full animate-palette"></div>
-      </div>
-    </figure>
-  );
-}
 
 function PostForm() {
   const { showOnToast } = useToastContext();
