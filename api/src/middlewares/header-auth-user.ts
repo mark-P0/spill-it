@@ -1,6 +1,6 @@
 import { parseHeaderAuth } from "@spill-it/auth/headers";
 import { isSignatureValid } from "@spill-it/auth/signing";
-import { User } from "@spill-it/db/schema";
+import { User } from "@spill-it/db/schema/drizzle";
 import {
   isSessionExpired,
   readSessionWithUser,

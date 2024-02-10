@@ -2,7 +2,12 @@ import { raise } from "@spill-it/utils/errors";
 import { safeAsync } from "@spill-it/utils/safe";
 import { and, desc, eq, lt } from "drizzle-orm";
 import { db } from "../db";
-import { Post, PostDetails, PostWithAuthor, PostsTable } from "../schema";
+import {
+  Post,
+  PostDetails,
+  PostWithAuthor,
+  PostsTable,
+} from "../schema/drizzle";
 import { POST_CT_CAP } from "../utils/constants";
 
 export async function createPost(details: PostDetails): Promise<Post> {

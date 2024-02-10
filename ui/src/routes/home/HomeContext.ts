@@ -1,4 +1,4 @@
-import { PostWithAuthor } from "@spill-it/db/schema";
+import { PostWithAuthor } from "@spill-it/db/schema/drizzle";
 import { safe } from "@spill-it/utils/safe";
 import { addDays } from "date-fns";
 import { useCallback, useEffect, useState } from "react";
