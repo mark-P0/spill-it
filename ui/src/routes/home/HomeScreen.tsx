@@ -98,13 +98,14 @@ function PostForm() {
           disabled={content === ""}
           className={clsx(
             "ml-auto",
+            "select-none",
             "rounded-full px-6 py-3",
             "disabled:opacity-50",
             "font-bold tracking-wide",
             ...[
               "transition",
               "bg-rose-500 enabled:hover:bg-rose-600",
-              "active:scale-95",
+              "enabled:active:scale-95",
             ],
           )}
         >
@@ -155,13 +156,14 @@ function DeletePostModalContent(props: { postToDelete: PostWithAuthor }) {
             type="button"
             onClick={triggerDelete}
             className={clsx(
+              "select-none",
               "rounded-full px-6 py-3",
               "disabled:opacity-50",
               "font-bold tracking-wide",
               ...[
                 "transition",
-                "bg-rose-500 hover:bg-red-700",
-                "active:scale-95",
+                "bg-rose-500 enabled:hover:bg-red-700",
+                "enabled:active:scale-95",
               ],
             )}
           >
@@ -171,10 +173,15 @@ function DeletePostModalContent(props: { postToDelete: PostWithAuthor }) {
             type="button"
             onClick={closeModal}
             className={clsx(
+              "select-none",
               "rounded-full px-6 py-3",
               "disabled:opacity-50",
               "outline outline-1 outline-white/25",
-              ...["transition", "hover:bg-white/10", "active:scale-95"],
+              ...[
+                "transition",
+                "enabled:hover:bg-white/10",
+                "enabled:active:scale-95",
+              ],
             )}
           >
             Cancel 🙅‍♀️
@@ -224,7 +231,10 @@ function PostCard(props: { post: PostWithAuthor }) {
       <div>
         <button
           onClick={promptDelete}
-          className="rounded-full p-2 transition hover:bg-white/25 active:scale-90"
+          className={clsx(
+            "rounded-full p-2",
+            ...["transition", "hover:bg-white/25 active:scale-90"],
+          )}
         >
           <BsTrashFill />
         </button>
@@ -299,12 +309,13 @@ function PostsList() {
         <button
           onClick={initializePosts}
           className={clsx(
+            "select-none",
             "rounded-full px-6 py-3",
             "disabled:opacity-50",
             "font-bold tracking-wide",
             ...[
               "transition",
-              "bg-fuchsia-500 enabled:hover:bg-fuchsia-600",
+              "bg-fuchsia-500 hover:bg-fuchsia-600",
               "active:scale-95",
             ],
           )}
@@ -358,7 +369,7 @@ function LogoutModalContent() {
         <Link
           to={endpoint("/logout")}
           className={clsx(
-            "text-center",
+            "text-center select-none",
             "rounded-full px-6 py-3",
             "disabled:opacity-50",
             "font-bold tracking-wide",
@@ -375,10 +386,11 @@ function LogoutModalContent() {
           type="button"
           onClick={closeModal}
           className={clsx(
+            "select-none",
             "rounded-full px-6 py-3",
             "disabled:opacity-50",
             "outline outline-1 outline-white/25",
-            ...["transition", "hover:bg-white/10", "active:scale-95"],
+            ...["transition", "hover:bg-white/10 active:scale-95"],
           )}
         >
           No 🙅‍♀️
@@ -398,7 +410,10 @@ function LogoutButton() {
   return (
     <button
       onClick={promptLogout}
-      className="rounded-full p-2 transition hover:bg-white/25 active:scale-90"
+      className={clsx(
+        "rounded-full p-2",
+        ...["transition", "hover:bg-white/25 active:scale-90"],
+      )}
     >
       <BsBoxArrowLeft />
     </button>
