@@ -6,7 +6,7 @@ import {
   DrizzleZodSession,
   DrizzleZodUser,
   Sample,
-} from "./schema";
+} from "../schema";
 
 export const zodSample: DrizzleZodSample = z.object({
   id: z.string().uuid(),
