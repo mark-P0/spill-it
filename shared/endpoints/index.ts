@@ -3,7 +3,7 @@ import {
   zodPostWithAuthor,
   zodSample,
   zodUser,
-} from "@spill-it/db/schema";
+} from "@spill-it/db/schema-zod";
 import { POST_CT_CAP } from "@spill-it/db/utils/constants";
 import { z } from "zod";
 
