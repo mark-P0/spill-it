@@ -11,6 +11,58 @@ import { useHomeContext } from "./HomeContext";
 import { LoadingCursorAbsoluteOverlay, LoadingIndicator } from "./Loading";
 import { Controller } from "./controller";
 
+function useObserver<T extends Element>() {
+  const [isIntersecting, setIsIntersecting] = useState(false);
+
+  const elementRef = useRef<T | null>(null);
+  useEffect(() => {
+    const element = elementRef.current;
+    if (element === null) {
+      console.warn("Element to be observed does not exist...?");
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.length > 1) {
+        console.warn("Multiple elements observed...?");
+        return;
+      }
+
+      const entry = entries[0];
+      if (entry === undefined) {
+        console.warn("Observed element does not exist...?");
+        return;
+      }
+
+      // TODO Also have state for entry?
+      setIsIntersecting(entry.isIntersecting);
+    });
+
+    observer.observe(element);
+    return () => {
+      observer.unobserve(element);
+    };
+  }, []);
+
+  return [elementRef, isIntersecting] as const;
+}
+
+function PostsListEndObserver() {
+  const [divRef, isIntersecting] = useObserver<HTMLDivElement>();
+
+  const { extendPosts } = useHomeContext();
+  useEffect(() => {
+    if (!isIntersecting) return;
+    const ctl: Controller = { shouldProceed: true };
+    extendPosts(ctl);
+    return () => {
+      ctl.shouldProceed = false;
+    };
+  }, [isIntersecting, extendPosts]);
+
+  return <div ref={divRef}>{isIntersecting && <LoadingIndicator />}</div>;
+}
+
 function DeletePostModalContent(props: { postToDelete: PostWithAuthor }) {
   const { showOnToast } = useToastContext();
   const { closeModal, makeModalCancellable } = useModalContext();
@@ -86,7 +138,6 @@ function DeletePostModalContent(props: { postToDelete: PostWithAuthor }) {
     </ModalContent>
   );
 }
-
 function formatPostDate(date: PostWithAuthor["timestamp"]): string {
   return formatDistanceToNow(date, {
     addSuffix: true,
@@ -134,57 +185,6 @@ function PostCard(props: { post: PostWithAuthor }) {
       </div>
     </article>
   );
-}
-
-function useObserver<T extends Element>() {
-  const [isIntersecting, setIsIntersecting] = useState(false);
-
-  const elementRef = useRef<T | null>(null);
-  useEffect(() => {
-    const element = elementRef.current;
-    if (element === null) {
-      console.warn("Element to be observed does not exist...?");
-      return;
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      if (entries.length > 1) {
-        console.warn("Multiple elements observed...?");
-        return;
-      }
-
-      const entry = entries[0];
-      if (entry === undefined) {
-        console.warn("Observed element does not exist...?");
-        return;
-      }
-
-      // TODO Also have state for entry?
-      setIsIntersecting(entry.isIntersecting);
-    });
-
-    observer.observe(element);
-    return () => {
-      observer.unobserve(element);
-    };
-  }, []);
-
-  return [elementRef, isIntersecting] as const;
-}
-function PostsListEndObserver() {
-  const [divRef, isIntersecting] = useObserver<HTMLDivElement>();
-
-  const { extendPosts } = useHomeContext();
-  useEffect(() => {
-    if (!isIntersecting) return;
-    const ctl: Controller = { shouldProceed: true };
-    extendPosts(ctl);
-    return () => {
-      ctl.shouldProceed = false;
-    };
-  }, [isIntersecting, extendPosts]);
-
-  return <div ref={divRef}>{isIntersecting && <LoadingIndicator />}</div>;
 }
 
 export function PostsList() {
