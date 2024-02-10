@@ -31,7 +31,7 @@ export function Toast() {
         onClick={discardSelf}
         className={clsx(
           "font-bold text-sm uppercase tracking-widest",
-          "opacity-50 hover:opacity-100 transition",
+          ...["transition", "opacity-50 hover:opacity-100"],
         )}
       >
         Close
