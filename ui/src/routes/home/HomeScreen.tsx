@@ -94,7 +94,7 @@ function PostForm() {
     const headerAuthResult = safe(() => getFromStorage("SESS"));
     if (!headerAuthResult.success) {
       console.error(headerAuthResult.error);
-      showOnToast("😫 We spilt too much! Please try again.", "warn");
+      showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
       setIsSubmitting(false);
       return;
     }
@@ -106,13 +106,13 @@ function PostForm() {
     });
     if (!fetchResult.success) {
       console.error(fetchResult.error);
-      showOnToast("😫 We spilt too much! Please try again.", "warn");
+      showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
       setIsSubmitting(false);
       return;
     }
 
     extendPostsWithRecent();
-    showOnToast("Spilt! 😋", "info");
+    showOnToast(<>Spilt! 😋</>, "info");
     setIsSubmitting(false);
     reset();
   }
