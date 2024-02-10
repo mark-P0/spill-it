@@ -1,15 +1,14 @@
-import { useCallback, useState } from "react";
+import { ReactNode, useCallback, useState } from "react";
 import { createNewContext } from "../../../utils/react";
 
-type ToastContent = string | null;
 type ToastLevel = "info" | "warn";
 
 export const [useToastContext, ToastProvider] = createNewContext(() => {
-  const [content, setContent] = useState<ToastContent>(null);
+  const [content, setContent] = useState<ReactNode>(null);
   const [level, setLevel] = useState<ToastLevel>("info");
 
   const showOnToast = useCallback(
-    (content: ToastContent, level: ToastLevel = "info") => {
+    (content: ReactNode, level: ToastLevel = "info") => {
       setContent(content);
       setLevel(level);
     },

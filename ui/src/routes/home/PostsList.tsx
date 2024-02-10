@@ -80,7 +80,7 @@ function DeletePostModalContent(props: { postToDelete: PostWithAuthor }) {
 
     const deleteResult = await safeAsync(() => deletePost(postToDelete));
     if (!deleteResult.success) {
-      showOnToast("😫 We spilt too much! Please try again.", "warn");
+      showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
     }
 
     setIsDeleting(false);
@@ -194,7 +194,7 @@ export function PostsList() {
 
   useEffect(() => {
     if (postsStatus !== "error") return;
-    showOnToast("🥶 We spilt things along the way", "warn");
+    showOnToast(<>🥶 We spilt things along the way</>, "warn");
   }, [postsStatus, showOnToast]);
   if (postsStatus === "error") {
     return (
