@@ -135,9 +135,12 @@ export const PostsRouter = Router();
     }
     const user = userResult.value;
 
-    logger.info("Fetching user posts...");
+    // TODO Check if user is authorized to view posts of queried user ID
+
+    logger.info("Fetching posts...");
+    const userId = query.userId ?? user.id;
     const postsResult = await safeAsync(() =>
-      readPostsOfUserBeforeTimestamp(user.id, beforeISODate, size),
+      readPostsOfUserBeforeTimestamp(userId, beforeISODate, size),
     );
     if (!postsResult.success) {
       logger.error(formatError(postsResult.error));
@@ -155,7 +158,7 @@ export const PostsRouter = Router();
     }
     const output = outputParsing.data;
 
-    logger.info("Sending user posts...");
+    logger.info("Sending posts...");
     const result = safe(() => {
       const rawOutput = jsonPack(output);
       return res.send(rawOutput);

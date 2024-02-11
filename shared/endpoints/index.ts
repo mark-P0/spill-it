@@ -72,6 +72,7 @@ export const endpointMap = {
           Authorization: z.string(),
         }),
         query: z.object({
+          userId: z.optional(zodUser.shape.id),
           /** Should be parseable to same format as `zodPost.shape.timestamp` */
           beforeISODateStr: z
             .string()
