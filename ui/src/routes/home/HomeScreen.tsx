@@ -3,10 +3,11 @@ import clsx from "clsx";
 import { FormEvent, useState } from "react";
 import { BsBoxArrowLeft } from "react-icons/bs";
 import { Link } from "react-router-dom";
-import { endpoint } from "../../utils/endpoints";
+import { endpoint, endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { getFromStorage } from "../../utils/storage";
 import { Screen } from "../_app/Screen";
+import { useUserContext } from "../_app/UserContext";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
 import { useToastContext } from "../_app/toast/ToastContext";
@@ -74,6 +75,27 @@ function LogoutButton() {
     >
       <BsBoxArrowLeft />
     </button>
+  );
+}
+
+function ProfileButtonLink() {
+  const { user } = useUserContext();
+
+  if (user === null) return null;
+  return (
+    <Link
+      to={endpointWithParam("/:username", { username: user.username })}
+      className={clsx(...["transition", "active:scale-95"])}
+    >
+      <img
+        src={user.portraitUrl}
+        alt={`Portrait of "${user.handleName}"`}
+        className={clsx(
+          "w-9 aspect-square rounded-full",
+          "border-2 border-white/50",
+        )}
+      />
+    </Link>
   );
 }
 
@@ -163,8 +185,12 @@ export function HomeScreen() {
   return (
     <HomeProvider>
       <Screen className="grid auto-rows-min gap-6 p-6">
-        <header className="flex justify-between items-center">
+        <header className="flex items-center gap-3">
           <h1 className="text-3xl">Home</h1>
+
+          <div className="ml-auto flex">
+            <ProfileButtonLink />
+          </div>
           <LogoutButton />
         </header>
         <PostForm />
