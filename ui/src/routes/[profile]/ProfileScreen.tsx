@@ -72,7 +72,7 @@ function LogoutModalContent() {
 function LogoutButton() {
   const { user } = useUserContext();
   const { showOnModal } = useModalContext();
-  const profile = useProfileLoader();
+  const { profile } = useProfileLoader();
 
   function promptLogout() {
     showOnModal(<LogoutModalContent />);
@@ -107,7 +107,7 @@ function HomeButtonLink() {
 }
 
 export function ProfileScreen() {
-  const profile = useProfileLoader();
+  const { profile } = useProfileLoader();
   const { handleName, username, portraitUrl } = profile;
 
   document.title = `${handleName} (${username}) 👀 Spill.it!`;

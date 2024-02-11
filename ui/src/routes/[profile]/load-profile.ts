@@ -38,6 +38,6 @@ export const [loadProfile, useProfileLoader] = createLoader(
     if (users.length > 1) raise("Multiple users for a username...?");
     const user = users[0] ?? raise("Username possibly does not exist");
 
-    return user;
+    return { profile: user };
   },
 );

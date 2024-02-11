@@ -11,7 +11,7 @@ const POSTS_IN_VIEW_CT = 8;
 
 type PostStatus = "fetching" | "error" | "ok";
 export const [usePostsContext, PostsProvider] = createNewContext(() => {
-  const profile = useProfileLoader();
+  const { profile } = useProfileLoader();
   const [postsStatus, setPostsStatus] = useState<PostStatus>("fetching");
 
   const [posts, setPosts] = useState<PostWithAuthor[]>([]);
