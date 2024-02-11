@@ -1,4 +1,5 @@
 import { raise } from "@spill-it/utils/errors";
+import { randomInteger } from "@spill-it/utils/random";
 import { safeAsync } from "@spill-it/utils/safe";
 import { eq, sql } from "drizzle-orm";
 import { db } from "../db";
@@ -63,9 +64,14 @@ export async function readUserWithUsername(
   return user;
 }
 
-function createUsernameFromHandle(handleName: string) {
-  const tentativeHandle = handleName.toLowerCase().split(/\s/g).join("-"); // TODO Ensure unique from existing database entries!
-  return tentativeHandle;
+async function createUsernameFromHandle(handleName: string, sep = "-") {
+  let username = handleName.toLowerCase().replace(/\s/g, sep);
+
+  const existingUser = await readUserWithUsername(username);
+  if (existingUser === null) return username;
+
+  username += sep + `${randomInteger(0, 9 + 1)}`;
+  return createUsernameFromHandle(username, "");
 }
 export async function createUserFromGoogle(
   googleId: string,
@@ -75,7 +81,7 @@ export async function createUserFromGoogle(
   if (await isGoogleUserExisting(googleId))
     raise("Failed creating user from Google ID as they already exist");
 
-  const username = createUsernameFromHandle(handleName);
+  const username = await createUsernameFromHandle(handleName);
   const result = await safeAsync(() =>
     db
       .insert(UsersTable)
