@@ -68,7 +68,7 @@ export const endpointMap = {
     GET: {
       input: z.object({
         headers: z.object({
-          Authorization: z.string(),
+          Authorization: z.string().optional(),
         }),
         query: z.object({
           userId: z.optional(zodUser.shape.id),
