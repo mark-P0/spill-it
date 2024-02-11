@@ -1,4 +1,4 @@
-import { raise } from "@spill-it/utils/errors";
+import { raise } from "./errors";
 import { letters } from "./strings";
 
 export function randomFloat(from: number, to: number): number {
