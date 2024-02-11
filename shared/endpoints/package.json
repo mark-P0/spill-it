@@ -2,6 +2,7 @@
   "name": "@spill-it/endpoints",
   "dependencies": {
     "@spill-it/db": "workspace:^",
+    "@spill-it/utils": "workspace:^",
     "zod": "^3.22.4"
   }
 }
