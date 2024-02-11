@@ -19,15 +19,14 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
     setPostsStatus("fetching");
 
     const headerAuthResult = safe(() => getFromStorage("SESS"));
-    if (!headerAuthResult.success) {
-      console.error(headerAuthResult.error);
-      setPostsStatus("error");
-      return;
-    }
-    const headerAuth = headerAuthResult.value;
+    const headerAuth = headerAuthResult.success
+      ? headerAuthResult.value
+      : undefined;
 
     const fetchResult = await fetchAPI("/api/v0/posts", "GET", {
-      headers: { Authorization: headerAuth },
+      headers: {
+        ...(headerAuth !== undefined ? { Authorization: headerAuth } : {}),
+      },
       query: {
         userId: profile.id,
         beforeISODateStr: tomorrow().toISOString(), // Use a "future" date to ensure most recent posts are also fetched
@@ -56,16 +55,15 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
 
       if (!ctl.shouldProceed) return;
       const headerAuthResult = safe(() => getFromStorage("SESS"));
-      if (!headerAuthResult.success) {
-        console.error(headerAuthResult.error);
-        setPostsStatus("error");
-        return;
-      }
-      const headerAuth = headerAuthResult.value;
+      const headerAuth = headerAuthResult.success
+        ? headerAuthResult.value
+        : undefined;
 
       if (!ctl.shouldProceed) return;
       const nextPostsResult = await fetchAPI("/api/v0/posts", "GET", {
-        headers: { Authorization: headerAuth },
+        headers: {
+          ...(headerAuth !== undefined ? { Authorization: headerAuth } : {}),
+        },
         query: {
           userId: profile.id,
           beforeISODateStr: date.toISOString(),
@@ -88,15 +86,14 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
 
   const extendPostsWithRecent = useCallback(async () => {
     const headerAuthResult = safe(() => getFromStorage("SESS"));
-    if (!headerAuthResult.success) {
-      console.error(headerAuthResult.error);
-      setPostsStatus("error");
-      return;
-    }
-    const headerAuth = headerAuthResult.value;
+    const headerAuth = headerAuthResult.success
+      ? headerAuthResult.value
+      : undefined;
 
     const recentPostsResult = await fetchAPI("/api/v0/posts", "GET", {
-      headers: { Authorization: headerAuth },
+      headers: {
+        ...(headerAuth !== undefined ? { Authorization: headerAuth } : {}),
+      },
       query: {
         userId: profile.id,
         beforeISODateStr: tomorrow().toISOString(),
