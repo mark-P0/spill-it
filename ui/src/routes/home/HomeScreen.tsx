@@ -2,6 +2,7 @@ import { safe } from "@spill-it/utils/safe";
 import clsx from "clsx";
 import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
+import { LoadingCursorAbsoluteOverlay } from "../../components/Loading";
 import { endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { getFromStorage } from "../../utils/storage";
@@ -13,7 +14,6 @@ import { PostsList } from "../[profile]/posts/PostsList";
 import { Screen } from "../_app/Screen";
 import { useUserContext } from "../_app/UserContext";
 import { useToastContext } from "../_app/toast/ToastContext";
-import { LoadingCursorAbsoluteOverlay } from "./Loading";
 
 function ProfileButtonLink() {
   const { user } = useUserContext();
