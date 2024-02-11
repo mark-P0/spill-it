@@ -7,6 +7,8 @@ import { useUserContext } from "../_app/UserContext";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
 import { useProfileLoader } from "./load-profile";
+import { PostsProvider } from "./posts/PostsContext";
+import { PostsList } from "./posts/PostsList";
 
 /**
  * Can be used to place an "element" (it is a text node) where desired but not necessarily "visible"
@@ -111,32 +113,36 @@ export function ProfileScreen() {
   document.title = `${handleName} (${username}) 👀 Spill.it!`;
 
   return (
-    <Screen className="grid auto-rows-min gap-6 p-6">
-      <header className="grid grid-rows-subgrid row-span-2">
-        <nav className="flex justify-between items-center">
-          <LogoutButton />
+    <PostsProvider>
+      <Screen className="grid auto-rows-min gap-6 p-6">
+        <header className="grid grid-rows-subgrid row-span-2">
+          <nav className="flex justify-between items-center">
+            <LogoutButton />
 
-          <HomeButtonLink />
-        </nav>
+            <HomeButtonLink />
+          </nav>
 
-        <section className="flex justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">{handleName}</h1>
-            <p className="text-lg text-white/50">{username}</p>
-          </div>
-          <div>
-            <img
-              src={portraitUrl}
-              alt={`Portrait of "${handleName}"`}
-              className="w-20 aspect-square rounded-full"
-            />
-          </div>
-        </section>
-      </header>
+          <section className="flex justify-between">
+            <div>
+              <h1 className="text-3xl font-bold">{handleName}</h1>
+              <p className="text-lg text-white/50">{username}</p>
+            </div>
+            <div>
+              <img
+                src={portraitUrl}
+                alt={`Portrait of "${handleName}"`}
+                className="w-20 aspect-square rounded-full"
+              />
+            </div>
+          </section>
+        </header>
 
-      <main>
-        <pre>posts</pre>
-      </main>
-    </Screen>
+        <main>
+          <h2 className="sr-only">Spills 🍵</h2>
+
+          <PostsList />
+        </main>
+      </Screen>
+    </PostsProvider>
   );
 }
