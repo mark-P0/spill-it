@@ -3,9 +3,26 @@ import { BsBoxArrowLeft, BsHouseFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { endpoint } from "../../utils/endpoints";
 import { Screen } from "../_app/Screen";
+import { useUserContext } from "../_app/UserContext";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
 import { useProfileLoader } from "./load-profile";
+
+/**
+ * Can be used to place an "element" (it is a text node) where desired but not necessarily "visible"
+ *
+ * Alternative entities include:
+ * - `&nbsp;`
+ * - `&#8203;` Zero-width space
+ *
+ * ---
+ *
+ * - https://github.com/typora/typora-issues/issues/4136
+ * - https://levelup.gitconnected.com/the-zero-width-space-77543a28c984
+ */
+function Nothing() {
+  return <>&zwj;</>;
+}
 
 function LogoutModalContent() {
   const { closeModal } = useModalContext();
@@ -51,12 +68,15 @@ function LogoutModalContent() {
   );
 }
 function LogoutButton() {
+  const { user } = useUserContext();
   const { showOnModal } = useModalContext();
+  const profile = useProfileLoader();
 
   function promptLogout() {
     showOnModal(<LogoutModalContent />);
   }
 
+  if (user?.id !== profile.id) return <Nothing />; // Logout should not be available if viewing other profiles
   return (
     <button
       onClick={promptLogout}
