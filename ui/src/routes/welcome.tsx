@@ -12,8 +12,6 @@ import { redirectUri } from "./welcome/redirect-uri";
 export const WelcomeRoute: RouteObject = {
   path: endpoint("/welcome"),
   async loader() {
-    document.title = "Welcome! ✨ Spill.it!";
-
     /** Redirect if already logged in */
     {
       const canShowHome = await isLoggedIn();

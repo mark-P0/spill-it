@@ -158,6 +158,8 @@ function PostForm() {
 }
 
 export function HomeScreen() {
+  document.title = "Home 🍵 Spill.it!";
+
   return (
     <HomeProvider>
       <Screen className="grid auto-rows-min gap-6 p-6">

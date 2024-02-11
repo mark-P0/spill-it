@@ -6,8 +6,6 @@ import { HomeScreen } from "./home/HomeScreen";
 export const HomeRoute: RouteObject = {
   path: endpoint("/home"),
   async loader() {
-    document.title = "Home 🍵 Spill.it!";
-
     const canShowHome = await isLoggedIn();
     if (!canShowHome) {
       return redirect(endpoint("/welcome"));

@@ -96,6 +96,8 @@ function LoginWithGoogle() {
 }
 
 export function WelcomeScreen() {
+  document.title = "Welcome! ✨ Spill.it!";
+
   return (
     <Screen className="grid place-items-center">
       <LoginWithGoogle />
