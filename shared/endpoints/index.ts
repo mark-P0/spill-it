@@ -5,7 +5,6 @@ import {
   zodUser,
 } from "@spill-it/db/schema/zod";
 import { POST_CT_CAP } from "@spill-it/db/utils/constants";
-import { today } from "@spill-it/utils/dates";
 import { z } from "zod";
 
 export const endpointMap = {
@@ -73,15 +72,8 @@ export const endpointMap = {
         }),
         query: z.object({
           userId: z.optional(zodUser.shape.id),
-          /** Should be parseable to same format as `zodPost.shape.timestamp` */
-          beforeISODateStr: z
-            .string()
-            .datetime()
-            .default(() => today().toISOString()),
-          size: z.coerce
-            .number()
-            .max(POST_CT_CAP)
-            .default(() => Math.floor(POST_CT_CAP / 2)),
+          beforeISODateStr: z.string().datetime().optional(), // Should be parseable to same format as `zodPost.shape.timestamp`
+          size: z.coerce.number().max(POST_CT_CAP).optional(),
         }),
       }),
       output: z.object({
