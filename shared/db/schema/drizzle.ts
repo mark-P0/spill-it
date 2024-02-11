@@ -52,7 +52,7 @@ export type SampleDetails = typeof SamplesTable.$inferInsert;
 
 export const UsersTable = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
-  username: text("username").notNull(),
+  username: text("username").notNull().unique(),
   handleName: text("handleName").notNull(),
   portraitUrl: text("portraitUrl").notNull(),
   googleId: text("googleId"),
