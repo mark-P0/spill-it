@@ -7,8 +7,8 @@ import { BsTrashFill } from "react-icons/bs";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
 import { useToastContext } from "../_app/toast/ToastContext";
-import { useHomeContext } from "./HomeContext";
 import { LoadingCursorAbsoluteOverlay, LoadingIndicator } from "./Loading";
+import { usePostsContext } from "./PostsContext";
 import { Controller } from "./controller";
 
 function useObserver<T extends Element>() {
@@ -50,7 +50,7 @@ function useObserver<T extends Element>() {
 function PostsListEndObserver() {
   const [divRef, isIntersecting] = useObserver<HTMLDivElement>();
 
-  const { extendPosts } = useHomeContext();
+  const { extendPosts } = usePostsContext();
   useEffect(() => {
     if (!isIntersecting) return;
     const ctl: Controller = { shouldProceed: true };
@@ -66,7 +66,7 @@ function PostsListEndObserver() {
 function DeletePostModalContent(props: { postToDelete: PostWithAuthor }) {
   const { showOnToast } = useToastContext();
   const { closeModal, makeModalCancellable } = useModalContext();
-  const { deletePost } = useHomeContext();
+  const { deletePost } = usePostsContext();
   const { postToDelete } = props;
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -190,7 +190,7 @@ function PostCard(props: { post: PostWithAuthor }) {
 export function PostsList() {
   const { showOnToast } = useToastContext();
   const { postsStatus, posts, hasNextPosts, initializePosts } =
-    useHomeContext();
+    usePostsContext();
 
   useEffect(() => {
     if (postsStatus !== "error") return;
