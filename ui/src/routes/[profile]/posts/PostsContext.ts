@@ -2,15 +2,16 @@ import { PostWithAuthor } from "@spill-it/db/schema/drizzle";
 import { tomorrow } from "@spill-it/utils/dates";
 import { safe } from "@spill-it/utils/safe";
 import { useCallback, useEffect, useState } from "react";
-import { fetchAPI } from "../../utils/fetch-api";
-import { createNewContext } from "../../utils/react";
-import { getFromStorage } from "../../utils/storage";
-import { Controller } from "./controller";
+import { fetchAPI } from "../../../utils/fetch-api";
+import { Controller, createNewContext } from "../../../utils/react";
+import { getFromStorage } from "../../../utils/storage";
+import { useProfileLoader } from "../load-profile";
 
 const POSTS_IN_VIEW_CT = 8;
 
 type PostStatus = "fetching" | "error" | "ok";
-export const [useHomeContext, HomeProvider] = createNewContext(() => {
+export const [usePostsContext, PostsProvider] = createNewContext(() => {
+  const { profile } = useProfileLoader();
   const [postsStatus, setPostsStatus] = useState<PostStatus>("fetching");
 
   const [posts, setPosts] = useState<PostWithAuthor[]>([]);
@@ -18,16 +19,16 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
     setPostsStatus("fetching");
 
     const headerAuthResult = safe(() => getFromStorage("SESS"));
-    if (!headerAuthResult.success) {
-      console.error(headerAuthResult.error);
-      setPostsStatus("error");
-      return;
-    }
-    const headerAuth = headerAuthResult.value;
+    const headerAuth = headerAuthResult.success
+      ? headerAuthResult.value
+      : undefined;
 
     const fetchResult = await fetchAPI("/api/v0/posts", "GET", {
-      headers: { Authorization: headerAuth },
+      headers: {
+        ...(headerAuth !== undefined ? { Authorization: headerAuth } : {}),
+      },
       query: {
+        userId: profile.id,
         beforeISODateStr: tomorrow().toISOString(), // Use a "future" date to ensure most recent posts are also fetched
         size: POSTS_IN_VIEW_CT,
       },
@@ -41,7 +42,7 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
 
     setPostsStatus("ok");
     setPosts(data);
-  }, []);
+  }, [profile]);
   useEffect(() => {
     initializePosts();
   }, [initializePosts]);
@@ -54,17 +55,17 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
 
       if (!ctl.shouldProceed) return;
       const headerAuthResult = safe(() => getFromStorage("SESS"));
-      if (!headerAuthResult.success) {
-        console.error(headerAuthResult.error);
-        setPostsStatus("error");
-        return;
-      }
-      const headerAuth = headerAuthResult.value;
+      const headerAuth = headerAuthResult.success
+        ? headerAuthResult.value
+        : undefined;
 
       if (!ctl.shouldProceed) return;
       const nextPostsResult = await fetchAPI("/api/v0/posts", "GET", {
-        headers: { Authorization: headerAuth },
+        headers: {
+          ...(headerAuth !== undefined ? { Authorization: headerAuth } : {}),
+        },
         query: {
+          userId: profile.id,
           beforeISODateStr: date.toISOString(),
           size: POSTS_IN_VIEW_CT + 1, // Fetch 1 additional to "check" if there is still more next
         },
@@ -80,21 +81,21 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
       setPosts([...posts, ...nextPosts.slice(0, -1)]);
       if (nextPosts.length < POSTS_IN_VIEW_CT) setHasNextPosts(false);
     },
-    [posts],
+    [profile, posts],
   );
 
   const extendPostsWithRecent = useCallback(async () => {
     const headerAuthResult = safe(() => getFromStorage("SESS"));
-    if (!headerAuthResult.success) {
-      console.error(headerAuthResult.error);
-      setPostsStatus("error");
-      return;
-    }
-    const headerAuth = headerAuthResult.value;
+    const headerAuth = headerAuthResult.success
+      ? headerAuthResult.value
+      : undefined;
 
     const recentPostsResult = await fetchAPI("/api/v0/posts", "GET", {
-      headers: { Authorization: headerAuth },
+      headers: {
+        ...(headerAuth !== undefined ? { Authorization: headerAuth } : {}),
+      },
       query: {
+        userId: profile.id,
         beforeISODateStr: tomorrow().toISOString(),
         size: POSTS_IN_VIEW_CT, // TODO Is this enough? Too much?
       },
@@ -114,7 +115,7 @@ export const [useHomeContext, HomeProvider] = createNewContext(() => {
       return true; // Keep post
     });
     setPosts(newPosts);
-  }, [posts]);
+  }, [profile, posts]);
 
   const deletePost = useCallback(
     async (post: PostWithAuthor) => {

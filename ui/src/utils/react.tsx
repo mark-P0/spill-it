@@ -2,6 +2,14 @@ import { raise } from "@spill-it/utils/errors";
 import { Key, PropsWithChildren, createContext, useContext } from "react";
 import { LoaderFunction, useLoaderData } from "react-router-dom";
 
+/**
+ * Used mainly to stop effects on unmounts,
+ * kind of like `AbortController` for fetches.
+ */
+export type Controller = {
+  shouldProceed: boolean;
+};
+
 export function createNewContext<T>(useContextValue: () => T) {
   const NewContext = createContext<T | null>(null);
 
@@ -31,4 +39,12 @@ type LoaderData<TLoader extends LoaderFunction> =
   Awaited<ReturnType<TLoader>> extends Response | infer D ? D : never;
 export function useTypedLoaderData<TLoader extends LoaderFunction>() {
   return useLoaderData() as LoaderData<TLoader>;
+}
+
+export function createLoader<T extends LoaderFunction>(loader: T) {
+  function useLoader() {
+    return useLoaderData() as LoaderData<T>;
+  }
+
+  return [loader, useLoader] as const;
 }
