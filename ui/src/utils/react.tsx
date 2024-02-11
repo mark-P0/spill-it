@@ -32,3 +32,11 @@ type LoaderData<TLoader extends LoaderFunction> =
 export function useTypedLoaderData<TLoader extends LoaderFunction>() {
   return useLoaderData() as LoaderData<TLoader>;
 }
+
+export function createLoader<T extends LoaderFunction>(loader: T) {
+  function useLoader() {
+    return useLoaderData() as LoaderData<T>;
+  }
+
+  return [loader, useLoader] as const;
+}
