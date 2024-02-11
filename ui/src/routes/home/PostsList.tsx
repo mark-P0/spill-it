@@ -121,7 +121,7 @@ function DeletePostModalContent(props: { postToDelete: PostWithAuthor }) {
               "select-none",
               "rounded-full px-6 py-3",
               "disabled:opacity-50",
-              "outline outline-1 outline-white/25",
+              "border border-white/25",
               ...[
                 "transition",
                 "enabled:hover:bg-white/10",
