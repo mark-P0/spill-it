@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { FormEvent, useState } from "react";
 import { BsBoxArrowLeft } from "react-icons/bs";
 import { Link } from "react-router-dom";
-import { endpoint } from "../../utils/endpoints";
+import { endpoint, endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { getFromStorage } from "../../utils/storage";
 import { Screen } from "../_app/Screen";
@@ -82,9 +82,11 @@ function ProfileButtonLink() {
   const { user } = useUserContext();
 
   if (user === null) return null;
+
+  const { username, portraitUrl, handleName } = user;
   return (
     <Link
-      to="#"
+      to={endpointWithParam("/:username", { username })}
       className={clsx(
         "overflow-clip",
         "w-9 aspect-square rounded-full",
@@ -93,8 +95,8 @@ function ProfileButtonLink() {
       )}
     >
       <img
-        src={user.portraitUrl}
-        alt={`Portrait of "${user.handleName}"`}
+        src={portraitUrl}
+        alt={`Portrait of "${handleName}"`}
         className="w-full h-full"
       />
     </Link>
