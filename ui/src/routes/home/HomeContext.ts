@@ -1,15 +1,12 @@
 import { PostWithAuthor } from "@spill-it/db/schema/drizzle";
+import { tomorrow } from "@spill-it/utils/dates";
 import { safe } from "@spill-it/utils/safe";
-import { addDays } from "date-fns";
 import { useCallback, useEffect, useState } from "react";
 import { fetchAPI } from "../../utils/fetch-api";
 import { createNewContext } from "../../utils/react";
 import { getFromStorage } from "../../utils/storage";
 import { Controller } from "./controller";
 
-// TODO Move date functions to common file?
-const today = () => new Date();
-const tomorrow = () => addDays(today(), 1);
 const POSTS_IN_VIEW_CT = 8;
 
 type PostStatus = "fetching" | "error" | "ok";

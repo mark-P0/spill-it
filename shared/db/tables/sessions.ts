@@ -1,6 +1,7 @@
+import { tomorrow } from "@spill-it/utils/dates";
 import { raise } from "@spill-it/utils/errors";
 import { safeAsync } from "@spill-it/utils/safe";
-import { addDays, isPast } from "date-fns";
+import { isPast } from "date-fns";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import {
@@ -72,15 +73,12 @@ export async function readSessionWithUser(
   return session;
 }
 
-// TODO Move date functions to common file?
-const today = () => new Date();
-const tomorrow = () => addDays(today(), 1);
-const defaultExpiry = () => tomorrow();
 export async function createSession(userId: User["id"]): Promise<Session> {
+  const defaultExpiry = tomorrow();
   const result = await safeAsync(() =>
     db
       .insert(SessionsTable)
-      .values({ userId, expiry: defaultExpiry() })
+      .values({ userId, expiry: defaultExpiry })
       .returning(),
   );
   const sessions = result.success
