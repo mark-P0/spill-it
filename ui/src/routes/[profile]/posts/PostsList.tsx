@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 import { BsTrashFill } from "react-icons/bs";
+import { Controller } from "../../../utils/react";
 import { ModalContent } from "../../_app/modal/Modal";
 import { useModalContext } from "../../_app/modal/ModalContext";
 import { useToastContext } from "../../_app/toast/ToastContext";
@@ -11,7 +12,6 @@ import {
   LoadingCursorAbsoluteOverlay,
   LoadingIndicator,
 } from "../../home/Loading";
-import { Controller } from "../../home/controller";
 import { usePostsContext } from "./PostsContext";
 
 function useObserver<T extends Element>() {

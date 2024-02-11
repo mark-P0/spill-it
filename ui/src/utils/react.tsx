@@ -2,6 +2,14 @@ import { raise } from "@spill-it/utils/errors";
 import { Key, PropsWithChildren, createContext, useContext } from "react";
 import { LoaderFunction, useLoaderData } from "react-router-dom";
 
+/**
+ * Used mainly to stop effects on unmounts,
+ * kind of like `AbortController` for fetches.
+ */
+export type Controller = {
+  shouldProceed: boolean;
+};
+
 export function createNewContext<T>(useContextValue: () => T) {
   const NewContext = createContext<T | null>(null);
 
