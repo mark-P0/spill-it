@@ -94,4 +94,13 @@ export const tryRoutes: RouteObject[] = [
   loadRoute,
   toastRoute,
   modalRoute,
+  {
+    path: "/:username",
+    loader({ params }) {
+      console.warn({ params });
+
+      return null;
+    },
+    element: null,
+  },
 ];

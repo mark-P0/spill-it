@@ -7,6 +7,7 @@ import { endpoint } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { getFromStorage } from "../../utils/storage";
 import { Screen } from "../_app/Screen";
+import { useUserContext } from "../_app/UserContext";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
 import { useToastContext } from "../_app/toast/ToastContext";
@@ -73,6 +74,27 @@ function LogoutButton() {
       )}
     >
       <BsBoxArrowLeft />
+    </button>
+  );
+}
+
+function ProfileButton() {
+  const { user } = useUserContext();
+
+  if (user === null) return null;
+  return (
+    <button
+      className={clsx(
+        "rounded-full",
+        "border-2 border-white/50",
+        ...["transition", "active:scale-95"],
+      )}
+    >
+      <img
+        src={user.portraitUrl}
+        alt={`Portrait of "${user.handleName}"`}
+        className="w-9 aspect-square rounded-full"
+      />
     </button>
   );
 }
@@ -161,8 +183,12 @@ export function HomeScreen() {
   return (
     <HomeProvider>
       <Screen className="grid auto-rows-min gap-6 p-6">
-        <header className="flex justify-between items-center">
+        <header className="flex items-center gap-3">
           <h1 className="text-3xl">Home</h1>
+
+          <div className="ml-auto">
+            <ProfileButton />
+          </div>
           <LogoutButton />
         </header>
         <PostForm />

@@ -7,8 +7,6 @@ export async function isLoggedIn(): Promise<boolean> {
   if (!headerAuthResult.success) return false;
   const headerAuth = headerAuthResult.value;
 
-  if (headerAuth === null) return false;
-
   const result = await fetchAPI("/api/v0/users/me", "GET", {
     headers: {
       Authorization: headerAuth,
