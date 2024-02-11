@@ -5,12 +5,15 @@ import { Link } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { getFromStorage } from "../../utils/storage";
+import {
+  PostsProvider,
+  usePostsContext,
+} from "../[profile]/posts/PostsContext";
+import { PostsList } from "../[profile]/posts/PostsList";
 import { Screen } from "../_app/Screen";
 import { useUserContext } from "../_app/UserContext";
 import { useToastContext } from "../_app/toast/ToastContext";
 import { LoadingCursorAbsoluteOverlay } from "./Loading";
-import { PostsProvider, usePostsContext } from "./posts/PostsContext";
-import { PostsList } from "./posts/PostsList";
 
 function ProfileButtonLink() {
   const { user } = useUserContext();
