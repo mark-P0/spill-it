@@ -1,3 +1,4 @@
+import { User } from "@spill-it/db/schema/drizzle";
 import {
   createPost,
   deletePost,
@@ -130,19 +131,35 @@ export const PostsRouter = Router();
     }
     const beforeISODate = beforeISODateResult.value;
 
-    logger.info("Converting header authorization to user info...");
-    const userResult = await convertHeaderAuthToUser(headers.Authorization);
-    if (!userResult.success) {
-      return res.sendStatus(userResult.error.statusCode);
+    let user: User | undefined;
+    if (headers.Authorization !== undefined) {
+      logger.info("Converting header authorization to user info...");
+      const userResult = await convertHeaderAuthToUser(headers.Authorization);
+      if (!userResult.success) {
+        return res.sendStatus(userResult.error.statusCode);
+      }
+      user = userResult.value;
     }
-    const user = userResult.value;
 
-    // TODO Check if user is authorized to view posts of queried user ID
+    logger.info("Determining user whose posts to fetch...");
+    let userId: User["id"] | undefined;
+    if (query.userId !== undefined) {
+      // TODO Check if queried user has a public profile
+      // TODO Check if current user follows the queried user
+      // TODO Check other authorization criteria?
+      userId = query.userId;
+    } else if (user !== undefined) {
+      userId = user.id;
+    }
+    if (userId === undefined) {
+      logger.error("Cannot determine user");
+      return res.sendStatus(StatusCodes.BAD_REQUEST);
+    }
 
     logger.info("Fetching posts...");
-    const userId = query.userId ?? user.id;
+    const _userId = userId;
     const postsResult = await safeAsync(() =>
-      readPostsOfUserBeforeTimestamp(userId, beforeISODate, size),
+      readPostsOfUserBeforeTimestamp(_userId, beforeISODate, size),
     );
     if (!postsResult.success) {
       logger.error(formatError(postsResult.error));
