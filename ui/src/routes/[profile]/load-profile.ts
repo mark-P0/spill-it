@@ -1,17 +1,9 @@
 import { raise } from "@spill-it/utils/errors";
+import { zodOfType } from "@spill-it/utils/zod";
 import { z } from "zod";
 import { EndpointParams, endpoint } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { createLoader } from "../../utils/react";
-
-/**
- * https://github.com/colinhacks/zod/issues/372#issuecomment-826380330
- * - Double function required as TS only allows either inferred or explicit generics, but not a mix
- */
-function zodOfType<T>() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Only used for typechecking, and the author has "guaranteed" functionality
-  return <S extends z.ZodType<T, any, any>>(schema: S) => schema;
-}
 
 export const profilePath = endpoint("/:username");
 const zodProfileParams = zodOfType<EndpointParams<"/:username">>()(
