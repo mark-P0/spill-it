@@ -32,6 +32,22 @@ export const endpointMap = {
       }),
     },
   },
+  "/api/v0/users": {
+    GET: {
+      input: z.object({
+        // TODO Restrict access to user data?
+        // headers: z.object({
+        //   Authorization: z.string(),
+        // }),
+        query: z.object({
+          username: z.optional(zodUser.shape.username),
+        }),
+      }),
+      output: z.object({
+        data: z.array(zodUser),
+      }),
+    },
+  },
   "/api/v0/posts": {
     POST: {
       input: z.object({

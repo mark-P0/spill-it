@@ -43,6 +43,26 @@ export async function readUserWithGoogleId(
   return user;
 }
 
+export async function readUserWithUsername(
+  username: User["username"],
+): Promise<User | null> {
+  const result = await safeAsync(() =>
+    db
+      .select()
+      .from(UsersTable)
+      .where(eq(UsersTable.username, username))
+      .limit(2),
+  );
+  const users = result.success
+    ? result.value
+    : raise("Failed reading user with username", result.error);
+
+  if (users.length > 1) raise("Multiple users for a username...?");
+  const user = users[0] ?? null;
+
+  return user;
+}
+
 function createUsernameFromHandle(handleName: string) {
   const tentativeHandle = handleName.toLowerCase().split(/\s/g).join("-"); // TODO Ensure unique from existing database entries!
   return tentativeHandle;
