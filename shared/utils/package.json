@@ -1,6 +1,7 @@
 {
   "name": "@spill-it/utils",
   "dependencies": {
+    "date-fns": "^3.2.0",
     "superjson": "^2.2.1"
   }
 }

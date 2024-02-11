@@ -161,6 +161,9 @@ importers:
 
   shared/utils:
     dependencies:
+      date-fns:
+        specifier: ^3.2.0
+        version: 3.2.0
       superjson:
         specifier: ^2.2.1
         version: 2.2.1
