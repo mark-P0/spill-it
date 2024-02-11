@@ -13,7 +13,7 @@ const tomorrow = () => addDays(today(), 1);
 const POSTS_IN_VIEW_CT = 8;
 
 type PostStatus = "fetching" | "error" | "ok";
-export const [useHomeContext, HomeProvider] = createNewContext(() => {
+export const [usePostsContext, PostsProvider] = createNewContext(() => {
   const [postsStatus, setPostsStatus] = useState<PostStatus>("fetching");
 
   const [posts, setPosts] = useState<PostWithAuthor[]>([]);
