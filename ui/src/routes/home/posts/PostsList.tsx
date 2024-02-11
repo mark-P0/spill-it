@@ -169,7 +169,7 @@ function PostCard(props: { post: PostWithAuthor }) {
         <header className="flex items-baseline gap-3">
           {/* TODO Link to profile? */}
           <h3 className="font-bold">{author.username}</h3>
-          <p className="text-xs uppercase tracking-wide opacity-50">
+          <p className="text-white/50 text-xs uppercase tracking-wide">
             {formatPostDate(timestamp)}
           </p>
         </header>
