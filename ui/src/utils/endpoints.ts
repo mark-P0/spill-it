@@ -19,7 +19,7 @@ type Defined<T extends Record<string, unknown>> = {
   [Key in keyof T]: NonNullable<T[Key]>;
 };
 /** Used for the same functions as `RouteParameters<>` in `@types/express-serve-static-core` */
-type EndpointParams<T extends Endpoint> = Defined<Params<PathParam<T>>>;
+export type EndpointParams<T extends Endpoint> = Defined<Params<PathParam<T>>>;
 export function endpointWithParam<T extends Endpoint>(
   endpoint: T,
   params: EndpointParams<T>,
