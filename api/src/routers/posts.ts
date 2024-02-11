@@ -6,6 +6,7 @@ import {
 } from "@spill-it/db/tables/posts";
 import { POST_CT_CAP } from "@spill-it/db/utils/constants";
 import { endpointDetails } from "@spill-it/endpoints";
+import { today } from "@spill-it/utils/dates";
 import { formatError } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
 import { safe, safeAsync } from "@spill-it/utils/safe";
@@ -114,7 +115,8 @@ export const PostsRouter = Router();
     const input = inputParsing.data;
 
     const { headers, query } = input;
-    const { beforeISODateStr, size } = query;
+    const beforeISODateStr = query.beforeISODateStr ?? today().toISOString();
+    const size = query.size ?? Math.floor(POST_CT_CAP / 2);
 
     if (size > POST_CT_CAP) {
       logger.error("Requested post count greater than set cap");
