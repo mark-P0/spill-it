@@ -5,6 +5,7 @@ import {
   DrizzleZodSample,
   DrizzleZodSession,
   DrizzleZodUser,
+  DrizzleZodUserPublic,
   Sample,
 } from "./drizzle";
 
@@ -24,6 +25,15 @@ export const zodUser: DrizzleZodUser = z.object({
   portraitUrl: z.string(),
   googleId: z.string().nullable(),
   loginCt: z.number(),
+});
+
+export const zodUserPublic: DrizzleZodUserPublic = zodUser.pick({
+  id: true,
+  username: true,
+  handleName: true,
+  portraitUrl: true,
+  // googleId: true,
+  loginCt: true,
 });
 
 export const zodSession: DrizzleZodSession = z.object({

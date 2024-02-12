@@ -63,6 +63,17 @@ export type DrizzleZodUser = typeof drizzleZodUser;
 export type User = typeof UsersTable.$inferSelect;
 export type UserDetails = typeof UsersTable.$inferInsert;
 
+const drizzleZodUserPublic = drizzleZodUser.pick({
+  id: true,
+  username: true,
+  handleName: true,
+  portraitUrl: true,
+  // googleId: true,
+  loginCt: true,
+});
+export type DrizzleZodUserPublic = typeof drizzleZodUserPublic;
+export type UserPublic = z.infer<DrizzleZodUserPublic>;
+
 export const SessionsTable = pgTable("sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("userId").notNull(),
