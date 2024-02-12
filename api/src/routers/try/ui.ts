@@ -42,15 +42,16 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
     }
     const output = outputParsing.data;
 
-    logger.info("Sending login link...");
-    const result = safe(() => {
-      const rawOutput = jsonPack(output);
-      return res.send(rawOutput);
-    });
-    if (!result.success) {
-      logger.error(formatError(result.error));
+    logger.info("Packaging output...");
+    const rawOutputResult = safe(() => jsonPack(output));
+    if (!rawOutputResult.success) {
+      logger.error(formatError(rawOutputResult.error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
     }
+    const rawOutput = rawOutputResult.value;
+
+    logger.info("Sending login link...");
+    return res.send(rawOutput);
   });
 }
 
@@ -93,14 +94,15 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
     }
     const output = outputParsing.data;
 
-    logger.info("Sending app Google auth...");
-    const result = safe(() => {
-      const rawOutput = jsonPack(output);
-      return res.send(rawOutput);
-    });
-    if (!result.success) {
-      logger.error(formatError(result.error));
+    logger.info("Packaging output...");
+    const rawOutputResult = safe(() => jsonPack(output));
+    if (!rawOutputResult.success) {
+      logger.error(formatError(rawOutputResult.error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
     }
+    const rawOutput = rawOutputResult.value;
+
+    logger.info("Sending app Google auth...");
+    return res.send(rawOutput);
   });
 }
