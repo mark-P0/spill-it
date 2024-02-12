@@ -1,4 +1,4 @@
-import { User } from "@spill-it/db/schema/drizzle";
+import { UserPublic } from "@spill-it/db/schema/drizzle";
 import { safe } from "@spill-it/utils/safe";
 import { useEffect, useState } from "react";
 import { fetchAPI } from "../../utils/fetch-api";
@@ -6,7 +6,7 @@ import { createNewContext } from "../../utils/react";
 import { getFromStorage } from "../../utils/storage";
 
 export const [useUserContext, UserProvider] = createNewContext(() => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserPublic | null>(null);
   useEffect(() => {
     (async () => {
       const headerAuthResult = safe(() => getFromStorage("SESS"));

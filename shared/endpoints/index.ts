@@ -2,7 +2,7 @@ import {
   zodPost,
   zodPostWithAuthor,
   zodSample,
-  zodUser,
+  zodUserPublic,
 } from "@spill-it/db/schema/zod";
 import { POST_CT_CAP } from "@spill-it/db/utils/constants";
 import { z } from "zod";
@@ -28,7 +28,7 @@ export const endpointMap = {
         }),
       }),
       output: z.object({
-        data: zodUser,
+        data: zodUserPublic,
       }),
     },
   },
@@ -40,11 +40,11 @@ export const endpointMap = {
         //   Authorization: z.string(),
         // }),
         query: z.object({
-          username: z.optional(zodUser.shape.username),
+          username: z.optional(zodUserPublic.shape.username),
         }),
       }),
       output: z.object({
-        data: z.array(zodUser),
+        data: z.array(zodUserPublic),
       }),
     },
   },
@@ -71,7 +71,7 @@ export const endpointMap = {
           Authorization: z.string().optional(),
         }),
         query: z.object({
-          userId: z.optional(zodUser.shape.id),
+          userId: z.optional(zodUserPublic.shape.id),
           beforeISODateStr: z.string().datetime().optional(), // Should be parseable to same format as `zodPost.shape.timestamp`
           size: z.coerce.number().max(POST_CT_CAP).optional(),
         }),
