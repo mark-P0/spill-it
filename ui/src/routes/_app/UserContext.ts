@@ -2,6 +2,7 @@ import { UserPublic } from "@spill-it/db/schema/drizzle";
 import { safe } from "@spill-it/utils/safe";
 import { useEffect, useState } from "react";
 import { fetchAPI } from "../../utils/fetch-api";
+import { logger } from "../../utils/logger";
 import { createNewContext } from "../../utils/react";
 import { getFromStorage } from "../../utils/storage";
 
@@ -19,7 +20,7 @@ export const [useUserContext, UserProvider] = createNewContext(() => {
         },
       });
       if (!userResult.success) {
-        console.error(new Error("Failed fetching user", userResult.error));
+        logger.error(userResult.error);
         return;
       }
       const user = userResult.value.data;

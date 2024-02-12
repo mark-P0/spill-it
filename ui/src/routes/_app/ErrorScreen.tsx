@@ -1,13 +1,14 @@
 import clsx from "clsx";
 import { Link, useRouteError } from "react-router-dom";
 import { endpoint } from "../../utils/endpoints";
+import { logger } from "../../utils/logger";
 import { Screen } from "./Screen";
 
 export function ErrorScreen() {
   document.title = "Oops! 😬 Spill.it";
 
   const error = useRouteError();
-  console.error(error);
+  logger.error(error);
 
   return (
     <Screen className="grid place-content-center text-center">

@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
+import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
 import { LoadingCursorAbsoluteOverlay } from "../_app/Loading";
 import { Screen } from "../_app/Screen";
@@ -53,7 +54,7 @@ function PostForm() {
 
     const headerAuthResult = safe(() => getFromStorage("SESS"));
     if (!headerAuthResult.success) {
-      console.error(headerAuthResult.error);
+      logger.error(headerAuthResult.error);
       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
       setIsSubmitting(false);
       return;
@@ -65,7 +66,7 @@ function PostForm() {
       body: { content },
     });
     if (!fetchResult.success) {
-      console.error(fetchResult.error);
+      logger.error(fetchResult.error);
       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
       setIsSubmitting(false);
       return;

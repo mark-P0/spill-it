@@ -1,4 +1,5 @@
 import { RouteObject, redirect } from "react-router-dom";
+import { logger } from "../utils/logger";
 import { Screen } from "./_app/Screen";
 import { ModalContent } from "./_app/modal/Modal";
 import { useModalContext } from "./_app/modal/ModalContext";
@@ -10,16 +11,16 @@ async function sleep(seconds: number) {
 const queryRoute: RouteObject = (() => {
   return {
     path: "/query",
-    element: null,
     async loader(arg) {
       const { params, request } = arg;
       const query = Object.fromEntries(new URL(request.url).searchParams);
 
-      console.log({ arg, params, request });
-      console.log(query);
+      logger.debug({ arg, params, request });
+      logger.debug(query);
 
-      return redirect("/");
+      return null;
     },
+    element: null,
   };
 })();
 

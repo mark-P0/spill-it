@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 import { BsTrashFill } from "react-icons/bs";
+import { logger } from "../../../utils/logger";
 import { Controller } from "../../../utils/react";
 import {
   LoadingCursorAbsoluteOverlay,
@@ -21,19 +22,19 @@ function useObserver<T extends Element>() {
   useEffect(() => {
     const element = elementRef.current;
     if (element === null) {
-      console.warn("Element to be observed does not exist...?");
+      logger.warn("Element to be observed does not exist...?");
       return;
     }
 
     const observer = new IntersectionObserver((entries) => {
       if (entries.length > 1) {
-        console.warn("Multiple elements observed...?");
+        logger.warn("Multiple elements observed...?");
         return;
       }
 
       const entry = entries[0];
       if (entry === undefined) {
-        console.warn("Observed element does not exist...?");
+        logger.warn("Observed element does not exist...?");
         return;
       }
 
@@ -75,7 +76,7 @@ function DeletePostModalContent(props: { postToDelete: PostWithAuthor }) {
 
   async function triggerDelete() {
     if (isDeleting) {
-      console.warn("Cannot delete if already deleting...");
+      logger.warn("Cannot delete if already deleting...");
       return;
     }
     setIsDeleting(true);
