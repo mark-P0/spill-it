@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { BsBoxArrowLeft, BsHouseFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { endpoint } from "../../utils/endpoints";
+import { logger } from "../../utils/logger";
 import { Screen } from "../_app/Screen";
 import { useUserContext } from "../_app/UserContext";
 import { ModalContent } from "../_app/modal/Modal";
@@ -75,6 +76,7 @@ function LogoutButton() {
   const { profile } = useProfileLoader();
 
   function promptLogout() {
+    logger.debug("Showing logout prompt...");
     showOnModal(<LogoutModalContent />);
   }
 

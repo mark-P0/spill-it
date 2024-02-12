@@ -45,6 +45,7 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
     setPosts(data);
   }, [profile]);
   useEffect(() => {
+    logger.debug("Initializing posts...");
     initializePosts();
   }, [initializePosts]);
 

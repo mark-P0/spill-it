@@ -49,9 +49,11 @@ function PostForm() {
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
+    logger.debug("Submitting post...");
     event.preventDefault();
     setIsSubmitting(true);
 
+    logger.debug("Retrieving session info...");
     const headerAuthResult = safe(() => getFromStorage("SESS"));
     if (!headerAuthResult.success) {
       logger.error(headerAuthResult.error);
@@ -61,6 +63,7 @@ function PostForm() {
     }
     const headerAuth = headerAuthResult.value;
 
+    logger.debug("Sending post...");
     const fetchResult = await fetchAPI("/api/v0/posts", "POST", {
       headers: { Authorization: headerAuth },
       body: { content },
@@ -72,6 +75,7 @@ function PostForm() {
       return;
     }
 
+    logger.debug("Finishing submission...");
     extendPostsWithRecent();
     showOnToast(<>Spilt! 😋</>, "info");
     setIsSubmitting(false);

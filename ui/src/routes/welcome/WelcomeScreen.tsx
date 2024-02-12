@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import { E, EE } from "../../utils/dom";
 import { env } from "../../utils/env";
+import { logger } from "../../utils/logger";
 import { Screen } from "../_app/Screen";
 import { redirectUri } from "./redirect-uri";
 
@@ -26,6 +27,7 @@ function LoginWithGoogle() {
     const div = divRef.current;
     if (div == null) return;
 
+    logger.debug("Attaching Google script...");
     EE(div, {}, [
       E(
         "script",

@@ -23,19 +23,19 @@ function useObserver<T extends Element>() {
   useEffect(() => {
     const element = elementRef.current;
     if (element === null) {
-      logger.warn("Element to be observed does not exist...?");
+      logger.warn("Element to observe does not exist? Ignoring...");
       return;
     }
 
     const observer = new IntersectionObserver((entries) => {
       if (entries.length > 1) {
-        logger.warn("Multiple elements observed...?");
+        logger.warn("Multiple elements observed? Ignoring...");
         return;
       }
 
       const entry = entries[0];
       if (entry === undefined) {
-        logger.warn("Observed element does not exist...?");
+        logger.warn("Observed element does not exist? Ignoring...");
         return;
       }
 
@@ -58,9 +58,13 @@ function PostsListEndObserver() {
   const { extendPosts } = usePostsContext();
   useEffect(() => {
     if (!isIntersecting) return;
+
+    logger.debug("Extending posts...");
     const ctl: Controller = { shouldProceed: true };
     extendPosts(ctl);
+
     return () => {
+      logger.debug("Cancelling posts extension...");
       ctl.shouldProceed = false;
     };
   }, [isIntersecting, extendPosts]);
@@ -76,18 +80,22 @@ function DeletePostModalContent(props: { postToDelete: PostWithAuthor }) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   async function triggerDelete() {
+    logger.debug("Triggering deleting...");
     if (isDeleting) {
-      logger.warn("Cannot delete if already deleting...");
+      logger.warn("Cannot delete if already deleting; ignoring...");
       return;
     }
     setIsDeleting(true);
     makeModalCancellable(false);
 
+    logger.debug("Try deleting...");
     const deleteResult = await safeAsync(() => deletePost(postToDelete));
     if (!deleteResult.success) {
+      logger.error(deleteResult.error);
       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
     }
 
+    logger.debug("Finishing delete...");
     setIsDeleting(false);
     makeModalCancellable(true);
     closeModal();
@@ -143,6 +151,7 @@ function DeletePostModalContent(props: { postToDelete: PostWithAuthor }) {
     </ModalContent>
   );
 }
+
 function formatPostDate(date: PostWithAuthor["timestamp"]): string {
   return formatDistanceToNow(date, {
     addSuffix: true,
@@ -156,6 +165,7 @@ function PostCard(props: { post: PostWithAuthor }) {
   const { content, timestamp, author } = post;
 
   function promptDelete() {
+    logger.debug("Showing delete prompt...");
     showOnModal(<DeletePostModalContent postToDelete={post} />);
   }
 
@@ -200,6 +210,11 @@ export function PostsList() {
   const { postsStatus, posts, hasNextPosts, initializePosts } =
     usePostsContext();
 
+  function reinitializePosts() {
+    logger.debug("Re-initializing posts...");
+    initializePosts();
+  }
+
   useEffect(() => {
     if (postsStatus !== "error") return;
     showOnToast(<>🥶 We spilt things along the way</>, "warn");
@@ -208,7 +223,7 @@ export function PostsList() {
     return (
       <div className="grid place-items-center">
         <button
-          onClick={initializePosts}
+          onClick={reinitializePosts}
           className={clsx(
             "select-none",
             "rounded-full px-6 py-3",
