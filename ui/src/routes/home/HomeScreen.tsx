@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
+import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
 import { LoadingCursorAbsoluteOverlay } from "../_app/Loading";
 import { Screen } from "../_app/Screen";
@@ -48,29 +49,33 @@ function PostForm() {
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
+    logger.debug("Submitting post...");
     event.preventDefault();
     setIsSubmitting(true);
 
+    logger.debug("Retrieving session info...");
     const headerAuthResult = safe(() => getFromStorage("SESS"));
     if (!headerAuthResult.success) {
-      console.error(headerAuthResult.error);
+      logger.error(headerAuthResult.error);
       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
       setIsSubmitting(false);
       return;
     }
     const headerAuth = headerAuthResult.value;
 
+    logger.debug("Sending post...");
     const fetchResult = await fetchAPI("/api/v0/posts", "POST", {
       headers: { Authorization: headerAuth },
       body: { content },
     });
     if (!fetchResult.success) {
-      console.error(fetchResult.error);
+      logger.error(fetchResult.error);
       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
       setIsSubmitting(false);
       return;
     }
 
+    logger.debug("Finishing submission...");
     extendPostsWithRecent();
     showOnToast(<>Spilt! 😋</>, "info");
     setIsSubmitting(false);

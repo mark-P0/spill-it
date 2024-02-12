@@ -1,3 +1,5 @@
+import { logger } from "./logger";
+
 type Tag = keyof HTMLElementTagNameMap; // From signature of `document.createElement()`
 type AttributeValue = string | boolean;
 type Child = string | Node; // From signature of `Element.replaceChildren()`
@@ -39,7 +41,7 @@ export function EE<T extends HTMLElement>(
 const bodyClasses =
   document.body.getAttribute("class") ??
   (() => {
-    console.warn("No document body classes...?");
+    logger.warn("No document body classes...?");
     return "";
   })();
 

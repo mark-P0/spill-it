@@ -3,6 +3,7 @@ import { tomorrow } from "@spill-it/utils/dates";
 import { safe } from "@spill-it/utils/safe";
 import { useCallback, useEffect, useState } from "react";
 import { fetchAPI } from "../../../utils/fetch-api";
+import { logger } from "../../../utils/logger";
 import { Controller, createNewContext } from "../../../utils/react";
 import { getFromStorage } from "../../../utils/storage";
 import { useProfileLoader } from "../load-profile";
@@ -34,7 +35,7 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
       },
     });
     if (!fetchResult.success) {
-      console.error(fetchResult.error);
+      logger.error(fetchResult.error);
       setPostsStatus("error");
       return;
     }
@@ -44,6 +45,7 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
     setPosts(data);
   }, [profile]);
   useEffect(() => {
+    logger.debug("Initializing posts...");
     initializePosts();
   }, [initializePosts]);
 
@@ -71,7 +73,7 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
         },
       });
       if (!nextPostsResult.success) {
-        console.error(nextPostsResult.error);
+        logger.error(nextPostsResult.error);
         setPostsStatus("error");
         return;
       }
@@ -101,7 +103,7 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
       },
     });
     if (!recentPostsResult.success) {
-      console.error(recentPostsResult.error);
+      logger.error(recentPostsResult.error);
       setPostsStatus("error");
       return;
     }
