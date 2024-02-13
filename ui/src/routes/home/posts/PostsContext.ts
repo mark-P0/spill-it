@@ -107,7 +107,7 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
     const recentPosts = recentPostsResult.value.data;
 
     const postIds = new Set<PostWithAuthor["id"]>();
-    const newPostsWithPossibleRepeats = [...recentPosts, ...posts]; // TODO Only check at the end of recents and start of current?
+    const newPostsWithPossibleRepeats = [...recentPosts, ...posts]; // TODO Only check at the end of recent posts and start of current?
     const newPosts = newPostsWithPossibleRepeats.filter((post) => {
       if (postIds.has(post.id)) return false; // Remove post if it is already "seen"
       postIds.add(post.id); // Mark post as "seen"
