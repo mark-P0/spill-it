@@ -31,6 +31,7 @@ import { relations } from "drizzle-orm";
 import {
   integer,
   pgTable,
+  serial,
   text,
   timestamp,
   uuid,
@@ -73,6 +74,13 @@ const drizzleZodUserPublic = drizzleZodUser.pick({
 });
 export type DrizzleZodUserPublic = typeof drizzleZodUserPublic;
 export type UserPublic = z.infer<DrizzleZodUserPublic>;
+
+export const FollowsTable = pgTable("follows", {
+  id: serial("id").primaryKey(),
+  date: timestamp("date").notNull().defaultNow(),
+  followerUserId: uuid("followerUserId").notNull(),
+  followingUserId: uuid("followingUserId").notNull(),
+});
 
 export const SessionsTable = pgTable("sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
