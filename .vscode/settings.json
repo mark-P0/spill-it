@@ -11,7 +11,17 @@
   },
 
   "cSpell.allowCompoundWords": true,
-  "cSpell.words": ["pino", "clsx", "jwks", "falseish", "strat"],
+  "cSpell.words": [
+    "signin",
+    "SPILLITGOOGLE",
+    "SPILLITSESS",
+    "SESS",
+    "pino",
+    "clsx",
+    "jwks",
+    "falseish",
+    "strat"
+  ],
 
   "files.associations": {
     "*.css": "tailwindcss"
