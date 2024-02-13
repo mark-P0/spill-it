@@ -76,7 +76,7 @@ export type DrizzleZodUserPublic = typeof drizzleZodUserPublic;
 export type UserPublic = z.infer<DrizzleZodUserPublic>;
 
 export const FollowsTable = pgTable("follows", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").defaultRandom().primaryKey(),
   date: timestamp("date").notNull().defaultNow(),
   followerUserId: uuid("followerUserId").notNull(),
   followingUserId: uuid("followingUserId").notNull(),

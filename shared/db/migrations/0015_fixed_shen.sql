@@ -1,0 +1,1 @@
+ALTER TABLE "follows" ADD COLUMN "_id" uuid DEFAULT gen_random_uuid();
