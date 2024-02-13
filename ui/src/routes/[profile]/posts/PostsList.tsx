@@ -2,10 +2,10 @@ import { PostWithAuthor } from "@spill-it/db/schema/drizzle";
 import { safeAsync } from "@spill-it/utils/safe";
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { BsTrashFill } from "react-icons/bs";
 import { logger } from "../../../utils/logger";
-import { Controller } from "../../../utils/react";
+import { Controller, useObserver } from "../../../utils/react";
 import {
   LoadingCursorAbsoluteOverlay,
   LoadingIndicator,
@@ -15,42 +15,6 @@ import { ModalContent } from "../../_app/modal/Modal";
 import { useModalContext } from "../../_app/modal/ModalContext";
 import { useToastContext } from "../../_app/toast/ToastContext";
 import { usePostsContext } from "./PostsContext";
-
-function useObserver<T extends Element>() {
-  const [isIntersecting, setIsIntersecting] = useState(false);
-
-  const elementRef = useRef<T | null>(null);
-  useEffect(() => {
-    const element = elementRef.current;
-    if (element === null) {
-      logger.warn("Element to observe does not exist? Ignoring...");
-      return;
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      if (entries.length > 1) {
-        logger.warn("Multiple elements observed? Ignoring...");
-        return;
-      }
-
-      const entry = entries[0];
-      if (entry === undefined) {
-        logger.warn("Observed element does not exist? Ignoring...");
-        return;
-      }
-
-      // TODO Also have state for entry?
-      setIsIntersecting(entry.isIntersecting);
-    });
-
-    observer.observe(element);
-    return () => {
-      observer.unobserve(element);
-    };
-  }, []);
-
-  return [elementRef, isIntersecting] as const;
-}
 
 function PostsListEndObserver() {
   const [divRef, isIntersecting] = useObserver<HTMLDivElement>();
