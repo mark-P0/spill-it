@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  DrizzleZodFollow,
   DrizzleZodPost,
   DrizzleZodPostWithAuthor,
   DrizzleZodSample,
@@ -34,6 +35,13 @@ export const zodUserPublic: DrizzleZodUserPublic = zodUser.pick({
   portraitUrl: true,
   // googleId: true,
   loginCt: true,
+});
+
+export const zodFollow: DrizzleZodFollow = z.object({
+  id: z.string().uuid(),
+  date: z.date(),
+  followerUserId: zodUser.shape.id,
+  followingUserId: zodUser.shape.id,
 });
 
 export const zodSession: DrizzleZodSession = z.object({

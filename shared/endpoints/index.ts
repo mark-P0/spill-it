@@ -1,4 +1,5 @@
 import {
+  zodFollow,
   zodPost,
   zodPostWithAuthor,
   zodSample,
@@ -45,6 +46,21 @@ export const endpointMap = {
       }),
       output: z.object({
         data: z.array(zodUserPublic),
+      }),
+    },
+  },
+  "/api/v0/follows": {
+    POST: {
+      input: z.object({
+        headers: z.object({
+          Authorization: z.string(),
+        }),
+        query: z.object({
+          followingUserId: zodFollow.shape.followingUserId,
+        }),
+      }),
+      output: z.object({
+        data: zodFollow,
       }),
     },
   },

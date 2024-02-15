@@ -81,6 +81,10 @@ export const FollowsTable = pgTable("follows", {
   followerUserId: uuid("followerUserId").notNull(),
   followingUserId: uuid("followingUserId").notNull(),
 });
+const drizzleZodFollow = createSelectSchema(FollowsTable);
+export type DrizzleZodFollow = typeof drizzleZodFollow;
+export type Follow = typeof FollowsTable.$inferSelect;
+export type FollowDetails = typeof FollowsTable.$inferInsert;
 
 export const SessionsTable = pgTable("sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
