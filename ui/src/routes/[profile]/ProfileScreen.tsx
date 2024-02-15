@@ -145,26 +145,26 @@ function _ProfileScreen() {
   }
 
   return (
-    <PostsProvider>
-      <Screen className="grid auto-rows-min gap-6 p-6">
-        <header className="grid grid-rows-subgrid row-span-2">
-          <NavBar />
-          <ProfileCard />
-        </header>
+    <Screen className="grid auto-rows-min gap-6 p-6">
+      <header className="grid grid-rows-subgrid row-span-2">
+        <NavBar />
+        <ProfileCard />
+      </header>
 
-        <main>
-          <h2 className="sr-only">Spills 🍵</h2>
+      <main>
+        <h2 className="sr-only">Spills 🍵</h2>
 
-          <PostsList />
-        </main>
-      </Screen>
-    </PostsProvider>
+        <PostsList />
+      </main>
+    </Screen>
   );
 }
 export function ProfileScreen() {
   return (
     <ProfileProvider>
-      <_ProfileScreen />
+      <PostsProvider>
+        <_ProfileScreen />
+      </PostsProvider>
     </ProfileProvider>
   );
 }
