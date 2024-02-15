@@ -68,7 +68,7 @@ function _FollowersModal() {
   useEffect(() => {
     showOnModal(<FollowersModalContent />);
     setOnDismiss(() => () => {
-      navigate(-1);
+      navigate("..");
     });
   }, [showOnModal, setOnDismiss, navigate]);
 
@@ -112,7 +112,7 @@ function _FollowingModal() {
   useEffect(() => {
     showOnModal(<FollowingModalContent />);
     setOnDismiss(() => () => {
-      navigate(-1);
+      navigate("..");
     });
   }, [showOnModal, setOnDismiss, navigate]);
 
