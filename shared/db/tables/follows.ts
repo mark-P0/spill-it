@@ -5,13 +5,13 @@ import { db } from "../db";
 import {
   Follow,
   FollowDetails,
-  FollowWithUser,
+  FollowWithUsers,
   FollowsTable,
 } from "../schema/drizzle";
 
 export async function createFollow(
   details: FollowDetails,
-): Promise<FollowWithUser> {
+): Promise<FollowWithUsers> {
   return await db.transaction(async (tx) => {
     const insertedFollows = await tx
       .insert(FollowsTable)

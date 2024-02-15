@@ -103,7 +103,7 @@ const drizzleZodFollowWithUsers = z.intersection(
   }),
 );
 export type DrizzleZodFollowWithUsers = typeof drizzleZodFollowWithUsers;
-export type FollowWithUser = z.infer<DrizzleZodFollowWithUsers>;
+export type FollowWithUsers = z.infer<DrizzleZodFollowWithUsers>;
 
 export const SessionsTable = pgTable("sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
