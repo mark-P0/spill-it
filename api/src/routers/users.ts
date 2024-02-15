@@ -1,4 +1,4 @@
-import { readUserViaUsername } from "@spill-it/db/tables/users";
+import { readUserWithFollowsViaUsername } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
@@ -45,7 +45,9 @@ export const UsersRouter = Router();
     username: NonNullable<Input["query"]["username"]>,
   ): Promise<T> {
     logger.info("Fetching user info...");
-    const userResult = await safeAsync(() => readUserViaUsername(username));
+    const userResult = await safeAsync(() =>
+      readUserWithFollowsViaUsername(username),
+    );
     if (!userResult.success) {
       logger.error(formatError(userResult.error));
       return res.sendStatus(StatusCodes.BAD_GATEWAY);

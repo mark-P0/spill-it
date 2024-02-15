@@ -44,13 +44,30 @@ export const zodFollow: DrizzleZodFollow = z.object({
   followerUserId: zodUserPublic.shape.id,
   followingUserId: zodUserPublic.shape.id,
 });
-export const zodFollowWithUsers: DrizzleZodFollowWithUsers = z.intersection(
-  zodFollow,
-  z.object({
-    follower: zodUserPublic,
-    following: zodUserPublic,
-  }),
-);
+export const zodFollowWithUsers: DrizzleZodFollowWithUsers = zodFollow.extend({
+  follower: zodUserPublic,
+  following: zodUserPublic,
+});
+
+export const zodUserPublicWithFollowDate = z.object({
+  date: zodFollow.shape.date,
+  user: zodUserPublic,
+});
+export const zodUserPublicWithFollows = zodUserPublic.extend({
+  followers: z.array(
+    zodFollowWithUsers.pick({
+      date: true,
+      follower: true,
+    }),
+  ),
+  followings: z.array(
+    zodFollowWithUsers.pick({
+      date: true,
+      following: true,
+    }),
+  ),
+});
+export type UserPublicWithFollows = z.infer<typeof zodUserPublicWithFollows>;
 
 export const zodSession: DrizzleZodSession = z.object({
   id: z.string().uuid(),

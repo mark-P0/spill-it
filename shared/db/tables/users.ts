@@ -4,6 +4,7 @@ import { safeAsync } from "@spill-it/utils/safe";
 import { eq, sql } from "drizzle-orm";
 import { db } from "../db";
 import { User, UsersTable } from "../schema/drizzle";
+import { UserPublicWithFollows } from "../schema/zod";
 
 export async function isGoogleUserExisting(googleId: string): Promise<boolean> {
   const user = await readUserViaGoogleId(googleId);
@@ -57,6 +58,30 @@ export async function readUserViaUsername(
   const users = result.success
     ? result.value
     : raise("Failed reading user with username", result.error);
+
+  if (users.length > 1) raise("Multiple users for a username...?");
+  const user = users[0] ?? null;
+
+  return user;
+}
+
+export async function readUserWithFollowsViaUsername(
+  username: User["username"],
+): Promise<UserPublicWithFollows | null> {
+  const users = await db.query.UsersTable.findMany({
+    limit: 2,
+    where: eq(UsersTable.username, username),
+    with: {
+      followers: {
+        columns: { date: true },
+        with: { follower: true },
+      },
+      followings: {
+        columns: { date: true },
+        with: { following: true },
+      },
+    },
+  });
 
   if (users.length > 1) raise("Multiple users for a username...?");
   const user = users[0] ?? null;
