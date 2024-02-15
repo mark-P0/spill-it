@@ -2,7 +2,10 @@ import { buildHeaderAuth } from "@spill-it/auth/headers";
 import { raise } from "@spill-it/utils/errors";
 import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";
-import { FollowersModal } from "./routes/[profile]/FollowsModal";
+import {
+  FollowersModal,
+  FollowingModal,
+} from "./routes/[profile]/FollowsModal";
 import { ProfileScreen } from "./routes/[profile]/ProfileScreen";
 import { ErrorScreen } from "./routes/_app/ErrorScreen";
 import { HomeScreen } from "./routes/home/HomeScreen";
@@ -19,6 +22,7 @@ export const ProfileRoute: RouteObject = {
   element: <ProfileScreen />,
   children: [
     { path: endpoint("/:username/followers"), element: <FollowersModal /> },
+    { path: endpoint("/:username/following"), element: <FollowingModal /> },
   ],
 };
 

@@ -137,7 +137,7 @@ export function ProfileCard() {
             {followers.length === 1 ? <>follower</> : <>followers</>}
           </Link>
           <Link
-            to="#"
+            to={endpointWithParam("/:username/following", { username })}
             className={clsx(
               "text-xs uppercase tracking-wide",
               "underline underline-offset-4",
