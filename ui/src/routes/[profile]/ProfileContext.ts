@@ -4,18 +4,16 @@ import { zodOfType } from "@spill-it/utils/zod";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { z } from "zod";
-import { EndpointParams, endpoint } from "../../utils/endpoints";
+import { EndpointParams } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
 import { createNewContext } from "../../utils/react";
 
-export const profilePath = endpoint("/:username");
 const zodProfileParams = zodOfType<EndpointParams<"/:username">>()(
   z.object({
     username: z.string(),
   }),
 );
-
 export const [useProfileContext, ProfileProvider] = createNewContext(() => {
   const [error, setError] = useState<Error | null>(null);
   if (error !== null) {
