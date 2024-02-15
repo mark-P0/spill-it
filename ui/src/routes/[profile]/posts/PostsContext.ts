@@ -16,6 +16,7 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
   const [postsStatus, setPostsStatus] = useState<PostStatus>("fetching");
 
   const [posts, setPosts] = useState<PostWithAuthor[]>([]);
+  const [hasNextPosts, setHasNextPosts] = useState(true);
   const initializePosts = useCallback(async () => {
     if (profile === null) {
       logger.warn("No profile yet; cancelling initialization...");
@@ -48,13 +49,13 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
 
     setPostsStatus("ok");
     setPosts(data);
+    setHasNextPosts(true);
   }, [profile]);
   useEffect(() => {
     logger.debug("Initializing posts...");
     initializePosts();
   }, [initializePosts]);
 
-  const [hasNextPosts, setHasNextPosts] = useState(true);
   const extendPosts = useCallback(
     async (ctl: Controller) => {
       if (profile === null) {
@@ -91,7 +92,10 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
 
       if (!ctl.shouldProceed) return;
       setPosts([...posts, ...nextPosts.slice(0, -1)]);
-      if (nextPosts.length < POSTS_IN_VIEW_CT) setHasNextPosts(false);
+      if (nextPosts.length < POSTS_IN_VIEW_CT) {
+        logger.warn("No more next posts; remembering...");
+        setHasNextPosts(false);
+      }
     },
     [profile, posts],
   );
