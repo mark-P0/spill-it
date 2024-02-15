@@ -50,8 +50,9 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
     }
   }, [rawParams]);
   useEffect(() => {
+    if (profile !== null) return;
     initializeProfile();
-  }, [initializeProfile]);
+  }, [profile, initializeProfile]);
 
   return { profile, initializeProfile };
 });

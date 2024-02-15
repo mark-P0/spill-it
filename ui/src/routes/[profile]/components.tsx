@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { BsBoxArrowLeft, BsHouseFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
-import { endpoint } from "../../utils/endpoints";
+import { endpoint, endpointWithParam } from "../../utils/endpoints";
 import { logger } from "../../utils/logger";
 import { useUserContext } from "../_app/UserContext";
 import { ModalContent } from "../_app/modal/Modal";
@@ -126,7 +126,7 @@ export function ProfileCard() {
         <p className="text-lg text-white/50">{username}</p>
         <nav className="mt-1 flex gap-3">
           <Link
-            to="#"
+            to={endpointWithParam("/:username/followers", { username })}
             className={clsx(
               "text-xs uppercase tracking-wide",
               "underline underline-offset-4",
