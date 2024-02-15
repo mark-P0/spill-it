@@ -8,7 +8,6 @@ import { useUserContext } from "../_app/UserContext";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
 import { ProfileProvider, useProfileContext } from "./ProfileContext";
-import { useProfileLoader } from "./load-profile";
 import { PostsProvider } from "./posts/PostsContext";
 import { PostsList } from "./posts/PostsList";
 
@@ -72,16 +71,13 @@ function LogoutModalContent() {
   );
 }
 function LogoutButton() {
-  const { user } = useUserContext();
   const { showOnModal } = useModalContext();
-  const { profile } = useProfileLoader();
 
   function promptLogout() {
     logger.debug("Showing logout prompt...");
     showOnModal(<LogoutModalContent />);
   }
 
-  if (user?.id !== profile.id) return <Nothing />; // Logout should not be available if viewing other profiles
   return (
     <button
       onClick={promptLogout}
@@ -95,17 +91,27 @@ function LogoutButton() {
   );
 }
 
-function HomeButtonLink() {
+function NavBar() {
+  const { user } = useUserContext();
+  const { profile } = useProfileContext();
+
+  const isProfileOfUser = profile?.id === user?.id;
   return (
-    <Link
-      to={endpoint("/home")}
-      className={clsx(
-        "w-9 aspect-square rounded-full p-2",
-        ...["transition", "hover:bg-white/25 active:scale-90"],
-      )}
-    >
-      <BsHouseFill className="w-full h-full" />
-    </Link>
+    <nav className="flex justify-between items-center">
+      {
+        isProfileOfUser ? <LogoutButton /> : <Nothing /> // Use placeholder to not affect layout
+      }
+
+      <Link
+        to={endpoint("/home")}
+        className={clsx(
+          "w-9 aspect-square rounded-full p-2",
+          ...["transition", "hover:bg-white/25 active:scale-90"],
+        )}
+      >
+        <BsHouseFill className="w-full h-full" />
+      </Link>
+    </nav>
   );
 }
 
@@ -120,26 +126,19 @@ function _ProfileScreen() {
   return (
     <PostsProvider>
       <Screen className="grid auto-rows-min gap-6 p-6">
-        <header className="grid grid-rows-subgrid row-span-2">
-          <nav className="flex justify-between items-center">
-            <LogoutButton />
-
-            <HomeButtonLink />
-          </nav>
-
-          <section className="flex justify-between">
-            <div>
-              <h1 className="text-3xl font-bold">{handleName}</h1>
-              <p className="text-lg text-white/50">{username}</p>
-            </div>
-            <div>
-              <img
-                src={portraitUrl}
-                alt={`Portrait of "${handleName}"`}
-                className="w-20 aspect-square rounded-full"
-              />
-            </div>
-          </section>
+        <NavBar />
+        <header className="flex justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">{handleName}</h1>
+            <p className="text-lg text-white/50">{username}</p>
+          </div>
+          <div>
+            <img
+              src={portraitUrl}
+              alt={`Portrait of "${handleName}"`}
+              className="w-20 aspect-square rounded-full"
+            />
+          </div>
         </header>
 
         <main>

@@ -6,17 +6,22 @@ import { fetchAPI } from "../../../utils/fetch-api";
 import { logger } from "../../../utils/logger";
 import { Controller, createNewContext } from "../../../utils/react";
 import { getFromStorage } from "../../../utils/storage";
-import { useProfileLoader } from "../load-profile";
+import { useProfileContext } from "../ProfileContext";
 
 const POSTS_IN_VIEW_CT = 8;
 
 type PostStatus = "fetching" | "error" | "ok";
 export const [usePostsContext, PostsProvider] = createNewContext(() => {
-  const { profile } = useProfileLoader();
+  const { profile } = useProfileContext();
   const [postsStatus, setPostsStatus] = useState<PostStatus>("fetching");
 
   const [posts, setPosts] = useState<PostWithAuthor[]>([]);
   const initializePosts = useCallback(async () => {
+    if (profile === null) {
+      logger.warn("No profile yet; cancelling initialization...");
+      return;
+    }
+
     setPostsStatus("fetching");
 
     const headerAuthResult = safe(() => getFromStorage("SESS"));
@@ -52,6 +57,11 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
   const [hasNextPosts, setHasNextPosts] = useState(true);
   const extendPosts = useCallback(
     async (ctl: Controller) => {
+      if (profile === null) {
+        logger.warn("No profile yet; cancelling extension...");
+        return;
+      }
+
       const lastPost = posts.at(-1);
       const date = lastPost?.timestamp ?? tomorrow(); // Use a "future" date to ensure most recent posts are also fetched
 
@@ -87,6 +97,11 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
   );
 
   const extendPostsWithRecent = useCallback(async () => {
+    if (profile === null) {
+      logger.warn("No profile yet; cancelling extension with recent...");
+      return;
+    }
+
     const headerAuthResult = safe(() => getFromStorage("SESS"));
     const headerAuth = headerAuthResult.success
       ? headerAuthResult.value
