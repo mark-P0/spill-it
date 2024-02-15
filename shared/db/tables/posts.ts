@@ -38,7 +38,7 @@ export async function readPost(id: Post["id"]): Promise<Post | null> {
   return post;
 }
 
-export async function readPostsOfUser(
+export async function readPostsWithAuthorViaUser(
   userId: PostWithAuthor["userId"],
 ): Promise<PostWithAuthor[]> {
   const result = await safeAsync(() =>
@@ -55,7 +55,7 @@ export async function readPostsOfUser(
   return posts;
 }
 
-export async function readPostsOfUserBeforeTimestamp(
+export async function readPostsWithAuthorViaUserBeforeTimestamp(
   userId: PostWithAuthor["userId"],
   timestamp: PostWithAuthor["timestamp"],
   ct: number,

@@ -6,7 +6,7 @@ import { db } from "../db";
 import { User, UsersTable } from "../schema/drizzle";
 
 export async function isGoogleUserExisting(googleId: string): Promise<boolean> {
-  const user = await readUserWithGoogleId(googleId);
+  const user = await readUserViaGoogleId(googleId);
   return user !== null;
 }
 
@@ -24,7 +24,7 @@ export async function readUser(id: User["id"]): Promise<User | null> {
   return user;
 }
 
-export async function readUserWithGoogleId(
+export async function readUserViaGoogleId(
   googleId: NonNullable<User["googleId"]>,
 ): Promise<User | null> {
   const result = await safeAsync(() =>
@@ -44,7 +44,7 @@ export async function readUserWithGoogleId(
   return user;
 }
 
-export async function readUserWithUsername(
+export async function readUserViaUsername(
   username: User["username"],
 ): Promise<User | null> {
   const result = await safeAsync(() =>
@@ -67,7 +67,7 @@ export async function readUserWithUsername(
 async function createUsernameFromHandle(handleName: string, sep = "-") {
   let username = handleName.toLowerCase().replace(/\s/g, sep);
 
-  const existingUser = await readUserWithUsername(username);
+  const existingUser = await readUserViaUsername(username);
   if (existingUser === null) return username;
 
   username += sep + `${randomInteger(0, 9 + 1)}`;

@@ -3,7 +3,7 @@ import {
   createPost,
   deletePost,
   readPost,
-  readPostsOfUserBeforeTimestamp,
+  readPostsWithAuthorViaUserBeforeTimestamp,
 } from "@spill-it/db/tables/posts";
 import { POST_CT_CAP } from "@spill-it/db/utils/constants";
 import { endpointDetails } from "@spill-it/endpoints";
@@ -160,7 +160,7 @@ export const PostsRouter = Router();
     logger.info("Fetching posts...");
     const _userId = userId;
     const postsResult = await safeAsync(() =>
-      readPostsOfUserBeforeTimestamp(_userId, beforeISODate, size),
+      readPostsWithAuthorViaUserBeforeTimestamp(_userId, beforeISODate, size),
     );
     if (!postsResult.success) {
       logger.error(formatError(postsResult.error));
