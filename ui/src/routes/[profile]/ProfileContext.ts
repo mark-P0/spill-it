@@ -21,15 +21,11 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
   }
 
   const rawParams = useParams();
+  const params = zodProfileParams.parse(rawParams);
+
   const [profile, setProfile] = useState<UserPublicWithFollows | null>(null);
   const initializeProfile = useCallback(async () => {
     try {
-      logger.debug("Parsing URL params...");
-      const paramsParsing = zodProfileParams.safeParse(rawParams);
-      const params = paramsParsing.success
-        ? paramsParsing.data
-        : raise("Unexpected URL params", paramsParsing.error);
-
       logger.debug("Fetching profile info...");
       const { username } = params;
       const userResult = await fetchAPI("/api/v0/users", "GET", {
@@ -48,11 +44,13 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
     } catch (caughtError) {
       setError(ensureError(caughtError));
     }
-  }, [rawParams]);
+  }, [params]);
   useEffect(() => {
-    if (profile !== null) return;
-    initializeProfile();
-  }, [profile, initializeProfile]);
+    const hasNoProfile = profile === null;
+    const isParamsDifferentFromProfile =
+      profile !== null && profile.username !== params.username;
+    if (hasNoProfile || isParamsDifferentFromProfile) initializeProfile();
+  }, [params, profile, initializeProfile]);
 
   return { profile, initializeProfile };
 });

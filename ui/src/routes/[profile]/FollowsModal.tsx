@@ -1,6 +1,8 @@
 import { UserPublic } from "@spill-it/db/schema/drizzle";
+import clsx from "clsx";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { endpointWithParam } from "../../utils/endpoints";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
 import { useProfileContext } from "./ProfileContext";
@@ -19,7 +21,18 @@ function UserCard(props: { user: UserPublic }) {
         />
       </div>
       <header>
-        <h3 className="font-bold">{handleName}</h3>
+        <h3 className="font-bold">
+          <Link
+            to={endpointWithParam("/:username", { username })}
+            className={clsx(
+              // "text-xs uppercase tracking-wide",
+              "underline underline-offset-4",
+              ...["transition", "text-white hover:text-fuchsia-500"],
+            )}
+          >
+            {handleName}
+          </Link>
+        </h3>
         <p className="text-white/50 text-sm">{username}</p>
       </header>
       <div></div>
