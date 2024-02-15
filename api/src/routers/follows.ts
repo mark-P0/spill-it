@@ -1,4 +1,7 @@
-import { createFollow } from "@spill-it/db/tables/follows";
+import {
+  createFollow,
+  readFollowBetweenUsers,
+} from "@spill-it/db/tables/follows";
 import { readUser } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
@@ -49,11 +52,30 @@ export const FollowsRouter = Router();
       return res.sendStatus(StatusCodes.BAD_REQUEST); // "Not Found" also seems fitting but the "user to follow" is not the primary target of the request
     }
 
-    // TODO Cannot follow self?
-    // TODO Cannot again?
+    logger.info("Checking if follow entry is possible...");
+    const followerUserId = user.id;
+    {
+      if (followerUserId === followingUserId) {
+        logger.error("Cannot follow self");
+        return res.sendStatus(StatusCodes.BAD_REQUEST);
+      }
+    }
+    {
+      const followResult = await safeAsync(() =>
+        readFollowBetweenUsers(followerUserId, followingUserId),
+      );
+      if (!followResult.success) {
+        logger.error(formatError(followResult.error));
+        return res.sendStatus(StatusCodes.BAD_GATEWAY);
+      }
+      const follow = followResult.value;
+      if (follow !== null) {
+        logger.error("Follow entry already exists");
+        return res.sendStatus(StatusCodes.CONFLICT); // TODO Respond with existing entry?
+      }
+    }
 
     logger.info("Creating follow entry...");
-    const followerUserId = user.id;
     const followResult = await safeAsync(() =>
       createFollow({ followerUserId, followingUserId }),
     );
