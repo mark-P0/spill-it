@@ -114,31 +114,42 @@ function NavBar() {
     </nav>
   );
 }
-
-function _ProfileScreen() {
+function ProfileCard() {
   const { profile } = useProfileContext();
 
   if (profile === null) return null;
-
   const { handleName, username, portraitUrl } = profile;
-  document.title = `${handleName} (${username}) 👀 Spill.it!`;
+
+  return (
+    <article className="flex justify-between">
+      <div>
+        <h1 className="text-3xl font-bold">{handleName}</h1>
+        <p className="text-lg text-white/50">{username}</p>
+      </div>
+      <div>
+        <img
+          src={portraitUrl}
+          alt={`Portrait of "${handleName}"`}
+          className="w-20 aspect-square rounded-full"
+        />
+      </div>
+    </article>
+  );
+}
+
+function _ProfileScreen() {
+  const { profile } = useProfileContext();
+  if (profile !== null) {
+    const { handleName, username } = profile;
+    document.title = `${handleName} (${username}) 👀 Spill.it!`;
+  }
 
   return (
     <PostsProvider>
       <Screen className="grid auto-rows-min gap-6 p-6">
-        <NavBar />
-        <header className="flex justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">{handleName}</h1>
-            <p className="text-lg text-white/50">{username}</p>
-          </div>
-          <div>
-            <img
-              src={portraitUrl}
-              alt={`Portrait of "${handleName}"`}
-              className="w-20 aspect-square rounded-full"
-            />
-          </div>
+        <header className="grid grid-rows-subgrid row-span-2">
+          <NavBar />
+          <ProfileCard />
         </header>
 
         <main>
