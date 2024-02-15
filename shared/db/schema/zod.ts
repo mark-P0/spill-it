@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   DrizzleZodFollow,
+  DrizzleZodFollowWithUsers,
   DrizzleZodPost,
   DrizzleZodPostWithAuthor,
   DrizzleZodSample,
@@ -43,6 +44,13 @@ export const zodFollow: DrizzleZodFollow = z.object({
   followerUserId: zodUser.shape.id,
   followingUserId: zodUser.shape.id,
 });
+export const zodFollowWithUsers: DrizzleZodFollowWithUsers = z.intersection(
+  zodFollow,
+  z.object({
+    follower: zodUser,
+    following: zodUser,
+  }),
+);
 
 export const zodSession: DrizzleZodSession = z.object({
   id: z.string().uuid(),

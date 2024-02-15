@@ -1,5 +1,6 @@
 import {
   zodFollow,
+  zodFollowWithUsers,
   zodPost,
   zodPostWithAuthor,
   zodSample,
@@ -60,7 +61,7 @@ export const endpointMap = {
         }),
       }),
       output: z.object({
-        data: zodFollow,
+        data: zodFollowWithUsers,
       }),
     },
   },

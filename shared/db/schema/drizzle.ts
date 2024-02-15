@@ -31,7 +31,6 @@ import { relations } from "drizzle-orm";
 import {
   integer,
   pgTable,
-  serial,
   text,
   timestamp,
   uuid,
@@ -85,6 +84,26 @@ const drizzleZodFollow = createSelectSchema(FollowsTable);
 export type DrizzleZodFollow = typeof drizzleZodFollow;
 export type Follow = typeof FollowsTable.$inferSelect;
 export type FollowDetails = typeof FollowsTable.$inferInsert;
+
+export const FollowsRelations = relations(FollowsTable, ({ one }) => ({
+  follower: one(UsersTable, {
+    fields: [FollowsTable.followerUserId],
+    references: [UsersTable.id],
+  }),
+  following: one(UsersTable, {
+    fields: [FollowsTable.followingUserId],
+    references: [UsersTable.id],
+  }),
+}));
+const drizzleZodFollowWithUsers = z.intersection(
+  drizzleZodFollow,
+  z.object({
+    follower: drizzleZodUser,
+    following: drizzleZodUser,
+  }),
+);
+export type DrizzleZodFollowWithUsers = typeof drizzleZodFollowWithUsers;
+export type FollowWithUser = z.infer<DrizzleZodFollowWithUsers>;
 
 export const SessionsTable = pgTable("sessions", {
   id: uuid("id").defaultRandom().primaryKey(),

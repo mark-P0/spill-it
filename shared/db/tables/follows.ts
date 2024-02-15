@@ -2,20 +2,51 @@ import { raise } from "@spill-it/utils/errors";
 import { safeAsync } from "@spill-it/utils/safe";
 import { and, eq } from "drizzle-orm";
 import { db } from "../db";
-import { Follow, FollowDetails, FollowsTable } from "../schema/drizzle";
+import {
+  Follow,
+  FollowDetails,
+  FollowWithUser,
+  FollowsTable,
+} from "../schema/drizzle";
 
-export async function createFollow(details: FollowDetails): Promise<Follow> {
-  const result = await safeAsync(() =>
-    db.insert(FollowsTable).values(details).returning(),
-  );
-  const follows = result.success
-    ? result.value
-    : raise("Failed creating follow entry", result.error);
+export async function createFollow(
+  details: FollowDetails,
+): Promise<FollowWithUser> {
+  return await db.transaction(async (tx) => {
+    const insertedFollows = await tx
+      .insert(FollowsTable)
+      .values(details)
+      .returning();
+    if (insertedFollows.length > 1) {
+      await tx.rollback(); // Not a promise? Awaited in docs...
+      raise("Multiple follow entries created...?");
+    }
+    const insertedFollow = insertedFollows[0];
+    if (insertedFollow === undefined) {
+      await tx.rollback();
+      raise("Inserted follow entry does not exist...?");
+    }
 
-  if (follows.length > 1) raise("Multiple follow entries created...?");
-  const follow = follows[0] ?? raise("Created follow entry does not exist...?");
+    const follows = await tx.query.FollowsTable.findMany({
+      limit: 2,
+      where: eq(FollowsTable.id, insertedFollow.id),
+      with: {
+        follower: true,
+        following: true,
+      },
+    });
+    if (follows.length > 1) {
+      await tx.rollback();
+      raise("Multiple follow entries created...?");
+    }
+    const follow = follows[0];
+    if (follow === undefined) {
+      await tx.rollback();
+      raise("Inserted follow entry does not exist...?");
+    }
 
-  return follow;
+    return follow;
+  });
 }
 
 export async function readFollowBetweenUsers(
