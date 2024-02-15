@@ -1,4 +1,4 @@
-import { User } from "@spill-it/db/schema/drizzle";
+import { UserPublic } from "@spill-it/db/schema/drizzle";
 import {
   createPost,
   deletePost,
@@ -132,7 +132,7 @@ export const PostsRouter = Router();
     }
     const beforeISODate = beforeISODateResult.value;
 
-    let user: User | undefined;
+    let user: UserPublic | undefined;
     if (headers.Authorization !== undefined) {
       logger.info("Converting header authorization to user info...");
       const userResult = await convertHeaderAuthToUser(headers.Authorization);
@@ -143,7 +143,7 @@ export const PostsRouter = Router();
     }
 
     logger.info("Determining user whose posts to fetch...");
-    let userId: User["id"] | undefined;
+    let userId: UserPublic["id"] | undefined;
     if (query.userId !== undefined) {
       // TODO Check if queried user has a public profile
       // TODO Check if current user follows the queried user

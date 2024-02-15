@@ -41,38 +41,38 @@ export const zodUserPublic: DrizzleZodUserPublic = zodUser.pick({
 export const zodFollow: DrizzleZodFollow = z.object({
   id: z.string().uuid(),
   date: z.date(),
-  followerUserId: zodUser.shape.id,
-  followingUserId: zodUser.shape.id,
+  followerUserId: zodUserPublic.shape.id,
+  followingUserId: zodUserPublic.shape.id,
 });
 export const zodFollowWithUsers: DrizzleZodFollowWithUsers = z.intersection(
   zodFollow,
   z.object({
-    follower: zodUser,
-    following: zodUser,
+    follower: zodUserPublic,
+    following: zodUserPublic,
   }),
 );
 
 export const zodSession: DrizzleZodSession = z.object({
   id: z.string().uuid(),
-  userId: zodUser.shape.id,
+  userId: zodUserPublic.shape.id,
   expiry: z.date(),
 });
 export const zodSessionWithUser = z.intersection(
   zodSession,
   z.object({
-    user: zodUser,
+    user: zodUserPublic,
   }),
 );
 
 export const zodPost: DrizzleZodPost = z.object({
   id: z.string().uuid(),
-  userId: zodUser.shape.id,
+  userId: zodUserPublic.shape.id,
   timestamp: z.date(),
   content: z.string(),
 });
 export const zodPostWithAuthor: DrizzleZodPostWithAuthor = z.intersection(
   zodPost,
   z.object({
-    author: zodUser,
+    author: zodUserPublic,
   }),
 );

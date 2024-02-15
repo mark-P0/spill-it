@@ -98,8 +98,8 @@ export const FollowsRelations = relations(FollowsTable, ({ one }) => ({
 const drizzleZodFollowWithUsers = z.intersection(
   drizzleZodFollow,
   z.object({
-    follower: drizzleZodUser,
-    following: drizzleZodUser,
+    follower: drizzleZodUserPublic,
+    following: drizzleZodUserPublic,
   }),
 );
 export type DrizzleZodFollowWithUsers = typeof drizzleZodFollowWithUsers;
@@ -127,7 +127,7 @@ export const SessionsRelations = relations(SessionsTable, ({ one }) => ({
 const drizzleZodSessionWithUser = z.intersection(
   drizzleZodSession,
   z.object({
-    user: drizzleZodUser,
+    user: drizzleZodUserPublic,
   }),
 );
 export type DrizzleZodSessionWithUser = typeof drizzleZodSessionWithUser;
@@ -156,7 +156,7 @@ export const PostsRelations = relations(PostsTable, ({ one }) => ({
 const drizzleZodPostWithAuthor = z.intersection(
   drizzleZodPost,
   z.object({
-    author: drizzleZodUser,
+    author: drizzleZodUserPublic,
   }),
 );
 export type DrizzleZodPostWithAuthor = typeof drizzleZodPostWithAuthor;
