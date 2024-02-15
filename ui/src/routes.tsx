@@ -3,7 +3,6 @@ import { raise } from "@spill-it/utils/errors";
 import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";
 import { ProfileScreen } from "./routes/[profile]/ProfileScreen";
-import { loadProfile, profilePath } from "./routes/[profile]/load-profile";
 import { ErrorScreen } from "./routes/_app/ErrorScreen";
 import { HomeScreen } from "./routes/home/HomeScreen";
 import { WelcomeScreen } from "./routes/welcome/WelcomeScreen";
@@ -15,8 +14,7 @@ import { logger } from "./utils/logger";
 import { deleteFromStorage, setOnStorage } from "./utils/storage";
 
 export const ProfileRoute: RouteObject = {
-  path: profilePath,
-  loader: loadProfile,
+  path: endpoint("/:username"),
   element: <ProfileScreen />,
 };
 

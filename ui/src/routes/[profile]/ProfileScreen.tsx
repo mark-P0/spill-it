@@ -7,7 +7,7 @@ import { Screen } from "../_app/Screen";
 import { useUserContext } from "../_app/UserContext";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
-import { useProfileLoader } from "./load-profile";
+import { ProfileProvider, useProfileContext } from "./ProfileContext";
 import { PostsProvider } from "./posts/PostsContext";
 import { PostsList } from "./posts/PostsList";
 
@@ -71,16 +71,13 @@ function LogoutModalContent() {
   );
 }
 function LogoutButton() {
-  const { user } = useUserContext();
   const { showOnModal } = useModalContext();
-  const { profile } = useProfileLoader();
 
   function promptLogout() {
     logger.debug("Showing logout prompt...");
     showOnModal(<LogoutModalContent />);
   }
 
-  if (user?.id !== profile.id) return <Nothing />; // Logout should not be available if viewing other profiles
   return (
     <button
       onClick={promptLogout}
@@ -94,57 +91,80 @@ function LogoutButton() {
   );
 }
 
-function HomeButtonLink() {
+function NavBar() {
+  const { user } = useUserContext();
+  const { profile } = useProfileContext();
+
+  const isProfileOfUser = profile?.id === user?.id;
   return (
-    <Link
-      to={endpoint("/home")}
-      className={clsx(
-        "w-9 aspect-square rounded-full p-2",
-        ...["transition", "hover:bg-white/25 active:scale-90"],
-      )}
-    >
-      <BsHouseFill className="w-full h-full" />
-    </Link>
+    <nav className="flex justify-between items-center">
+      {
+        isProfileOfUser ? <LogoutButton /> : <Nothing /> // Use placeholder to not affect layout
+      }
+
+      <Link
+        to={endpoint("/home")}
+        className={clsx(
+          "w-9 aspect-square rounded-full p-2",
+          ...["transition", "hover:bg-white/25 active:scale-90"],
+        )}
+      >
+        <BsHouseFill className="w-full h-full" />
+      </Link>
+    </nav>
+  );
+}
+function ProfileCard() {
+  const { profile } = useProfileContext();
+
+  if (profile === null) return null;
+  const { handleName, username, portraitUrl } = profile;
+
+  return (
+    <article className="flex justify-between">
+      <div>
+        <h1 className="text-3xl font-bold">{handleName}</h1>
+        <p className="text-lg text-white/50">{username}</p>
+      </div>
+      <div>
+        <img
+          src={portraitUrl}
+          alt={`Portrait of "${handleName}"`}
+          className="w-20 aspect-square rounded-full"
+        />
+      </div>
+    </article>
   );
 }
 
-export function ProfileScreen() {
-  const { profile } = useProfileLoader();
-  const { handleName, username, portraitUrl } = profile;
-
-  document.title = `${handleName} (${username}) 👀 Spill.it!`;
+function _ProfileScreen() {
+  const { profile } = useProfileContext();
+  if (profile !== null) {
+    const { handleName, username } = profile;
+    document.title = `${handleName} (${username}) 👀 Spill.it!`;
+  }
 
   return (
-    <PostsProvider>
-      <Screen className="grid auto-rows-min gap-6 p-6">
-        <header className="grid grid-rows-subgrid row-span-2">
-          <nav className="flex justify-between items-center">
-            <LogoutButton />
+    <Screen className="grid auto-rows-min gap-6 p-6">
+      <header className="grid grid-rows-subgrid row-span-2">
+        <NavBar />
+        <ProfileCard />
+      </header>
 
-            <HomeButtonLink />
-          </nav>
+      <main>
+        <h2 className="sr-only">Spills 🍵</h2>
 
-          <section className="flex justify-between">
-            <div>
-              <h1 className="text-3xl font-bold">{handleName}</h1>
-              <p className="text-lg text-white/50">{username}</p>
-            </div>
-            <div>
-              <img
-                src={portraitUrl}
-                alt={`Portrait of "${handleName}"`}
-                className="w-20 aspect-square rounded-full"
-              />
-            </div>
-          </section>
-        </header>
-
-        <main>
-          <h2 className="sr-only">Spills 🍵</h2>
-
-          <PostsList />
-        </main>
-      </Screen>
-    </PostsProvider>
+        <PostsList />
+      </main>
+    </Screen>
+  );
+}
+export function ProfileScreen() {
+  return (
+    <ProfileProvider>
+      <PostsProvider>
+        <_ProfileScreen />
+      </PostsProvider>
+    </ProfileProvider>
   );
 }
