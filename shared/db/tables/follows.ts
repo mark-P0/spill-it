@@ -9,6 +9,14 @@ import {
   FollowsTable,
 } from "../schema/drizzle";
 
+/**
+ * Transactions are automatically rolled back upon errors (think try-catch)
+ * - https://github.com/drizzle-team/drizzle-orm/issues/1450
+ * - https://discord.com/channels/1043890932593987624/1164552839369072711
+ *
+ * In fact, all that `tx.rollback()` does is throw an error and it not awaitable, unlike what the docs says
+ * - https://discord.com/channels/1043890932593987624/1164552839369072711
+ */
 export async function createFollow(
   details: FollowDetails,
 ): Promise<FollowWithUsers> {
@@ -17,15 +25,10 @@ export async function createFollow(
       .insert(FollowsTable)
       .values(details)
       .returning();
-    if (insertedFollows.length > 1) {
-      await tx.rollback(); // Not a promise? Awaited in docs...
+    if (insertedFollows.length > 1)
       raise("Multiple follow entries created...?");
-    }
-    const insertedFollow = insertedFollows[0];
-    if (insertedFollow === undefined) {
-      await tx.rollback();
-      raise("Inserted follow entry does not exist...?");
-    }
+    const insertedFollow =
+      insertedFollows[0] ?? raise("Inserted follow entry does not exist...?");
 
     const follows = await tx.query.FollowsTable.findMany({
       limit: 2,
@@ -35,15 +38,9 @@ export async function createFollow(
         following: true,
       },
     });
-    if (follows.length > 1) {
-      await tx.rollback();
-      raise("Multiple follow entries created...?");
-    }
-    const follow = follows[0];
-    if (follow === undefined) {
-      await tx.rollback();
-      raise("Inserted follow entry does not exist...?");
-    }
+    if (follows.length > 1) raise("Multiple follow entries created...?");
+    const follow =
+      follows[0] ?? raise("Inserted follow entry does not exist...?");
 
     return follow;
   });
