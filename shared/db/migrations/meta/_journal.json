@@ -99,6 +99,34 @@
       "when": 1707688692518,
       "tag": "0013_elite_captain_america",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "5",
+      "when": 1707847404149,
+      "tag": "0014_worthless_wolfpack",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "5",
+      "when": 1707848569783,
+      "tag": "0015_fixed_shen",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "5",
+      "when": 1707848703568,
+      "tag": "0016_massive_sheva_callister",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1707848741359,
+      "tag": "0017_dizzy_aaron_stack",
+      "breakpoints": true
     }
   ]
 }

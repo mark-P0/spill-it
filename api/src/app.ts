@@ -8,6 +8,7 @@ import helmet from "helmet";
 import { StatusCodes } from "http-status-codes";
 import morgan from "morgan";
 import path from "path";
+import { FollowsRouter } from "./routers/follows";
 import { PostsRouter } from "./routers/posts";
 import { SessionsRouter } from "./routers/sessions";
 import { TryRouter } from "./routers/try";
@@ -135,6 +136,7 @@ app.use(express.static(path.join(__dirname, "public")));
   app.use(SessionsRouter);
   app.use(UsersRouter);
   app.use(PostsRouter);
+  app.use(FollowsRouter);
 }
 
 /** Custom catch-call handlers, to override Express' defaults */

@@ -1,8 +1,11 @@
 import {
+  zodFollow,
+  zodFollowWithUsers,
   zodPost,
   zodPostWithAuthor,
   zodSample,
   zodUserPublic,
+  zodUserPublicWithFollows,
 } from "@spill-it/db/schema/zod";
 import { POST_CT_CAP } from "@spill-it/db/utils/constants";
 import { z } from "zod";
@@ -44,7 +47,22 @@ export const endpointMap = {
         }),
       }),
       output: z.object({
-        data: z.array(zodUserPublic),
+        data: z.array(zodUserPublicWithFollows),
+      }),
+    },
+  },
+  "/api/v0/follows": {
+    POST: {
+      input: z.object({
+        headers: z.object({
+          Authorization: z.string(),
+        }),
+        query: z.object({
+          followingUserId: zodFollow.shape.followingUserId,
+        }),
+      }),
+      output: z.object({
+        data: zodFollowWithUsers,
       }),
     },
   },

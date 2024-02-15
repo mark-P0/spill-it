@@ -1,5 +1,7 @@
 import { z } from "zod";
 import {
+  DrizzleZodFollow,
+  DrizzleZodFollowWithUsers,
   DrizzleZodPost,
   DrizzleZodPostWithAuthor,
   DrizzleZodSample,
@@ -36,27 +38,58 @@ export const zodUserPublic: DrizzleZodUserPublic = zodUser.pick({
   loginCt: true,
 });
 
+export const zodFollow: DrizzleZodFollow = z.object({
+  id: z.string().uuid(),
+  date: z.date(),
+  followerUserId: zodUserPublic.shape.id,
+  followingUserId: zodUserPublic.shape.id,
+});
+export const zodFollowWithUsers: DrizzleZodFollowWithUsers = zodFollow.extend({
+  follower: zodUserPublic,
+  following: zodUserPublic,
+});
+
+export const zodUserPublicWithFollowDate = z.object({
+  date: zodFollow.shape.date,
+  user: zodUserPublic,
+});
+export const zodUserPublicWithFollows = zodUserPublic.extend({
+  followers: z.array(
+    zodFollowWithUsers.pick({
+      date: true,
+      follower: true,
+    }),
+  ),
+  followings: z.array(
+    zodFollowWithUsers.pick({
+      date: true,
+      following: true,
+    }),
+  ),
+});
+export type UserPublicWithFollows = z.infer<typeof zodUserPublicWithFollows>;
+
 export const zodSession: DrizzleZodSession = z.object({
   id: z.string().uuid(),
-  userId: zodUser.shape.id,
+  userId: zodUserPublic.shape.id,
   expiry: z.date(),
 });
 export const zodSessionWithUser = z.intersection(
   zodSession,
   z.object({
-    user: zodUser,
+    user: zodUserPublic,
   }),
 );
 
 export const zodPost: DrizzleZodPost = z.object({
   id: z.string().uuid(),
-  userId: zodUser.shape.id,
+  userId: zodUserPublic.shape.id,
   timestamp: z.date(),
   content: z.string(),
 });
 export const zodPostWithAuthor: DrizzleZodPostWithAuthor = z.intersection(
   zodPost,
   z.object({
-    author: zodUser,
+    author: zodUserPublic,
   }),
 );

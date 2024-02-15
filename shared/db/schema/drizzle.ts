@@ -74,6 +74,41 @@ const drizzleZodUserPublic = drizzleZodUser.pick({
 export type DrizzleZodUserPublic = typeof drizzleZodUserPublic;
 export type UserPublic = z.infer<DrizzleZodUserPublic>;
 
+export const UsersRelations = relations(UsersTable, ({ many }) => ({
+  followers: many(FollowsTable, { relationName: "following" }), // The followers of a user are users that are following them
+  followings: many(FollowsTable, { relationName: "follower" }), // The followings of a user are users that they are a follower of
+}));
+
+export const FollowsTable = pgTable("follows", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  date: timestamp("date").notNull().defaultNow(),
+  followerUserId: uuid("followerUserId").notNull(),
+  followingUserId: uuid("followingUserId").notNull(),
+});
+const drizzleZodFollow = createSelectSchema(FollowsTable);
+export type DrizzleZodFollow = typeof drizzleZodFollow;
+export type Follow = typeof FollowsTable.$inferSelect;
+export type FollowDetails = typeof FollowsTable.$inferInsert;
+
+export const FollowsRelations = relations(FollowsTable, ({ one }) => ({
+  follower: one(UsersTable, {
+    relationName: "follower",
+    fields: [FollowsTable.followerUserId],
+    references: [UsersTable.id],
+  }),
+  following: one(UsersTable, {
+    relationName: "following",
+    fields: [FollowsTable.followingUserId],
+    references: [UsersTable.id],
+  }),
+}));
+const drizzleZodFollowWithUsers = drizzleZodFollow.extend({
+  follower: drizzleZodUserPublic,
+  following: drizzleZodUserPublic,
+});
+export type DrizzleZodFollowWithUsers = typeof drizzleZodFollowWithUsers;
+export type FollowWithUsers = z.infer<DrizzleZodFollowWithUsers>;
+
 export const SessionsTable = pgTable("sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("userId").notNull(),
@@ -96,7 +131,7 @@ export const SessionsRelations = relations(SessionsTable, ({ one }) => ({
 const drizzleZodSessionWithUser = z.intersection(
   drizzleZodSession,
   z.object({
-    user: drizzleZodUser,
+    user: drizzleZodUserPublic,
   }),
 );
 export type DrizzleZodSessionWithUser = typeof drizzleZodSessionWithUser;
@@ -125,7 +160,7 @@ export const PostsRelations = relations(PostsTable, ({ one }) => ({
 const drizzleZodPostWithAuthor = z.intersection(
   drizzleZodPost,
   z.object({
-    author: drizzleZodUser,
+    author: drizzleZodUserPublic,
   }),
 );
 export type DrizzleZodPostWithAuthor = typeof drizzleZodPostWithAuthor;

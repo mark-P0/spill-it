@@ -1,6 +1,6 @@
 import { parseHeaderAuth } from "@spill-it/auth/headers";
 import { isSignatureValid } from "@spill-it/auth/signing";
-import { User } from "@spill-it/db/schema/drizzle";
+import { UserPublic } from "@spill-it/db/schema/drizzle";
 import {
   isSessionExpired,
   readSessionWithUser,
@@ -21,7 +21,7 @@ class StatusCodeError extends Error {
 
 export async function convertHeaderAuthToUser(
   authorization: string,
-): Promise<Result<User, StatusCodeError>> {
+): Promise<Result<UserPublic, StatusCodeError>> {
   logger.info("Parsing header authorization...");
   const headerAuthResult = safe(() =>
     parseHeaderAuth("SPILLITSESS", authorization),
