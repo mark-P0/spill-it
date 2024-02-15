@@ -7,6 +7,7 @@ import { Screen } from "../_app/Screen";
 import { useUserContext } from "../_app/UserContext";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
+import { ProfileProvider, useProfileContext } from "./ProfileContext";
 import { useProfileLoader } from "./load-profile";
 import { PostsProvider } from "./posts/PostsContext";
 import { PostsList } from "./posts/PostsList";
@@ -108,10 +109,12 @@ function HomeButtonLink() {
   );
 }
 
-export function ProfileScreen() {
-  const { profile } = useProfileLoader();
-  const { handleName, username, portraitUrl } = profile;
+function _ProfileScreen() {
+  const { profile } = useProfileContext();
 
+  if (profile === null) return null;
+
+  const { handleName, username, portraitUrl } = profile;
   document.title = `${handleName} (${username}) 👀 Spill.it!`;
 
   return (
@@ -146,5 +149,12 @@ export function ProfileScreen() {
         </main>
       </Screen>
     </PostsProvider>
+  );
+}
+export function ProfileScreen() {
+  return (
+    <ProfileProvider>
+      <_ProfileScreen />
+    </ProfileProvider>
   );
 }
