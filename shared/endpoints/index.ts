@@ -65,6 +65,17 @@ export const endpointMap = {
         data: zodFollowWithUsers,
       }),
     },
+    DELETE: {
+      input: z.object({
+        headers: z.object({
+          Authorization: z.string(),
+        }),
+        query: z.object({
+          followingUserId: zodFollow.shape.followingUserId,
+        }),
+      }),
+      output: z.object({}),
+    },
   },
   "/api/v0/posts": {
     POST: {

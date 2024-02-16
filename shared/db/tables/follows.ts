@@ -71,3 +71,26 @@ export async function readFollowBetweenUsers(
 
   return follow;
 }
+
+export async function deleteFollowBetweenUsers(
+  followerUserId: Follow["followerUserId"],
+  followingUserId: Follow["followingUserId"],
+): Promise<Follow> {
+  return await db.transaction(async (tx) => {
+    const follows = await tx
+      .delete(FollowsTable)
+      .where(
+        and(
+          eq(FollowsTable.followerUserId, followerUserId),
+          eq(FollowsTable.followingUserId, followingUserId),
+        ),
+      )
+      .returning();
+
+    if (follows.length > 1) raise("Multiple follow entries between users...?");
+    const follow =
+      follows[0] ?? raise("Deleted follow entry does not exist...?");
+
+    return follow;
+  });
+}
