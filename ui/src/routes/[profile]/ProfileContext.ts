@@ -25,13 +25,11 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
   const [profile, setProfile] = useState<UserPublic | null>(null);
   const reflectProfile = useCallback(async () => {
     try {
-      logger.debug("Parsing URL params...");
       const paramsParsing = zodProfileParams.safeParse(rawParams);
       const params = paramsParsing.success
         ? paramsParsing.data
         : raise("Unexpected URL params", paramsParsing.error);
 
-      logger.debug("Fetching profile info...");
       const { username } = params;
       const userResult = await fetchAPI("/api/v0/users", "GET", {
         query: { username },
@@ -40,19 +38,20 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
         ? userResult.value.data
         : raise("Failed fetching profile info");
 
-      logger.debug("Checking profile info...");
       if (users.length > 1) raise("Multiple users for a username...?");
       const user = users[0] ?? raise("Username possibly does not exist");
 
-      logger.debug("Storing user info as profile state...");
       setProfile(user);
     } catch (caughtError) {
       setError(ensureError(caughtError));
     }
   }, [rawParams]);
   useEffect(() => {
+    if (profile !== null) return;
+
+    logger.debug("Reflecting profile on state...");
     reflectProfile();
-  }, [reflectProfile]);
+  }, [profile, reflectProfile]);
 
   const [followers, setFollowers] = useState<Follower[] | null>(null);
   const reflectFollowers = useCallback(async () => {
