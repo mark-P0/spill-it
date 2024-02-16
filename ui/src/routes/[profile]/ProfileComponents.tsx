@@ -113,7 +113,7 @@ export function NavBar() {
 }
 
 export function ProfileCard() {
-  const { profile, followers } = useProfileContext();
+  const { profile, followers, followings } = useProfileContext();
 
   if (profile === null) return null;
   const { handleName, username, portraitUrl } = profile;
@@ -136,6 +136,19 @@ export function ProfileCard() {
               {followers?.length ?? <>...</>}
             </span>{" "}
             {followers?.length === 1 ? <>follower</> : <>followers</>}
+          </Link>
+          <Link
+            to="#"
+            className={clsx(
+              "text-xs uppercase tracking-wide",
+              "underline underline-offset-4",
+              ...["transition", "text-white/50 hover:text-fuchsia-500"],
+            )}
+          >
+            <span className="font-bold text-base">
+              {followings?.length ?? <>...</>}
+            </span>{" "}
+            following
           </Link>
         </nav>
       </header>

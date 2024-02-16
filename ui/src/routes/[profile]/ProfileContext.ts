@@ -1,5 +1,5 @@
 import { UserPublic } from "@spill-it/db/schema/drizzle";
-import { Follower } from "@spill-it/db/schema/zod";
+import { Follower, Following } from "@spill-it/db/schema/zod";
 import { ensureError, raise } from "@spill-it/utils/errors";
 import { zodOfType } from "@spill-it/utils/zod";
 import { useCallback, useEffect, useState } from "react";
@@ -74,8 +74,29 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
     reflectFollowers();
   }, [reflectFollowers]);
 
+  const [followings, setFollowings] = useState<Following[] | null>(null);
+  const reflectFollowings = useCallback(async () => {
+    if (profile === null) return;
+
+    try {
+      const followingsResult = await fetchAPI("/api/v0/followings", "GET", {
+        query: { userId: profile.id },
+      });
+      const followings = followingsResult.success
+        ? followingsResult.value.data
+        : raise("Failed fetching followings", followingsResult.error);
+      setFollowings(followings);
+    } catch (caughtError) {
+      logger.error(ensureError(caughtError));
+    }
+  }, [profile]);
+  useEffect(() => {
+    reflectFollowings();
+  }, [reflectFollowings]);
+
   return {
     ...{ profile, reflectProfile },
     ...{ followers, reflectFollowers },
+    ...{ followings, reflectFollowings },
   };
 });
