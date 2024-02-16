@@ -112,6 +112,51 @@ export function NavBar() {
   );
 }
 
+function FollowButton() {
+  const { user } = useUserContext();
+  const { profile } = useProfileContext();
+
+  if (user === null) return null;
+  if (profile === null) return null;
+  if (user.id === profile.id) return null; // Self-following is not a supported concept
+
+  const { followers } = profile;
+  const isFollowing = followers.some(({ follower }) => follower.id === user.id);
+
+  return (
+    <button
+      className={clsx(
+        "select-none",
+        "rounded-full px-6 py-3",
+        "disabled:opacity-50",
+        "font-bold tracking-wide",
+        ...[
+          "transition",
+          "bg-fuchsia-500",
+          isFollowing
+            ? "enabled:hover:bg-red-700"
+            : "enabled:hover:bg-fuchsia-600",
+          "enabled:active:scale-95",
+        ],
+        "group",
+      )}
+    >
+      {isFollowing ? (
+        <span className="grid *:row-[1] *:col-[1]">
+          <span className="transition opacity-100 group-hover:opacity-0">
+            Following
+          </span>
+          <span className="transition opacity-0 group-hover:opacity-100">
+            Unfollow
+          </span>
+        </span>
+      ) : (
+        <>Follow</>
+      )}
+    </button>
+  );
+}
+
 export function ProfileCard() {
   const { profile } = useProfileContext();
 
@@ -120,9 +165,12 @@ export function ProfileCard() {
   const { followers, followings } = profile;
 
   return (
-    <article className="flex justify-between">
-      <div>
-        <h1 className="text-3xl font-bold">{handleName}</h1>
+    <article className="flex items-start gap-6">
+      <header>
+        <h1 className="relative text-3xl font-bold">
+          {handleName}
+          <div className="absolute top-0 left-full translate-x-6"></div>
+        </h1>
         <p className="text-lg text-white/50">{username}</p>
         <nav className="mt-1 flex gap-3">
           <Link
@@ -148,8 +196,11 @@ export function ProfileCard() {
             following
           </Link>
         </nav>
-      </div>
-      <div>
+      </header>
+
+      <FollowButton />
+
+      <div className="ml-auto">
         <img
           src={portraitUrl}
           alt={`Portrait of "${handleName}"`}
