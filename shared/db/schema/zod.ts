@@ -53,6 +53,11 @@ export const zodFollowers = zodFollowWithUsers.pick({
   follower: true,
 });
 export type Follower = z.infer<typeof zodFollowers>;
+export const zodFollowings = zodFollowWithUsers.pick({
+  date: true,
+  following: true,
+});
+export type Following = z.infer<typeof zodFollowings>;
 
 export const zodUserPublicWithFollowDate = z.object({
   date: zodFollow.shape.date,
@@ -60,12 +65,7 @@ export const zodUserPublicWithFollowDate = z.object({
 });
 export const zodUserPublicWithFollows = zodUserPublic.extend({
   followers: z.array(zodFollowers),
-  followings: z.array(
-    zodFollowWithUsers.pick({
-      date: true,
-      following: true,
-    }),
-  ),
+  followings: z.array(zodFollowings),
 });
 export type UserPublicWithFollows = z.infer<typeof zodUserPublicWithFollows>;
 
