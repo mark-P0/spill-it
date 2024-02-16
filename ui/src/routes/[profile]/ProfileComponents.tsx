@@ -113,17 +113,32 @@ export function NavBar() {
 }
 
 export function ProfileCard() {
-  const { profile } = useProfileContext();
+  const { profile, followers } = useProfileContext();
 
   if (profile === null) return null;
   const { handleName, username, portraitUrl } = profile;
 
   return (
     <article className="flex justify-between">
-      <div>
+      <header>
         <h1 className="text-3xl font-bold">{handleName}</h1>
         <p className="text-lg text-white/50">{username}</p>
-      </div>
+        <nav className="flex gap-3">
+          <Link
+            to="#"
+            className={clsx(
+              "text-xs uppercase tracking-wide",
+              "underline underline-offset-4",
+              ...["transition", "text-white/50 hover:text-fuchsia-500"],
+            )}
+          >
+            <span className="font-bold text-base">
+              {followers?.length ?? <>...</>}
+            </span>{" "}
+            {followers?.length === 1 ? <>follower</> : <>followers</>}
+          </Link>
+        </nav>
+      </header>
       <div>
         <img
           src={portraitUrl}
