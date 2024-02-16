@@ -1,4 +1,4 @@
-import { UserPublicWithFollows } from "@spill-it/db/schema/zod";
+import { UserPublic } from "@spill-it/db/schema/drizzle";
 import { ensureError, raise } from "@spill-it/utils/errors";
 import { zodOfType } from "@spill-it/utils/zod";
 import { useCallback, useEffect, useState } from "react";
@@ -21,7 +21,7 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
   }
 
   const rawParams = useParams();
-  const [profile, setProfile] = useState<UserPublicWithFollows | null>(null);
+  const [profile, setProfile] = useState<UserPublic | null>(null);
   const initializeProfile = useCallback(async () => {
     try {
       logger.debug("Parsing URL params...");

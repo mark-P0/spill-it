@@ -8,6 +8,7 @@ import {
   FollowWithUsers,
   FollowsTable,
 } from "../schema/drizzle";
+import { Follower, Following } from "../schema/zod";
 
 /**
  * Transactions are automatically rolled back upon errors (think try-catch)
@@ -70,6 +71,29 @@ export async function readFollowBetweenUsers(
   const follow = follows[0] ?? null;
 
   return follow;
+}
+
+export async function readFollowers(
+  followingUserId: Follow["followingUserId"],
+): Promise<Follower[]> {
+  const followers = await db.query.FollowsTable.findMany({
+    where: eq(FollowsTable.followingUserId, followingUserId),
+    columns: { date: true },
+    with: { follower: true },
+  });
+
+  return followers;
+}
+export async function readFollowings(
+  followerUserId: Follow["followerUserId"],
+): Promise<Following[]> {
+  const followings = await db.query.FollowsTable.findMany({
+    where: eq(FollowsTable.followerUserId, followerUserId),
+    columns: { date: true },
+    with: { following: true },
+  });
+
+  return followings;
 }
 
 export async function deleteFollowBetweenUsers(

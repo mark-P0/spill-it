@@ -1,6 +1,7 @@
-import { readUserWithFollowsViaUsername } from "@spill-it/db/tables/users";
+import { readUserViaUsername } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
+import { removeFalseish } from "@spill-it/utils/falseish";
 import { jsonPack } from "@spill-it/utils/json";
 import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response, Router } from "express";
@@ -45,9 +46,7 @@ export const UsersRouter = Router();
     username: NonNullable<Input["query"]["username"]>,
   ): Promise<T> {
     logger.info("Fetching user info...");
-    const userResult = await safeAsync(() =>
-      readUserWithFollowsViaUsername(username),
-    );
+    const userResult = await safeAsync(() => readUserViaUsername(username));
     if (!userResult.success) {
       logger.error(formatError(userResult.error));
       return res.sendStatus(StatusCodes.BAD_GATEWAY);
@@ -55,9 +54,8 @@ export const UsersRouter = Router();
     const user = userResult.value;
 
     logger.info("Parsing output...");
-    const data: Output["data"] = user === null ? [] : [user];
     const outputParsing = signature.output.safeParse({
-      data,
+      data: removeFalseish([user !== null && user]),
     } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
