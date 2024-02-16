@@ -48,18 +48,18 @@ export const zodFollowWithUsers: DrizzleZodFollowWithUsers = zodFollow.extend({
   follower: zodUserPublic,
   following: zodUserPublic,
 });
+export const zodFollowers = zodFollowWithUsers.pick({
+  date: true,
+  follower: true,
+});
+export type Follower = z.infer<typeof zodFollowers>;
 
 export const zodUserPublicWithFollowDate = z.object({
   date: zodFollow.shape.date,
   user: zodUserPublic,
 });
 export const zodUserPublicWithFollows = zodUserPublic.extend({
-  followers: z.array(
-    zodFollowWithUsers.pick({
-      date: true,
-      follower: true,
-    }),
-  ),
+  followers: z.array(zodFollowers),
   followings: z.array(
     zodFollowWithUsers.pick({
       date: true,
