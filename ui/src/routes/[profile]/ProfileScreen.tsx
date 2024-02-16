@@ -1,3 +1,4 @@
+import { Outlet } from "react-router-dom";
 import { Screen } from "../_app/Screen";
 import { NavBar, ProfileCard } from "./ProfileComponents";
 import { ProfileProvider, useProfileContext } from "./ProfileContext";
@@ -23,6 +24,8 @@ function _ProfileScreen() {
 
         <PostsList />
       </main>
+
+      <Outlet />
     </Screen>
   );
 }
