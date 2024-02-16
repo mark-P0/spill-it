@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Screen } from "../_app/Screen";
+import { NavBar, ProfileCard } from "./ProfileComponents";
 import { ProfileProvider, useProfileContext } from "./ProfileContext";
-import { NavBar, ProfileCard } from "./components";
 import { PostsProvider } from "./posts/PostsContext";
 import { PostsList } from "./posts/PostsList";
 
