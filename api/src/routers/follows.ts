@@ -2,6 +2,7 @@ import {
   createFollow,
   deleteFollowBetweenUsers,
   readFollowBetweenUsers,
+  readFollowers,
 } from "@spill-it/db/tables/follows";
 import { readUser } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
@@ -167,6 +168,56 @@ export const FollowsRouter = Router();
 
     logger.info("Parsing output...");
     const outputParsing = signature.output.safeParse({} satisfies Output);
+    if (!outputParsing.success) {
+      logger.error(formatError(outputParsing.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const output = outputParsing.data;
+
+    logger.info("Packaging output...");
+    const rawOutputResult = safe(() => jsonPack(output));
+    if (!rawOutputResult.success) {
+      logger.error(formatError(rawOutputResult.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const rawOutput = rawOutputResult.value;
+
+    logger.info("Sending output...");
+    return res.send(rawOutput);
+  });
+}
+
+{
+  const details = endpointDetails("/api/v0/followers", "GET");
+  const [ep, , signature, method] = details;
+  type Input = z.infer<typeof signature.input>;
+  type Output = z.infer<typeof signature.output>;
+
+  FollowsRouter[method](ep, async (req, res, next) => {
+    logger.info("Parsing input...");
+    const inputParsing = signature.input.safeParse(req);
+    if (!inputParsing.success) {
+      logger.error(formatError(inputParsing.error));
+      return res.sendStatus(StatusCodes.BAD_REQUEST);
+    }
+    const input = inputParsing.data;
+
+    logger.info("Fetching followers...");
+    const { query } = input;
+    const followingUserId = query.userId;
+    const followersResult = await safeAsync(() =>
+      readFollowers(followingUserId),
+    );
+    if (!followersResult.success) {
+      logger.error(formatError(followersResult.error));
+      return res.sendStatus(StatusCodes.BAD_GATEWAY);
+    }
+    const followers = followersResult.value;
+
+    logger.info("Parsing output...");
+    const outputParsing = signature.output.safeParse({
+      data: followers,
+    } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);

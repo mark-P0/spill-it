@@ -1,6 +1,7 @@
 import {
   zodFollow,
   zodFollowWithUsers,
+  zodFollowers,
   zodPost,
   zodPostWithAuthor,
   zodSample,
@@ -74,6 +75,19 @@ export const endpointMap = {
         }),
       }),
       output: z.object({}),
+    },
+  },
+  "/api/v0/followers": {
+    GET: {
+      input: z.object({
+        // TODO Restrict access to user data?
+        query: z.object({
+          userId: zodUserPublic.shape.id, // Requesting the users that follow `userId`
+        }),
+      }),
+      output: z.object({
+        data: z.array(zodFollowers),
+      }),
     },
   },
   "/api/v0/posts": {
