@@ -1,11 +1,16 @@
+import { ensureError, raise } from "@spill-it/utils/errors";
 import clsx from "clsx";
+import { useState } from "react";
 import { BsBoxArrowLeft, BsHouseFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { endpoint, endpointWithParam } from "../../utils/endpoints";
+import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
+import { getFromStorage } from "../../utils/storage";
 import { useUserContext } from "../_app/UserContext";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
+import { useToastContext } from "../_app/toast/ToastContext";
 import { useProfileContext } from "./ProfileContext";
 
 /**
@@ -114,7 +119,9 @@ export function NavBar() {
 
 function FollowButton() {
   const { user } = useUserContext();
-  const { profile } = useProfileContext();
+  const { showOnToast } = useToastContext();
+  const { profile, initializeProfile } = useProfileContext();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   if (user === null) return null;
   if (profile === null) return null;
@@ -123,9 +130,38 @@ function FollowButton() {
   const { followers } = profile;
   const isFollowing = followers.some(({ follower }) => follower.id === user.id);
 
+  async function follow() {
+    setIsProcessing(true);
+    try {
+      if (profile === null) raise("Profile is not available yet");
+
+      logger.debug("Retrieving session info...");
+      const headerAuth = getFromStorage("SESS");
+
+      logger.debug("Requesting follow...");
+      const result = await fetchAPI("/api/v0/follows", "POST", {
+        headers: { Authorization: headerAuth },
+        query: {
+          followingUserId: profile.id,
+        },
+      });
+      if (!result.success) raise("Failed following", result.error);
+
+      initializeProfile();
+    } catch (caughtError) {
+      logger.error(ensureError(caughtError));
+      showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
+    }
+    setIsProcessing(false);
+  }
+  async function unfollow() {}
+
   return (
     <button
+      disabled={isProcessing}
+      onClick={isFollowing ? unfollow : follow}
       className={clsx(
+        isProcessing && "cursor-wait",
         "select-none",
         "rounded-full px-6 py-3",
         "disabled:opacity-50",
