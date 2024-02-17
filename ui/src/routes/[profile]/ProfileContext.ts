@@ -22,14 +22,11 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
   }
 
   const rawParams = useParams();
+  const params = zodProfileParams.parse(rawParams);
+
   const [profile, setProfile] = useState<UserPublic | null>(null);
   const reflectProfile = useCallback(async () => {
     try {
-      const paramsParsing = zodProfileParams.safeParse(rawParams);
-      const params = paramsParsing.success
-        ? paramsParsing.data
-        : raise("Unexpected URL params", paramsParsing.error);
-
       const { username } = params;
       const userResult = await fetchAPI("/api/v0/users", "GET", {
         query: { username },
@@ -45,13 +42,14 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
     } catch (caughtError) {
       setError(ensureError(caughtError));
     }
-  }, [rawParams]);
+  }, [params]);
   useEffect(() => {
-    if (profile !== null) return;
+    const hasParamsChanged = profile?.username !== params.username;
+    if (!hasParamsChanged) return;
 
     logger.debug("Reflecting profile on state...");
     reflectProfile();
-  }, [profile, reflectProfile]);
+  }, [params, profile, reflectProfile]);
 
   const [followers, setFollowers] = useState<Follower[] | null>(null);
   const reflectFollowers = useCallback(async () => {
@@ -70,6 +68,8 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
     }
   }, [profile]);
   useEffect(() => {
+    logger.debug("Reflecting followers on state...");
+    setFollowers(null);
     reflectFollowers();
   }, [reflectFollowers]);
 
@@ -90,6 +90,8 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
     }
   }, [profile]);
   useEffect(() => {
+    logger.debug("Reflecting followings on state...");
+    setFollowings(null);
     reflectFollowings();
   }, [reflectFollowings]);
 
