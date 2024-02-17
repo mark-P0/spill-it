@@ -1,5 +1,4 @@
 import { raise } from "@spill-it/utils/errors";
-import { safeAsync } from "@spill-it/utils/safe";
 import { db } from "../db";
 import { Sample, SampleDetails, SamplesTable } from "../schema/drizzle";
 
@@ -30,10 +29,7 @@ import { Sample, SampleDetails, SamplesTable } from "../schema/drizzle";
 // })();
 
 export async function readSamplesAll(): Promise<Sample[]> {
-  const result = await safeAsync(() => db.select().from(SamplesTable));
-  const samples = result.success
-    ? result.value
-    : raise("Failed reading samples table", result.error);
+  const samples = await db.select().from(SamplesTable);
 
   return samples;
 }
@@ -42,12 +38,10 @@ export async function createSample(
   details: Omit<SampleDetails, "id">,
 ): Promise<Sample> {
   const { fullName, phone } = details;
-  const result = await safeAsync(() =>
-    db.insert(SamplesTable).values({ fullName, phone }).returning(),
-  );
-  const samples = result.success
-    ? result.value
-    : raise("Failed inserting to samples table", result.error);
+  const samples = await db
+    .insert(SamplesTable)
+    .values({ fullName, phone })
+    .returning();
 
   if (samples.length > 1) raise("Multiple samples inserted...?");
   const sample = samples[0] ?? raise("Inserted sample does not exist...?");

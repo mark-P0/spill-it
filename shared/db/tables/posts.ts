@@ -1,5 +1,4 @@
 import { raise } from "@spill-it/utils/errors";
-import { safeAsync } from "@spill-it/utils/safe";
 import { and, desc, eq, lt } from "drizzle-orm";
 import { db } from "../db";
 import {
@@ -11,12 +10,7 @@ import {
 import { POST_CT_CAP } from "../utils/constants";
 
 export async function createPost(details: PostDetails): Promise<Post> {
-  const result = await safeAsync(() =>
-    db.insert(PostsTable).values(details).returning(),
-  );
-  const posts = result.success
-    ? result.value
-    : raise("Failed creating post", result.error);
+  const posts = await db.insert(PostsTable).values(details).returning();
 
   if (posts.length > 1) raise("Multiple posts inserted...?");
   const post = posts[0] ?? raise("Inserted post does not exist...?");
@@ -25,12 +19,11 @@ export async function createPost(details: PostDetails): Promise<Post> {
 }
 
 export async function readPost(id: Post["id"]): Promise<Post | null> {
-  const result = await safeAsync(
-    () => db.select().from(PostsTable).where(eq(PostsTable.id, id)).limit(2), // There should only be at most 1. If there are 2 (or more), something has gone wrong...
-  );
-  const posts = result.success
-    ? result.value
-    : raise("Failed reading post from ID", result.error);
+  const posts = await db
+    .select()
+    .from(PostsTable)
+    .where(eq(PostsTable.id, id))
+    .limit(2); // There should only be at most 1. If there are 2 (or more), something has gone wrong...
 
   if (posts.length > 1) raise("Multiple posts for an ID...?");
   const post = posts[0] ?? null;
@@ -41,16 +34,11 @@ export async function readPost(id: Post["id"]): Promise<Post | null> {
 export async function readPostsWithAuthorViaUser(
   userId: PostWithAuthor["userId"],
 ): Promise<PostWithAuthor[]> {
-  const result = await safeAsync(() =>
-    db.query.PostsTable.findMany({
-      where: eq(PostsTable.userId, userId),
-      orderBy: desc(PostsTable.timestamp),
-      with: { author: true },
-    }),
-  );
-  const posts = result.success
-    ? result.value
-    : raise("Failed reading posts of user", result.error);
+  const posts = await db.query.PostsTable.findMany({
+    where: eq(PostsTable.userId, userId),
+    orderBy: desc(PostsTable.timestamp),
+    with: { author: true },
+  });
 
   return posts;
 }
@@ -62,27 +50,19 @@ export async function readPostsWithAuthorViaUserBeforeTimestamp(
 ): Promise<PostWithAuthor[]> {
   if (ct > POST_CT_CAP) raise("Requested post count greater than set cap");
 
-  const result = await safeAsync(() =>
-    db.query.PostsTable.findMany({
-      where: and(
-        eq(PostsTable.userId, userId), // Posts of user
-        lt(PostsTable.timestamp, timestamp), // Before a particular time
-      ),
-      limit: ct, // Limited to a specific count
-      orderBy: desc(PostsTable.timestamp), // Sorted from most to least recent
-      with: { author: true },
-    }),
-  );
-  const posts = result.success
-    ? result.value
-    : raise("Failed reading posts of user", result.error);
+  const posts = await db.query.PostsTable.findMany({
+    where: and(
+      eq(PostsTable.userId, userId), // Posts of user
+      lt(PostsTable.timestamp, timestamp), // Before a particular time
+    ),
+    limit: ct, // Limited to a specific count
+    orderBy: desc(PostsTable.timestamp), // Sorted from most to least recent
+    with: { author: true },
+  });
 
   return posts;
 }
 
 export async function deletePost(id: Post["id"]) {
-  const result = await safeAsync(() =>
-    db.delete(PostsTable).where(eq(PostsTable.id, id)),
-  );
-  if (!result.success) raise("Failed deleting post", result.error);
+  await db.delete(PostsTable).where(eq(PostsTable.id, id));
 }
