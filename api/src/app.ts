@@ -1,6 +1,5 @@
 import { endpoints } from "@spill-it/endpoints";
-import { formatError } from "@spill-it/utils/errors";
-import { safe } from "@spill-it/utils/safe";
+import { ensureError, formatError } from "@spill-it/utils/errors";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { ErrorRequestHandler } from "express";
@@ -91,21 +90,20 @@ app.use(express.static(path.join(__dirname, "public")));
   }
 
   app.use((req, res, next) => {
-    const headersPascalKebab = Object.fromEntries(
-      Object.entries(req.headers).map(([header, value]) => [
-        convertKebabToPascalKebab(header),
-        value,
-      ]),
-    );
+    try {
+      const headersPascalKebab = Object.fromEntries(
+        Object.entries(req.headers).map(([header, value]) => [
+          convertKebabToPascalKebab(header),
+          value,
+        ]),
+      );
 
-    const result = safe(() => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Request headers should not be used directly anyway...
       req.headers = headersPascalKebab as any;
-    });
-    if (!result.success) {
+    } catch (caughtError) {
       const error = new Error(
         "Failed converting request headers to Pascal-Kebab-Case",
-        { cause: result.error },
+        { cause: ensureError(caughtError) },
       );
       logger.error(formatError(error));
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
