@@ -6,7 +6,7 @@ const endpoints = [
   "/login/google/redirect",
   "/logout",
   "/home",
-  ...["/:username", "/:username/followers"],
+  ...["/:username", "/:username/followers", "/:username/following"],
 ] as const;
 type Endpoint = (typeof endpoints)[number];
 
