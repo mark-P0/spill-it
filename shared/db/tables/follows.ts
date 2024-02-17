@@ -1,5 +1,4 @@
 import { raise } from "@spill-it/utils/errors";
-import { safeAsync } from "@spill-it/utils/safe";
 import { and, eq } from "drizzle-orm";
 import { db } from "../db";
 import {
@@ -51,21 +50,16 @@ export async function readFollowBetweenUsers(
   followerUserId: Follow["followerUserId"],
   followingUserId: Follow["followingUserId"],
 ): Promise<Follow | null> {
-  const result = await safeAsync(() =>
-    db
-      .select()
-      .from(FollowsTable)
-      .where(
-        and(
-          eq(FollowsTable.followerUserId, followerUserId),
-          eq(FollowsTable.followingUserId, followingUserId),
-        ),
-      )
-      .limit(2),
-  );
-  const follows = result.success
-    ? result.value
-    : raise("Failed reading follow entries", result.error);
+  const follows = await db
+    .select()
+    .from(FollowsTable)
+    .where(
+      and(
+        eq(FollowsTable.followerUserId, followerUserId),
+        eq(FollowsTable.followingUserId, followingUserId),
+      ),
+    )
+    .limit(2);
 
   if (follows.length > 1) raise("Multiple follow entries between users...?");
   const follow = follows[0] ?? null;
