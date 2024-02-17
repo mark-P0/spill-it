@@ -1,5 +1,7 @@
 import { UserPublic } from "@spill-it/db/schema/drizzle";
+import clsx from "clsx";
 import { useEffect } from "react";
+import { BsXLg } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
@@ -26,6 +28,7 @@ function UserCard(props: { user: UserPublic }) {
 
 function FollowersModalContent() {
   const { profile, followers } = useProfileContext();
+  const { closeModal } = useModalContext();
 
   if (profile === null) return;
   if (followers === null) return;
@@ -33,9 +36,23 @@ function FollowersModalContent() {
   const { handleName } = profile;
   return (
     <ModalContent>
-      <h2 className="text-xl">
-        People who follow <span className="font-bold">{handleName}</span>
-      </h2>
+      <header className="flex items-center gap-6">
+        <h2 className="text-xl">
+          People who follow <span className="font-bold">{handleName}</span>
+        </h2>
+
+        <div className="ml-auto">
+          <button
+            onClick={closeModal}
+            className={clsx(
+              "w-9 aspect-square rounded-full p-2",
+              ...["transition", "hover:bg-white/25 active:scale-90"],
+            )}
+          >
+            <BsXLg className="w-full h-full" />
+          </button>
+        </div>
+      </header>
 
       <ol className="mt-3 grid gap-1">
         {followers.map(({ follower }) => (
@@ -69,6 +86,7 @@ export function FollowersModal() {
 
 function FollowingModalContent() {
   const { profile, followings } = useProfileContext();
+  const { closeModal } = useModalContext();
 
   if (profile === null) return;
   if (followings === null) return;
@@ -76,9 +94,23 @@ function FollowingModalContent() {
   const { handleName } = profile;
   return (
     <ModalContent>
-      <h2 className="text-xl">
-        People followed by <span className="font-bold">{handleName}</span>
-      </h2>
+      <header className="flex items-center gap-6">
+        <h2 className="text-xl">
+          People followed by <span className="font-bold">{handleName}</span>
+        </h2>
+
+        <div className="ml-auto">
+          <button
+            onClick={closeModal}
+            className={clsx(
+              "w-9 aspect-square rounded-full p-2",
+              ...["transition", "hover:bg-white/25 active:scale-90"],
+            )}
+          >
+            <BsXLg className="w-full h-full" />
+          </button>
+        </div>
+      </header>
 
       <ol className="mt-3 grid gap-1">
         {followings.map(({ following }) => (
