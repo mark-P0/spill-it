@@ -35,6 +35,7 @@ export function Modal() {
   const { content, showOnModal } = attributes;
   const { isOpen, openModal, closeModal } = attributes;
   const { isCancellable } = attributes;
+  const { onDismiss, setOnDismiss } = attributes;
 
   /** Open dialog as modal on render */
   useEffect(() => {
@@ -58,15 +59,29 @@ export function Modal() {
     closeModal();
   }
 
-  function discardContent(event: TransitionEvent) {
+  let hasEnded = false;
+  function handleTransitionEnd(event: TransitionEvent) {
+    if (hasEnded) return; // Prevent "re-runs" of the transition handler...
+
     if (content === null) return; // Nothing to discard
 
     const dialog =
       dialogRef.current ?? raise("Referenced dialog does not exist...?");
-    if (event.target !== dialog) return; // Only run on dialog tarnsitions
+    if (event.target !== dialog) return; // Only run on dialog transitions
 
     if (isOpen) return; // Only run when dialog has been "closed"
 
+    runDismissCallback();
+    discardContent();
+
+    hasEnded = true;
+  }
+  function runDismissCallback() {
+    if (onDismiss === null) return;
+    onDismiss();
+    setOnDismiss(null);
+  }
+  function discardContent() {
     showOnModal(null);
   }
 
@@ -75,7 +90,7 @@ export function Modal() {
     <dialog
       ref={dialogRef}
       onCancel={cancel}
-      onTransitionEnd={discardContent}
+      onTransitionEnd={handleTransitionEnd}
       className={clsx(
         "bg-transparent backdrop:bg-black/50",
         ...[

@@ -22,16 +22,11 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
   }
 
   const rawParams = useParams();
+  const params = zodProfileParams.parse(rawParams);
+
   const [profile, setProfile] = useState<UserPublic | null>(null);
   const reflectProfile = useCallback(async () => {
     try {
-      logger.debug("Parsing URL params...");
-      const paramsParsing = zodProfileParams.safeParse(rawParams);
-      const params = paramsParsing.success
-        ? paramsParsing.data
-        : raise("Unexpected URL params", paramsParsing.error);
-
-      logger.debug("Fetching profile info...");
       const { username } = params;
       const userResult = await fetchAPI("/api/v0/users", "GET", {
         query: { username },
@@ -40,19 +35,21 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
         ? userResult.value.data
         : raise("Failed fetching profile info");
 
-      logger.debug("Checking profile info...");
       if (users.length > 1) raise("Multiple users for a username...?");
       const user = users[0] ?? raise("Username possibly does not exist");
 
-      logger.debug("Storing user info as profile state...");
       setProfile(user);
     } catch (caughtError) {
       setError(ensureError(caughtError));
     }
-  }, [rawParams]);
+  }, [params]);
   useEffect(() => {
+    const hasParamsChanged = profile?.username !== params.username;
+    if (!hasParamsChanged) return;
+
+    logger.debug("Reflecting profile on state...");
     reflectProfile();
-  }, [reflectProfile]);
+  }, [params, profile, reflectProfile]);
 
   const [followers, setFollowers] = useState<Follower[] | null>(null);
   const reflectFollowers = useCallback(async () => {
@@ -71,6 +68,8 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
     }
   }, [profile]);
   useEffect(() => {
+    logger.debug("Reflecting followers on state...");
+    setFollowers(null);
     reflectFollowers();
   }, [reflectFollowers]);
 
@@ -91,6 +90,8 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
     }
   }, [profile]);
   useEffect(() => {
+    logger.debug("Reflecting followings on state...");
+    setFollowings(null);
     reflectFollowings();
   }, [reflectFollowings]);
 
