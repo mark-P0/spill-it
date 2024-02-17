@@ -151,6 +151,66 @@ function FollowCountsNav() {
   );
 }
 
+function FollowButton() {
+  const { user } = useUserContext();
+  const { profile, followers } = useProfileContext();
+
+  if (user === null) return null;
+  if (profile === null) return null;
+  if (followers === null) return null;
+  if (user.id === profile.id) return null; // Self-following is not a supported concept
+
+  const isFollowing = followers.some(({ follower }) => follower.id === user.id);
+
+  if (isFollowing) {
+    return (
+      <button
+        className={clsx(
+          "select-none",
+          "rounded-full px-6 py-3",
+          "disabled:opacity-50",
+          "font-bold tracking-wide",
+          ...[
+            "transition",
+            "enabled:active:scale-95",
+            ...[
+              "border",
+              "border-white/25 enabled:hover:border-transparent",
+              "text-white enabled:hover:bg-red-700",
+            ],
+          ],
+          "grid *:row-[1] *:col-[1]",
+          "group",
+        )}
+      >
+        <span className="transition opacity-100 group-hover:opacity-0">
+          Following
+        </span>
+        <span className="transition opacity-0 group-hover:opacity-100">
+          Unfollow
+        </span>
+      </button>
+    );
+  }
+  return (
+    <button
+      className={clsx(
+        "select-none",
+        "rounded-full px-6 py-3",
+        "disabled:opacity-50",
+        "font-bold tracking-wide",
+        ...[
+          "transition",
+          "enabled:active:scale-95",
+          "bg-fuchsia-500 enabled:hover:bg-fuchsia-600",
+        ],
+      )}
+    >
+      Follow
+    </button>
+  );
+}
+
 export function ProfileCard() {
   const { profile } = useProfileContext();
 
@@ -158,13 +218,16 @@ export function ProfileCard() {
   const { handleName, username, portraitUrl } = profile;
 
   return (
-    <article className="flex justify-between">
+    <article className="flex gap-6">
       <header>
         <h1 className="text-3xl font-bold">{handleName}</h1>
         <p className="text-lg text-white/50">{username}</p>
         <FollowCountsNav />
       </header>
       <div>
+        <FollowButton />
+      </div>
+      <div className="ml-auto">
         <img
           src={portraitUrl}
           alt={`Portrait of "${handleName}"`}
