@@ -6,6 +6,7 @@ import {
   DrizzleZodPostWithAuthor,
   DrizzleZodSample,
   DrizzleZodSession,
+  DrizzleZodSessionWithUser,
   DrizzleZodUser,
   DrizzleZodUserPublic,
   Sample,
@@ -74,12 +75,9 @@ export const zodSession: DrizzleZodSession = z.object({
   userId: zodUserPublic.shape.id,
   expiry: z.date(),
 });
-export const zodSessionWithUser = z.intersection(
-  zodSession,
-  z.object({
-    user: zodUserPublic,
-  }),
-);
+export const zodSessionWithUser: DrizzleZodSessionWithUser = zodSession.extend({
+  user: zodUserPublic,
+});
 
 export const zodPost: DrizzleZodPost = z.object({
   id: z.string().uuid(),
@@ -87,9 +85,6 @@ export const zodPost: DrizzleZodPost = z.object({
   timestamp: z.date(),
   content: z.string(),
 });
-export const zodPostWithAuthor: DrizzleZodPostWithAuthor = z.intersection(
-  zodPost,
-  z.object({
-    author: zodUserPublic,
-  }),
-);
+export const zodPostWithAuthor: DrizzleZodPostWithAuthor = zodPost.extend({
+  author: zodUserPublic,
+});
