@@ -112,6 +112,42 @@ export function NavBar() {
   );
 }
 
+function FollowCountsNav() {
+  const { followers, followings } = useProfileContext();
+
+  return (
+    <nav className="flex gap-3">
+      <Link
+        to="#"
+        className={clsx(
+          "text-xs uppercase tracking-wide",
+          "underline underline-offset-4",
+          ...["transition", "text-white/50 hover:text-fuchsia-500"],
+        )}
+      >
+        <span className="font-bold text-base">
+          {followers?.length ?? <>...</>}
+        </span>{" "}
+        {followers?.length === 1 ? <>follower</> : <>followers</>}
+      </Link>
+
+      <Link
+        to="#"
+        className={clsx(
+          "text-xs uppercase tracking-wide",
+          "underline underline-offset-4",
+          ...["transition", "text-white/50 hover:text-fuchsia-500"],
+        )}
+      >
+        <span className="font-bold text-base">
+          {followings?.length ?? <>...</>}
+        </span>{" "}
+        following
+      </Link>
+    </nav>
+  );
+}
+
 export function ProfileCard() {
   const { profile } = useProfileContext();
 
@@ -120,10 +156,11 @@ export function ProfileCard() {
 
   return (
     <article className="flex justify-between">
-      <div>
+      <header>
         <h1 className="text-3xl font-bold">{handleName}</h1>
         <p className="text-lg text-white/50">{username}</p>
-      </div>
+        <FollowCountsNav />
+      </header>
       <div>
         <img
           src={portraitUrl}

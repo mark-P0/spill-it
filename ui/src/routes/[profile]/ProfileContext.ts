@@ -1,4 +1,5 @@
 import { UserPublic } from "@spill-it/db/schema/drizzle";
+import { Follower, Following } from "@spill-it/db/schema/zod";
 import { ensureError, raise } from "@spill-it/utils/errors";
 import { zodOfType } from "@spill-it/utils/zod";
 import { useCallback, useEffect, useState } from "react";
@@ -22,7 +23,7 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
 
   const rawParams = useParams();
   const [profile, setProfile] = useState<UserPublic | null>(null);
-  const initializeProfile = useCallback(async () => {
+  const reflectProfile = useCallback(async () => {
     try {
       logger.debug("Parsing URL params...");
       const paramsParsing = zodProfileParams.safeParse(rawParams);
@@ -50,8 +51,52 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
     }
   }, [rawParams]);
   useEffect(() => {
-    initializeProfile();
-  }, [initializeProfile]);
+    reflectProfile();
+  }, [reflectProfile]);
 
-  return { profile, initializeProfile };
+  const [followers, setFollowers] = useState<Follower[] | null>(null);
+  const reflectFollowers = useCallback(async () => {
+    if (profile === null) return;
+
+    try {
+      const followersResult = await fetchAPI("/api/v0/followers", "GET", {
+        query: { userId: profile.id },
+      });
+      const followers = followersResult.success
+        ? followersResult.value.data
+        : raise("Failed fetching followers", followersResult.error);
+      setFollowers(followers);
+    } catch (caughtError) {
+      logger.error(ensureError(caughtError));
+    }
+  }, [profile]);
+  useEffect(() => {
+    reflectFollowers();
+  }, [reflectFollowers]);
+
+  const [followings, setFollowings] = useState<Following[] | null>(null);
+  const reflectFollowings = useCallback(async () => {
+    if (profile === null) return;
+
+    try {
+      const followingsResult = await fetchAPI("/api/v0/followings", "GET", {
+        query: { userId: profile.id },
+      });
+      const followings = followingsResult.success
+        ? followingsResult.value.data
+        : raise("Failed fetching followings", followingsResult.error);
+      setFollowings(followings);
+    } catch (caughtError) {
+      logger.error(ensureError(caughtError));
+    }
+  }, [profile]);
+  useEffect(() => {
+    reflectFollowings();
+  }, [reflectFollowings]);
+
+  return {
+    ...{ profile, reflectProfile },
+    ...{ followers, reflectFollowers },
+    ...{ followings, reflectFollowings },
+  };
 });
