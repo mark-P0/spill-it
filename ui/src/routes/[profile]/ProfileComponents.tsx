@@ -188,11 +188,33 @@ function FollowButton() {
     }
     setIsProcessing(false);
   }
+  async function unfollow() {
+    setIsProcessing(true);
+    try {
+      if (profile === null) raise("Profile not yet available");
+
+      const headerAuth = getFromStorage("SESS");
+      const result = await fetchAPI("/api/v0/follows", "DELETE", {
+        headers: { Authorization: headerAuth },
+        query: { followingUserId: profile.id },
+      });
+      if (!result.success) raise("Failed unfollowing", result.error);
+
+      reflectFollowers();
+    } catch (caughtError) {
+      logger.error(ensureError(caughtError));
+      showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
+    }
+    setIsProcessing(false);
+  }
 
   if (isFollowing) {
     return (
       <button
+        disabled={isProcessing}
+        onClick={unfollow}
         className={clsx(
+          isProcessing && "cursor-wait",
           "select-none",
           "rounded-full px-6 py-3",
           "disabled:opacity-50",
@@ -210,10 +232,10 @@ function FollowButton() {
           "group",
         )}
       >
-        <span className="transition opacity-100 group-hover:opacity-0">
+        <span className="transition opacity-100 group-enabled:group-hover:opacity-0">
           Following
         </span>
-        <span className="transition opacity-0 group-hover:opacity-100">
+        <span className="transition opacity-0 group-enabled:group-hover:opacity-100">
           Unfollow
         </span>
       </button>
