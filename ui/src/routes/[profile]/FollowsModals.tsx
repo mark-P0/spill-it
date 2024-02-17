@@ -31,14 +31,13 @@ function FollowersModalContent() {
   if (followers === null) return;
 
   const { handleName } = profile;
-
   return (
     <ModalContent>
       <h2 className="text-xl">
         People who follow <span className="font-bold">{handleName}</span>
       </h2>
 
-      <ol className="mt-3">
+      <ol className="mt-3 grid gap-1">
         {followers.map(({ follower }) => (
           <UserCard key={follower.id} user={follower} />
         ))}
@@ -62,6 +61,49 @@ export function FollowersModal() {
   return (
     <ModalProvider>
       <_FollowersModal />
+
+      <Modal />
+    </ModalProvider>
+  );
+}
+
+function FollowingModalContent() {
+  const { profile, followings } = useProfileContext();
+
+  if (profile === null) return;
+  if (followings === null) return;
+
+  const { handleName } = profile;
+  return (
+    <ModalContent>
+      <h2 className="text-xl">
+        People followed by <span className="font-bold">{handleName}</span>
+      </h2>
+
+      <ol className="mt-3 grid gap-1">
+        {followings.map(({ following }) => (
+          <UserCard key={following.id} user={following} />
+        ))}
+      </ol>
+    </ModalContent>
+  );
+}
+function _FollowingModal() {
+  const navigate = useNavigate();
+  const { showOnModal, setOnDismiss } = useModalContext();
+  useEffect(() => {
+    showOnModal(<FollowingModalContent />);
+    setOnDismiss(() => () => {
+      navigate("..");
+    });
+  }, [showOnModal, setOnDismiss, navigate]);
+
+  return null;
+}
+export function FollowingModal() {
+  return (
+    <ModalProvider>
+      <_FollowingModal />
 
       <Modal />
     </ModalProvider>
