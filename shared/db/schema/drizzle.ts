@@ -128,12 +128,9 @@ export const SessionsRelations = relations(SessionsTable, ({ one }) => ({
     references: [UsersTable.id],
   }),
 }));
-const drizzleZodSessionWithUser = z.intersection(
-  drizzleZodSession,
-  z.object({
-    user: drizzleZodUserPublic,
-  }),
-);
+const drizzleZodSessionWithUser = drizzleZodSession.extend({
+  user: drizzleZodUserPublic,
+});
 export type DrizzleZodSessionWithUser = typeof drizzleZodSessionWithUser;
 export type SessionWithUser = z.infer<typeof drizzleZodSessionWithUser>;
 
@@ -157,11 +154,8 @@ export const PostsRelations = relations(PostsTable, ({ one }) => ({
     references: [UsersTable.id],
   }),
 }));
-const drizzleZodPostWithAuthor = z.intersection(
-  drizzleZodPost,
-  z.object({
-    author: drizzleZodUserPublic,
-  }),
-);
+const drizzleZodPostWithAuthor = drizzleZodPost.extend({
+  author: drizzleZodUserPublic,
+});
 export type DrizzleZodPostWithAuthor = typeof drizzleZodPostWithAuthor;
 export type PostWithAuthor = z.infer<typeof drizzleZodPostWithAuthor>;
