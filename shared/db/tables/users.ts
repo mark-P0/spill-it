@@ -93,16 +93,21 @@ const charset = new Set([...letters, ...digits]);
 async function _buildUsernameFromHandle(
   tx: DBTransaction,
   handleName: string,
+  maxLen = 16,
 ): Promise<string> {
-  let username = handleName
+  const base = handleName
     .toLowerCase()
     .split("")
     .filter((char) => charset.has(char))
+    .slice(0, maxLen - 3) // Allot spaces at the end for random suffix
     .join("");
 
+  let username = base;
   for (;;) {
     const existingUser = await _readUserViaUsername(tx, username);
     if (existingUser === null) break;
+
+    if (username.length === maxLen) username = base; // Restart the process when max length has been reached and username still is not unique
     username += randomChoice(digits);
   }
 
