@@ -164,15 +164,19 @@ function UnfollowButton() {
   async function unfollow() {
     setIsProcessing(true);
     try {
-      if (profile === null) raise("Profile not yet available");
+      if (profile === null) raise("Profile not available...?");
 
+      logger.debug("Retrieving session info...");
       const headerAuth = getFromStorage("SESS");
+
+      logger.debug("Requesting unfollow...");
       const result = await fetchAPI("/api/v0/follows", "DELETE", {
         headers: { Authorization: headerAuth },
         query: { followingUserId: profile.id },
       });
       if (!result.success) raise("Failed unfollowing", result.error);
 
+      logger.debug("Reflecting followers...");
       reflectFollowers();
     } catch (caughtError) {
       logger.error(ensureError(caughtError));
@@ -221,15 +225,19 @@ function FollowButton() {
   async function follow() {
     setIsProcessing(true);
     try {
-      if (profile === null) raise("Profile not yet available");
+      if (profile === null) raise("Profile not available...?");
 
+      logger.debug("Retrieving session info...");
       const headerAuth = getFromStorage("SESS");
+
+      logger.debug("Requesting follow...");
       const result = await fetchAPI("/api/v0/follows", "POST", {
         headers: { Authorization: headerAuth },
         query: { followingUserId: profile.id },
       });
       if (!result.success) raise("Failed following", result.error);
 
+      logger.debug("Reflecting followers...");
       reflectFollowers();
     } catch (caughtError) {
       logger.error(ensureError(caughtError));
