@@ -94,6 +94,7 @@ async function _buildUsernameFromHandle(
   tx: DBTransaction,
   handleName: string,
   maxLen = 16,
+  maxRetries = 8,
 ): Promise<string> {
   const base = handleName
     .toLowerCase()
@@ -102,8 +103,12 @@ async function _buildUsernameFromHandle(
     .slice(0, maxLen - 3) // Allot spaces at the end for random suffix
     .join("");
 
+  let retryCt = 0;
   let username = base;
   for (;;) {
+    if (retryCt === maxRetries) raise("Built username too many times");
+    retryCt++;
+
     const existingUser = await _readUserViaUsername(tx, username);
     if (existingUser === null) break;
 
