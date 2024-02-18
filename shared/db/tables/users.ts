@@ -1,5 +1,6 @@
 import { raise } from "@spill-it/utils/errors";
-import { randomInteger } from "@spill-it/utils/random";
+import { randomChoice } from "@spill-it/utils/random";
+import { digits, letters } from "@spill-it/utils/strings";
 import { eq, sql } from "drizzle-orm";
 import { DBTransaction, db } from "../db";
 import { User, UsersTable } from "../schema/drizzle";
@@ -88,18 +89,24 @@ export async function readUserWithFollowsViaUsername(
   return user;
 }
 
+const charset = new Set([...letters, ...digits]);
 async function _buildUsernameFromHandle(
   tx: DBTransaction,
   handleName: string,
-  sep = "-",
-) {
-  let username = handleName.toLowerCase().replace(/\s/g, sep);
+): Promise<string> {
+  let username = handleName
+    .toLowerCase()
+    .split("")
+    .filter((char) => charset.has(char))
+    .join("");
 
-  const existingUser = await _readUserViaUsername(tx, username);
-  if (existingUser === null) return username;
+  for (;;) {
+    const existingUser = await _readUserViaUsername(tx, username);
+    if (existingUser === null) break;
+    username += randomChoice(digits);
+  }
 
-  username += sep + `${randomInteger(0, 9 + 1)}`;
-  return _buildUsernameFromHandle(tx, username, "");
+  return username;
 }
 export async function createUserFromGoogle(
   googleId: string,
