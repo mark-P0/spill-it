@@ -1,4 +1,5 @@
 import { Params, PathParam } from "react-router-dom";
+import { logger } from "./logger";
 
 const endpoints = [
   "/",
@@ -25,8 +26,13 @@ export function endpointWithParam<T extends Endpoint>(
   params: EndpointParams<T>,
 ): string {
   let epActual: string = endpoint;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeScript has trouble with `Object.entries()` and `params`...
-  for (const [param, value] of Object.entries(params) as any) {
+  for (const [param, value] of Object.entries(params)) {
+    /** Should not be possible as `params` should be something like `Record<string, string>` */
+    if (typeof value !== "string") {
+      logger.warn("Non-string parameter encountered; ignoring...");
+      continue;
+    }
+
     epActual = epActual.replace(`:${param}`, value);
   }
   return epActual;
