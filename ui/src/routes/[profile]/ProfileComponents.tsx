@@ -165,6 +165,7 @@ function UnfollowButton() {
     setIsProcessing(true);
     try {
       if (profile === null) raise("Profile not available...?");
+      const { id, handleName } = profile;
 
       logger.debug("Retrieving session info...");
       const headerAuth = getFromStorage("SESS");
@@ -172,12 +173,20 @@ function UnfollowButton() {
       logger.debug("Requesting unfollow...");
       const result = await fetchAPI("/api/v0/follows", "DELETE", {
         headers: { Authorization: headerAuth },
-        query: { followingUserId: profile.id },
+        query: { followingUserId: id },
       });
       if (!result.success) raise("Failed unfollowing", result.error);
 
       logger.debug("Reflecting followers...");
-      reflectFollowers();
+      await reflectFollowers();
+
+      showOnToast(
+        <>
+          You have now <span className="font-bold">unfollowed</span>{" "}
+          {handleName} 😢
+        </>,
+        "critical",
+      );
     } catch (caughtError) {
       logger.error(ensureError(caughtError));
       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
@@ -226,6 +235,7 @@ function FollowButton() {
     setIsProcessing(true);
     try {
       if (profile === null) raise("Profile not available...?");
+      const { id, handleName } = profile;
 
       logger.debug("Retrieving session info...");
       const headerAuth = getFromStorage("SESS");
@@ -233,12 +243,20 @@ function FollowButton() {
       logger.debug("Requesting follow...");
       const result = await fetchAPI("/api/v0/follows", "POST", {
         headers: { Authorization: headerAuth },
-        query: { followingUserId: profile.id },
+        query: { followingUserId: id },
       });
       if (!result.success) raise("Failed following", result.error);
 
       logger.debug("Reflecting followers...");
-      reflectFollowers();
+      await reflectFollowers();
+
+      showOnToast(
+        <>
+          You are now <span className="font-bold">following</span> {handleName}!
+          💅
+        </>,
+        "info",
+      );
     } catch (caughtError) {
       logger.error(ensureError(caughtError));
       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");

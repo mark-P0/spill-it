@@ -22,6 +22,7 @@ export function Toast() {
         "shadow-lg shadow-black/50",
         level === "info" && "bg-fuchsia-500 text-white",
         level === "warn" && "bg-yellow-500 text-black",
+        level === "critical" && "bg-rose-500 text-white",
         "animate-toast",
       )}
     >

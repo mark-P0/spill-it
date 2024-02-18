@@ -1,7 +1,7 @@
 import { ReactNode, useCallback, useState } from "react";
 import { createNewContext } from "../../../utils/react";
 
-type ToastLevel = "info" | "warn";
+type ToastLevel = "info" | "warn" | "critical";
 
 export const [useToastContext, ToastProvider] = createNewContext(() => {
   const [content, setContent] = useState<ReactNode>(null);
