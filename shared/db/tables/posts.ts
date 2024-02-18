@@ -1,13 +1,113 @@
 import { raise } from "@spill-it/utils/errors";
-import { and, desc, eq, lt } from "drizzle-orm";
+import { and, desc, eq, inArray, lt, or } from "drizzle-orm";
 import { db } from "../db";
 import {
+  FollowsTable,
   Post,
   PostDetails,
   PostWithAuthor,
   PostsTable,
 } from "../schema/drizzle";
 import { POST_CT_CAP } from "../utils/constants";
+
+(async () => {
+  await db.transaction(async (tx) => {
+    // RQB: {
+    //   const followingUserIds = tx.query.FollowsTable.findMany({
+    //     columns: { followerUserId: true },
+    //     where: eq(FollowsTable.followerUserId, userId),
+    //   });
+    //   // console.log(followingUserIds);
+    //
+    //   const feed = await tx
+    //     .select()
+    //     .from(PostsTable)
+    //     .where(inArray(PostsTable.userId, followingUserIds));
+    //   console.log(feed);
+    // }
+
+    SQImplied: {
+      const followingUserIds = tx
+        .select({ _: FollowsTable.followingUserId })
+        .from(FollowsTable)
+        .where(eq(FollowsTable.followerUserId, userId));
+      // console.log(followingUserIds);
+
+      const feed = await tx.query.PostsTable.findMany({
+        columns: { content: true },
+        where: or(
+          inArray(PostsTable.userId, followingUserIds),
+          eq(PostsTable.userId, userId),
+        ),
+        limit: 8,
+        orderBy: desc(PostsTable.timestamp),
+      });
+      console.log(feed);
+    }
+
+    //     SQ: {
+    //       const sqFollowingUserIds = tx
+    //         .select({ _: FollowsTable.followingUserId })
+    //         .from(FollowsTable)
+    //         .where(eq(FollowsTable.followerUserId, userId))
+    //         .as("followings");
+    //       // console.log(followingUserIds);
+    //
+    //       const feed = await tx
+    //         .select()
+    //         .from(PostsTable)
+    //         .where(inArray(PostsTable.userId, sqFollowingUserIds));
+    //       console.log(feed);
+    //     }
+
+    //     Join: {
+    //       const sqFollowingUserIds = tx
+    //         .select()
+    //         .from(FollowsTable)
+    //         .where(eq(FollowsTable.followerUserId, userId))
+    //         .as("followings");
+    //
+    //       const feed = await tx
+    //         .select({ content: PostsTable.content })
+    //         .from(PostsTable)
+    //         .innerJoin(
+    //           sqFollowingUserIds,
+    //           // eq(PostsTable.userId, sqFollowingUserIds.followingUserId),
+    //           or(
+    //             eq(PostsTable.userId, sqFollowingUserIds.followingUserId),
+    //             eq(PostsTable.userId, userId),
+    //           ),
+    //         )
+    //         .orderBy(desc(PostsTable.timestamp))
+    //         .limit(8);
+    //       console.log(feed);
+    //     }
+
+    // const followingUserIds = await tx
+    //   .select()
+    //   .from(FollowsTable)
+    //   .where(eq(FollowsTable.followerUserId, userId));
+    // console.log(followingUserIds);
+    // const sqUserFollowings = tx
+    //   .select()
+    //   .from(FollowsTable)
+    //   .where(eq(FollowsTable.followerUserId, userId))
+    //   .as("followings");
+    //     const feed = await tx
+    //       .select()
+    //       .from(PostsTable)
+    //       // .where(eq(PostsTable.userId, sqUserFollowings.followingUserId));
+    //     console.log(feed);
+    // const feed = await tx
+    //   .select()
+    //   .from(PostsTable)
+    //   .innerJoin(
+    //     sqUserFollowings,
+    //     eq(PostsTable.userId, sqUserFollowings.followingUserId),
+    //   );
+    // console.log(feed);
+  });
+})();
 
 export async function createPost(details: PostDetails): Promise<Post> {
   const posts = await db.insert(PostsTable).values(details).returning();
