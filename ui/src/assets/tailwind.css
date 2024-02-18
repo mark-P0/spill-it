@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  @apply selection:bg-emerald-700;
+}
