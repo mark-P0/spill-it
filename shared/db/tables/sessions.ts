@@ -3,19 +3,14 @@ import { raise } from "@spill-it/utils/errors";
 import { isPast } from "date-fns";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
-import {
-  Session,
-  SessionWithUser,
-  SessionsTable,
-  User,
-} from "../schema/drizzle";
+import { Session, SessionWithUser, SessionsTable } from "../schema/drizzle";
 
 export function isSessionExpired(session: Session) {
   return isPast(session.expiry);
 }
 
-export async function readSessionOfUser(
-  userId: User["id"],
+export async function readSessionViaUser(
+  userId: Session["userId"],
 ): Promise<Session | null> {
   const sessions = await db
     .select()
@@ -49,9 +44,7 @@ export async function readSessionWithUser(
   const sessions = await db.query.SessionsTable.findMany({
     where: eq(SessionsTable.id, id),
     limit: 2, // There should only be at most 1. If there are 2 (or more), something has gone wrong...
-    with: {
-      user: true,
-    },
+    with: { user: true },
   });
 
   if (sessions.length > 1) raise("Multiple sessions for an ID...?");
@@ -60,19 +53,33 @@ export async function readSessionWithUser(
   return session;
 }
 
-export async function createSession(userId: User["id"]): Promise<Session> {
-  const defaultExpiry = tomorrow();
-  const sessions = await db
-    .insert(SessionsTable)
-    .values({ userId, expiry: defaultExpiry })
-    .returning();
+export async function createSession(
+  userId: Session["userId"],
+): Promise<Session> {
+  return await db.transaction(async (tx) => {
+    const defaultExpiry = tomorrow();
+    const sessions = await tx
+      .insert(SessionsTable)
+      .values({ userId, expiry: defaultExpiry })
+      .returning();
 
-  if (sessions.length > 1) raise("Multiple sessions inserted...?");
-  const session = sessions[0] ?? raise("Inserted session does not exist...?");
+    if (sessions.length > 1) raise("Multiple sessions inserted...?");
+    const session = sessions[0] ?? raise("Inserted session does not exist...?");
 
-  return session;
+    return session;
+  });
 }
 
-export async function deleteSession(id: Session["id"]) {
-  await db.delete(SessionsTable).where(eq(SessionsTable.id, id));
+export async function deleteSession(id: Session["id"]): Promise<Session> {
+  return await db.transaction(async (tx) => {
+    const sessions = await tx
+      .delete(SessionsTable)
+      .where(eq(SessionsTable.id, id))
+      .returning();
+
+    if (sessions.length > 1) raise("Multiple sessions deleted...?");
+    const session = sessions[0] ?? raise("Deleted session does not exist...?");
+
+    return session;
+  });
 }
