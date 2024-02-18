@@ -1,14 +1,9 @@
 import { raise } from "@spill-it/utils/errors";
 import { randomInteger } from "@spill-it/utils/random";
 import { eq, sql } from "drizzle-orm";
-import { db } from "../db";
+import { DBTransaction, db } from "../db";
 import { User, UsersTable } from "../schema/drizzle";
 import { UserPublicWithFollows } from "../schema/zod";
-
-export async function isGoogleUserExisting(googleId: string): Promise<boolean> {
-  const user = await readUserViaGoogleId(googleId);
-  return user !== null;
-}
 
 export async function readUser(id: User["id"]): Promise<User | null> {
   const users = await db
@@ -23,10 +18,11 @@ export async function readUser(id: User["id"]): Promise<User | null> {
   return user;
 }
 
-export async function readUserViaGoogleId(
+async function _readUserViaGoogleId(
+  tx: DBTransaction,
   googleId: NonNullable<User["googleId"]>,
 ): Promise<User | null> {
-  const users = await db
+  const users = await tx
     .select()
     .from(UsersTable)
     .where(eq(UsersTable.googleId, googleId))
@@ -37,11 +33,19 @@ export async function readUserViaGoogleId(
 
   return user;
 }
+export async function readUserViaGoogleId(
+  googleId: NonNullable<User["googleId"]>,
+): Promise<User | null> {
+  return await db.transaction(async (tx) => {
+    return await _readUserViaGoogleId(tx, googleId);
+  });
+}
 
-export async function readUserViaUsername(
+async function _readUserViaUsername(
+  tx: DBTransaction,
   username: User["username"],
 ): Promise<User | null> {
-  const users = await db
+  const users = await tx
     .select()
     .from(UsersTable)
     .where(eq(UsersTable.username, username))
@@ -51,6 +55,13 @@ export async function readUserViaUsername(
   const user = users[0] ?? null;
 
   return user;
+}
+export async function readUserViaUsername(
+  username: User["username"],
+): Promise<User | null> {
+  return await db.transaction(async (tx) => {
+    return await _readUserViaUsername(tx, username);
+  });
 }
 
 export async function readUserWithFollowsViaUsername(
@@ -77,33 +88,40 @@ export async function readUserWithFollowsViaUsername(
   return user;
 }
 
-async function createUsernameFromHandle(handleName: string, sep = "-") {
+async function _buildUsernameFromHandle(
+  tx: DBTransaction,
+  handleName: string,
+  sep = "-",
+) {
   let username = handleName.toLowerCase().replace(/\s/g, sep);
 
-  const existingUser = await readUserViaUsername(username);
+  const existingUser = await _readUserViaUsername(tx, username);
   if (existingUser === null) return username;
 
   username += sep + `${randomInteger(0, 9 + 1)}`;
-  return createUsernameFromHandle(username, "");
+  return _buildUsernameFromHandle(tx, username, "");
 }
 export async function createUserFromGoogle(
   googleId: string,
   handleName: string,
   portraitUrl: string,
 ): Promise<User> {
-  if (await isGoogleUserExisting(googleId))
-    raise("Failed creating user from Google ID as they already exist");
+  return await db.transaction(async (tx) => {
+    const existingUser = await _readUserViaGoogleId(tx, googleId);
+    if (existingUser !== null)
+      raise("Google ID already associated with a user");
 
-  const username = await createUsernameFromHandle(handleName);
-  const users = await db
-    .insert(UsersTable)
-    .values({ username, handleName, portraitUrl, googleId, loginCt: 0 })
-    .returning();
+    const username = await _buildUsernameFromHandle(tx, handleName);
+    const users = await tx
+      .insert(UsersTable)
+      .values({ username, handleName, portraitUrl, googleId, loginCt: 0 })
+      .returning();
 
-  if (users.length > 1) raise("Multiple Google users inserted...?");
-  const user = users[0] ?? raise("Inserted Google user does not exist...?");
+    if (users.length > 1) raise("Multiple Google users inserted...?");
+    const user = users[0] ?? raise("Inserted Google user does not exist...?");
 
-  return user;
+    return user;
+  });
 }
 
 /**
@@ -112,14 +130,25 @@ export async function createUserFromGoogle(
  * - https://discord.com/channels/1043890932593987624/1176593045840482394
  * - https://discord.com/channels/1043890932593987624/1176256065684385922
  */
-export async function updateIncrementGoogleUserLoginCt(googleId: string) {
-  if (!(await isGoogleUserExisting(googleId)))
-    raise(
-      "Failed incrementing user login count from Google ID as they do not exist",
-    );
+export async function updateIncrementGoogleUserLoginCt(
+  googleId: string,
+): Promise<User> {
+  return await db.transaction(async (tx) => {
+    const existingUser = await _readUserViaGoogleId(tx, googleId);
+    if (existingUser === null)
+      raise(
+        "Failed incrementing user login count from Google ID as they do not exist",
+      );
 
-  await db
-    .update(UsersTable)
-    .set({ loginCt: sql`${UsersTable.loginCt} + 1` })
-    .where(eq(UsersTable.googleId, googleId));
+    const users = await tx
+      .update(UsersTable)
+      .set({ loginCt: sql`${UsersTable.loginCt} + 1` })
+      .where(eq(UsersTable.googleId, googleId))
+      .returning();
+
+    if (users.length > 1) raise("Multiple Google users updated...?");
+    const user = users[0] ?? raise("Updated Google user does not exist...?");
+
+    return user;
+  });
 }

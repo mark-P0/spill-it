@@ -37,14 +37,16 @@ export async function readSamplesAll(): Promise<Sample[]> {
 export async function createSample(
   details: Omit<SampleDetails, "id">,
 ): Promise<Sample> {
-  const { fullName, phone } = details;
-  const samples = await db
-    .insert(SamplesTable)
-    .values({ fullName, phone })
-    .returning();
+  return await db.transaction(async (tx) => {
+    const { fullName, phone } = details;
+    const samples = await tx
+      .insert(SamplesTable)
+      .values({ fullName, phone })
+      .returning();
 
-  if (samples.length > 1) raise("Multiple samples inserted...?");
-  const sample = samples[0] ?? raise("Inserted sample does not exist...?");
+    if (samples.length > 1) raise("Multiple samples inserted...?");
+    const sample = samples[0] ?? raise("Inserted sample does not exist...?");
 
-  return sample;
+    return sample;
+  });
 }
