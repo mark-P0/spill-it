@@ -1,5 +1,6 @@
 import { raise } from "@spill-it/utils/errors";
-import { randomInteger } from "@spill-it/utils/random";
+import { randomChoice } from "@spill-it/utils/random";
+import { digits, letters } from "@spill-it/utils/strings";
 import { eq, sql } from "drizzle-orm";
 import { DBTransaction, db } from "../db";
 import { User, UsersTable } from "../schema/drizzle";
@@ -88,18 +89,34 @@ export async function readUserWithFollowsViaUsername(
   return user;
 }
 
+const charset = new Set([...letters, ...digits]);
 async function _buildUsernameFromHandle(
   tx: DBTransaction,
   handleName: string,
-  sep = "-",
-) {
-  let username = handleName.toLowerCase().replace(/\s/g, sep);
+  maxLen = 16,
+  maxRetries = 8,
+): Promise<string> {
+  const base = handleName
+    .toLowerCase()
+    .split("")
+    .filter((char) => charset.has(char))
+    .slice(0, maxLen - 3) // Allot spaces at the end for random suffix
+    .join("");
 
-  const existingUser = await _readUserViaUsername(tx, username);
-  if (existingUser === null) return username;
+  let retryCt = 0;
+  let username = base;
+  for (;;) {
+    if (retryCt === maxRetries) raise("Built username too many times");
+    retryCt++;
 
-  username += sep + `${randomInteger(0, 9 + 1)}`;
-  return _buildUsernameFromHandle(tx, username, "");
+    const existingUser = await _readUserViaUsername(tx, username);
+    if (existingUser === null) break;
+
+    if (username.length === maxLen) username = base; // Restart the process when max length has been reached and username still is not unique
+    username += randomChoice(digits);
+  }
+
+  return username;
 }
 export async function createUserFromGoogle(
   googleId: string,
