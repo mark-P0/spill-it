@@ -14,7 +14,7 @@ import { useUserContext } from "../../_app/UserContext";
 import { ModalContent } from "../../_app/modal/Modal";
 import { useModalContext } from "../../_app/modal/ModalContext";
 import { useToastContext } from "../../_app/toast/ToastContext";
-import { useFeedContext } from "./PostsContext";
+import { useFeedContext } from "./FeedContext";
 
 function FeedEndObserver() {
   const [divRef, isIntersecting] = useObserver<HTMLDivElement>();

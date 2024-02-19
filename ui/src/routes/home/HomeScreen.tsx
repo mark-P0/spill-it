@@ -10,8 +10,8 @@ import { LoadingCursorAbsoluteOverlay } from "../_app/Loading";
 import { Screen } from "../_app/Screen";
 import { useUserContext } from "../_app/UserContext";
 import { useToastContext } from "../_app/toast/ToastContext";
-import { FeedProvider, useFeedContext } from "./posts/PostsContext";
-import { Feed } from "./posts/PostsList";
+import { Feed } from "./feed/Feed";
+import { FeedProvider, useFeedContext } from "./feed/FeedContext";
 
 function ProfileButtonLink() {
   const { user } = useUserContext();
