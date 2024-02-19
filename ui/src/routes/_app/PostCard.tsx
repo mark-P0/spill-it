@@ -113,6 +113,8 @@ export function PostCard(props: { post: PostWithAuthor }) {
   const { post } = props;
   const { content, timestamp, author } = post;
 
+  const canDelete = user?.id === author?.id;
+
   function promptDelete() {
     showOnModal(<DeletePostModalContent postToDelete={post} />);
   }
@@ -137,7 +139,7 @@ export function PostCard(props: { post: PostWithAuthor }) {
         <p>{content}</p>
       </div>
       <div>
-        {user?.id === author?.id && (
+        {canDelete && (
           <button
             onClick={promptDelete}
             className={clsx(
