@@ -26,10 +26,13 @@ async function deletePost(post: PostWithAuthor) {
   if (!deleteResult.success) raise("Failed deleting", deleteResult.error);
 }
 
-function DeletePostModalContent(props: { postToDelete: PostWithAuthor }) {
+function DeletePostModalContent(props: {
+  postToDelete: PostWithAuthor;
+  onDeleteEnd?: () => void;
+}) {
   const { showOnToast } = useToastContext();
   const { closeModal, makeModalCancellable } = useModalContext();
-  const { postToDelete } = props;
+  const { postToDelete, onDeleteEnd } = props;
   const [isDeleting, setIsDeleting] = useState(false);
 
   async function triggerDelete() {
@@ -47,6 +50,8 @@ function DeletePostModalContent(props: { postToDelete: PostWithAuthor }) {
 
     setIsDeleting(false);
     makeModalCancellable(true);
+
+    onDeleteEnd?.();
     closeModal();
   }
 
@@ -107,16 +112,21 @@ function formatPostDate(date: PostWithAuthor["timestamp"]): string {
     includeSeconds: true,
   });
 }
-export function PostCard(props: { post: PostWithAuthor }) {
+export function PostCard(props: {
+  post: PostWithAuthor;
+  onDeleteEnd?: () => void;
+}) {
   const { user } = useUserContext();
   const { showOnModal } = useModalContext();
-  const { post } = props;
+  const { post, onDeleteEnd } = props;
   const { content, timestamp, author } = post;
 
   const canDelete = user?.id === author?.id;
 
   function promptDelete() {
-    showOnModal(<DeletePostModalContent postToDelete={post} />);
+    showOnModal(
+      <DeletePostModalContent postToDelete={post} onDeleteEnd={onDeleteEnd} />,
+    );
   }
 
   return (

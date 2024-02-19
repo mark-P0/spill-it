@@ -24,9 +24,10 @@ function FeedEndObserver() {
 }
 
 function FeedPostCard(props: { post: PostWithAuthor }) {
+  const { removePostFromState } = useFeedContext();
   const { post } = props;
 
-  return <PostCard post={post} />;
+  return <PostCard post={post} onDeleteEnd={() => removePostFromState(post)} />;
 }
 
 export function Feed() {

@@ -142,9 +142,20 @@ export const [useFeedContext, FeedProvider] = createNewContext(() => {
     [feed],
   );
 
+  /** Possible to be de-synced with database... */
+  const removePostFromState = useCallback(
+    (post: PostWithAuthor) => {
+      const deletedPostId = post.id;
+      const newFeed = feed.filter((post) => post.id !== deletedPostId);
+      setFeed(newFeed);
+    },
+    [feed],
+  );
+
   return {
     feedStatus,
     ...{ feed, initializeFeed },
     ...{ hasNextPosts, extendFeed, extendFeedWithRecent, deletePost },
+    removePostFromState,
   };
 });
