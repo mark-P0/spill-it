@@ -20,10 +20,11 @@ function UserCard(props: { user: UserPublic }) {
         className="w-9 aspect-square rounded-full"
       />
       <header>
-        <h3 className="font-bold">
+        <h3>
           <Link
             to={endpointWithParam("/:username", { username })}
             className={clsx(
+              "font-bold",
               "underline underline-offset-4",
               ...["transition", "text-white hover:text-fuchsia-500"],
             )}
