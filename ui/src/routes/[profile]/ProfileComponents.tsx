@@ -156,6 +156,28 @@ function FollowCountsNav() {
   );
 }
 
+function EditProfileButtonLink() {
+  const { profile } = useProfileContext();
+
+  if (profile === null) return null;
+  const { username } = profile;
+
+  return (
+    <Link
+      to={endpointWithParam("/:username/edit", { username })}
+      className={clsx(
+        "select-none",
+        "rounded-full px-6 py-3",
+        "disabled:opacity-50",
+        "font-bold tracking-wide",
+        "border border-white/25",
+        ...["transition", "hover:bg-white/10 active:scale-95"],
+      )}
+    >
+      Edit Profile
+    </Link>
+  );
+}
 function UnfollowButton() {
   const { showOnToast } = useToastContext();
   const { profile, reflectFollowers } = useProfileContext();
@@ -292,10 +314,12 @@ function FollowButtonDecider() {
   if (user === null) return null;
   if (profile === null) return null;
   if (followers === null) return null;
-  if (user.id === profile.id) return null; // Self-following is not a supported concept
+
+  if (user.id === profile.id) return <EditProfileButtonLink />;
 
   const isFollowing = followers.some(({ follower }) => follower.id === user.id);
   if (isFollowing) return <UnfollowButton />;
+
   return <FollowButton />;
 }
 
@@ -312,7 +336,7 @@ export function ProfileCard() {
         <p className="text-lg text-white/50">{username}</p>
         <FollowCountsNav />
       </header>
-      <div>
+      <div className="flex items-start">
         <FollowButtonDecider />
       </div>
       <div className="ml-auto">

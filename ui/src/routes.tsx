@@ -3,6 +3,7 @@ import { raise } from "@spill-it/utils/errors";
 import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";
 import {
+  EditProfileModal,
   FollowersModal,
   FollowingModal,
 } from "./routes/[profile]/ProfileModals";
@@ -28,6 +29,10 @@ export const ProfileRoute: RouteObject = {
     {
       path: endpoint("/:username/following"),
       element: <FollowingModal />,
+    },
+    {
+      path: endpoint("/:username/edit"),
+      element: <EditProfileModal />,
     },
   ],
 };

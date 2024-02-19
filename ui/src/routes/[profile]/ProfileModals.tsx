@@ -153,3 +153,28 @@ export function FollowingModal() {
     </ModalProvider>
   );
 }
+
+function EditProfileModalContent() {
+  return <ModalContent></ModalContent>;
+}
+function _EditProfileModal() {
+  const navigate = useNavigate();
+  const { showOnModal, setOnDismiss } = useModalContext();
+  useEffect(() => {
+    showOnModal(<EditProfileModalContent />);
+    setOnDismiss(() => () => {
+      navigate("..");
+    });
+  }, [showOnModal, setOnDismiss, navigate]);
+
+  return null;
+}
+export function EditProfileModal() {
+  return (
+    <ModalProvider>
+      <_EditProfileModal />
+
+      <Modal />
+    </ModalProvider>
+  );
+}
