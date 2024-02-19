@@ -1,6 +1,5 @@
 import { PostWithAuthor } from "@spill-it/db/schema/drizzle";
-import { raise } from "@spill-it/utils/errors";
-import { safeAsync } from "@spill-it/utils/safe";
+import { ensureError, raise } from "@spill-it/utils/errors";
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
@@ -37,17 +36,21 @@ function DeletePostModalContent(props: {
 
   async function triggerDelete() {
     if (isDeleting) {
-      logger.warn("Cannot delete if already deleting...");
+      logger.warn("Cannot delete if already deleting; ignoring...");
       return;
     }
+
     setIsDeleting(true);
     makeModalCancellable(false);
+    try {
+      logger.debug("Deleting...");
+      await deletePost(postToDelete);
 
-    const deleteResult = await safeAsync(() => deletePost(postToDelete));
-    if (!deleteResult.success) {
+      showOnToast(<>Spill cleaned... 🧹</>, "critical");
+    } catch (caughtError) {
+      logger.error(ensureError(caughtError));
       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
     }
-
     setIsDeleting(false);
     makeModalCancellable(true);
 
