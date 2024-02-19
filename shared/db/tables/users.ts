@@ -3,7 +3,7 @@ import { randomChoice } from "@spill-it/utils/random";
 import { digits, letters } from "@spill-it/utils/strings";
 import { eq, sql } from "drizzle-orm";
 import { DBTransaction, db } from "../db";
-import { User, UsersTable } from "../schema/drizzle";
+import { User, UserDetails, UsersTable } from "../schema/drizzle";
 import { UserPublicWithFollows } from "../schema/zod";
 
 export async function readUser(id: User["id"]): Promise<User | null> {
@@ -90,6 +90,9 @@ export async function readUserWithFollowsViaUsername(
 }
 
 const charset = new Set([...letters, ...digits]);
+export function isUsernameCharsValid(username: User["username"]): boolean {
+  return username.split("").every((char) => charset.has(char));
+}
 async function _buildUsernameFromHandle(
   tx: DBTransaction,
   handleName: string,
@@ -136,6 +139,24 @@ export async function createUserFromGoogle(
 
     if (users.length > 1) raise("Multiple Google users inserted...?");
     const user = users[0] ?? raise("Inserted Google user does not exist...?");
+
+    return user;
+  });
+}
+
+export async function updateUser(
+  id: User["id"],
+  details: Partial<Omit<UserDetails, "id">>,
+): Promise<User> {
+  return await db.transaction(async (tx) => {
+    const users = await tx
+      .update(UsersTable)
+      .set(details)
+      .where(eq(UsersTable.id, id))
+      .returning();
+
+    if (users.length > 1) raise("Multiple users updated...?");
+    const user = users[0] ?? raise("Updated user does not exist...?");
 
     return user;
   });
