@@ -95,9 +95,14 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
     reflectFollowings();
   }, [reflectFollowings]);
 
+  const [cardStatus, setCardStatus] = useState<
+    "displaying" | "editing" | "processing"
+  >("displaying");
+
   return {
     ...{ profile, reflectProfile },
     ...{ followers, reflectFollowers },
     ...{ followings, reflectFollowings },
+    ...{ cardStatus, setCardStatus },
   };
 });

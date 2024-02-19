@@ -156,6 +156,29 @@ function FollowCountsNav() {
   );
 }
 
+function EditProfileButton() {
+  const { setCardStatus } = useProfileContext();
+
+  function showEditForm() {
+    logger.debug("Showing editing form...");
+    setCardStatus("editing");
+  }
+
+  return (
+    <button
+      onClick={showEditForm}
+      className={clsx(
+        "select-none",
+        "rounded-full px-6 py-3",
+        "font-bold tracking-wide",
+        "border border-white/25",
+        ...["transition", "enabled:active:scale-95 hover:bg-white/10"],
+      )}
+    >
+      Edit Profile
+    </button>
+  );
+}
 function UnfollowButton() {
   const { showOnToast } = useToastContext();
   const { profile, reflectFollowers } = useProfileContext();
@@ -285,21 +308,90 @@ function FollowButton() {
     </button>
   );
 }
-function FollowButtonDecider() {
+function ProfileActionButton() {
   const { user } = useUserContext();
   const { profile, followers } = useProfileContext();
 
   if (user === null) return null;
   if (profile === null) return null;
   if (followers === null) return null;
-  if (user.id === profile.id) return null; // Self-following is not a supported concept
+
+  if (user.id === profile.id) return <EditProfileButton />;
 
   const isFollowing = followers.some(({ follower }) => follower.id === user.id);
   if (isFollowing) return <UnfollowButton />;
+
   return <FollowButton />;
 }
 
-export function ProfileCard() {
+function EditingProfileCard() {
+  const { profile, setCardStatus } = useProfileContext();
+  const [newUsername, setNewUsername] = useState(profile?.username ?? "");
+  const [newHandleName, setNewHandleName] = useState(profile?.handleName ?? "");
+
+  if (profile === null) return null;
+  const { handleName, username, portraitUrl } = profile;
+
+  function cancel() {
+    logger.debug("Displaying profile info...");
+    setCardStatus("displaying");
+  }
+
+  return (
+    <form className="flex gap-6">
+      <fieldset>
+        {/* <h1 className="text-3xl font-bold">{handleName}</h1> */}
+        {/* <p className="text-lg text-white/50">{username}</p> */}
+        <FollowCountsNav />
+      </fieldset>
+
+      <fieldset className="flex items-start gap-3">
+        <button
+          type="button"
+          className={clsx(
+            "select-none",
+            "rounded-full px-6 py-3",
+            "disabled:opacity-50",
+            "font-bold tracking-wide",
+            ...[
+              "transition",
+              "enabled:active:scale-95",
+              "bg-fuchsia-500 enabled:hover:bg-fuchsia-600",
+            ],
+          )}
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          onClick={cancel}
+          className={clsx(
+            "select-none",
+            "rounded-full px-6 py-3",
+            "disabled:opacity-50",
+            "font-bold tracking-wide",
+            "border border-white/25",
+            ...[
+              "transition",
+              "enabled:active:scale-95 enabled:hover:bg-white/10",
+            ],
+          )}
+        >
+          Cancel
+        </button>
+      </fieldset>
+
+      <div className="ml-auto">
+        <img
+          src={portraitUrl}
+          alt={`Portrait of "${handleName}"`}
+          className="w-20 aspect-square rounded-full"
+        />
+      </div>
+    </form>
+  );
+}
+function DisplayProfileCard() {
   const { profile } = useProfileContext();
 
   if (profile === null) return null;
@@ -313,7 +405,7 @@ export function ProfileCard() {
         <FollowCountsNav />
       </header>
       <div>
-        <FollowButtonDecider />
+        <ProfileActionButton />
       </div>
       <div className="ml-auto">
         <img
@@ -324,4 +416,10 @@ export function ProfileCard() {
       </div>
     </article>
   );
+}
+export function ProfileCard() {
+  const { cardStatus } = useProfileContext();
+
+  if (cardStatus === "editing") return <EditingProfileCard />;
+  return <DisplayProfileCard />;
 }
