@@ -116,32 +116,6 @@ export const [useFeedContext, FeedProvider] = createNewContext(() => {
     setFeed(newPosts);
   }, [feed]);
 
-  const deletePost = useCallback(
-    async (post: PostWithAuthor) => {
-      const headerAuthResult = safe(() => getFromStorage("SESS"));
-      if (!headerAuthResult.success) {
-        throw headerAuthResult.error;
-      }
-      const headerAuth = headerAuthResult.value;
-
-      const fetchResult = await fetchAPI("/api/v0/posts", "DELETE", {
-        headers: { Authorization: headerAuth },
-        query: {
-          id: post.id,
-        },
-      });
-      /** Only proceed if the DELETE above succeeds... */
-      if (!fetchResult.success) {
-        throw fetchResult.error;
-      }
-
-      const deletedPostId = post.id;
-      const newFeed = feed.filter((post) => post.id !== deletedPostId); // Possible to be de-synced with database...
-      setFeed(newFeed);
-    },
-    [feed],
-  );
-
   /** Possible to be de-synced with database... */
   const removePostFromState = useCallback(
     (post: PostWithAuthor) => {
@@ -155,7 +129,7 @@ export const [useFeedContext, FeedProvider] = createNewContext(() => {
   return {
     feedStatus,
     ...{ feed, initializeFeed },
-    ...{ hasNextPosts, extendFeed, extendFeedWithRecent, deletePost },
+    ...{ hasNextPosts, extendFeed, extendFeedWithRecent },
     removePostFromState,
   };
 });
