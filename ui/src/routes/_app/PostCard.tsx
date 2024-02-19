@@ -1,10 +1,11 @@
 import { PostWithAuthor } from "@spill-it/db/schema/drizzle";
-import { raise } from "@spill-it/utils/errors";
-import { safeAsync } from "@spill-it/utils/safe";
+import { ensureError, raise } from "@spill-it/utils/errors";
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 import { BsTrashFill } from "react-icons/bs";
+import { Link } from "react-router-dom";
+import { endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
@@ -37,17 +38,21 @@ function DeletePostModalContent(props: {
 
   async function triggerDelete() {
     if (isDeleting) {
-      logger.warn("Cannot delete if already deleting...");
+      logger.warn("Cannot delete if already deleting; ignoring...");
       return;
     }
+
     setIsDeleting(true);
     makeModalCancellable(false);
+    try {
+      logger.debug("Deleting...");
+      await deletePost(postToDelete);
 
-    const deleteResult = await safeAsync(() => deletePost(postToDelete));
-    if (!deleteResult.success) {
+      showOnToast(<>Spill cleaned... 🧹</>, "critical");
+    } catch (caughtError) {
+      logger.error(ensureError(caughtError));
       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
     }
-
     setIsDeleting(false);
     makeModalCancellable(true);
 
@@ -120,6 +125,7 @@ export function PostCard(props: {
   const { showOnModal } = useModalContext();
   const { post, onDeleteEnd } = props;
   const { content, timestamp, author } = post;
+  const { username, handleName, portraitUrl } = author;
 
   const canDelete = user?.id === author?.id;
 
@@ -130,24 +136,42 @@ export function PostCard(props: {
   }
 
   return (
-    <article className="grid grid-cols-[auto_1fr_auto] gap-6 bg-white/10 p-6">
+    <article className="grid grid-cols-[auto_1fr_auto] gap-6 rounded p-6 bg-white/10">
       <div>
         <img
-          src={author.portraitUrl}
-          alt={`Portrait of "${author.handleName}"`}
+          src={portraitUrl}
+          alt={`Portrait of "${handleName}"`}
           className="w-9 aspect-square rounded-full"
         />
       </div>
+
       <div>
-        <header className="flex items-baseline gap-3">
-          {/* TODO Link to profile? */}
-          <h3 className="font-bold">{author.username}</h3>
-          <p className="text-white/50 text-xs uppercase tracking-wide">
-            {formatPostDate(timestamp)}
+        <header className="flex flex-wrap items-baseline gap-x-3">
+          <h3>
+            <Link
+              to={endpointWithParam("/:username", { username })}
+              className={clsx(
+                "font-bold",
+                "underline underline-offset-4",
+                ...["transition", "text-white hover:text-fuchsia-500"],
+              )}
+            >
+              {handleName}
+            </Link>
+          </h3>
+
+          <p className="text-white/50 select-none">
+            {username}
+            <> • </>
+            <span className="text-xs uppercase tracking-wide">
+              {formatPostDate(timestamp)}
+            </span>
           </p>
         </header>
+
         <p>{content}</p>
       </div>
+
       <div>
         {canDelete && (
           <button
