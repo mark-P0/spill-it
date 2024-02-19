@@ -25,7 +25,7 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
     }
     const headerAuth = headerAuthResult.value;
 
-    const fetchResult = await fetchAPI("/api/v0/posts", "GET", {
+    const fetchResult = await fetchAPI("/api/v0/posts/feed", "GET", {
       headers: { Authorization: headerAuth },
       query: {
         beforeISODateStr: tomorrow().toISOString(), // Use a "future" date to ensure most recent posts are also fetched
@@ -62,7 +62,7 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
       const headerAuth = headerAuthResult.value;
 
       if (!ctl.shouldProceed) return;
-      const nextPostsResult = await fetchAPI("/api/v0/posts", "GET", {
+      const nextPostsResult = await fetchAPI("/api/v0/posts/feed", "GET", {
         headers: { Authorization: headerAuth },
         query: {
           beforeISODateStr: date.toISOString(),
@@ -92,7 +92,7 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
     }
     const headerAuth = headerAuthResult.value;
 
-    const recentPostsResult = await fetchAPI("/api/v0/posts", "GET", {
+    const recentPostsResult = await fetchAPI("/api/v0/posts/feed", "GET", {
       headers: { Authorization: headerAuth },
       query: {
         beforeISODateStr: tomorrow().toISOString(),
