@@ -306,16 +306,36 @@ export function ProfileCard() {
   const { handleName, username, portraitUrl } = profile;
 
   return (
-    <article className="flex gap-6">
-      <header>
-        <h1 className="text-3xl font-bold">{handleName}</h1>
-        <p className="text-lg text-white/50">{username}</p>
+    <article className="grid grid-cols-[auto_1fr_auto] gap-x-6">
+      <div className="col-start-1">
+        <header>
+          <h1 className="text-3xl font-bold">{handleName}</h1>
+          <p className="text-lg text-white/50">{username}</p>
+        </header>
+      </div>
+
+      <div className="col-start-1 col-span-2 my-3">
+        <p className="bg-red-700">
+          {(() => {
+            // TODO Use profile data!
+            console.warn("Use profile data!");
+            const bio: string | null =
+              "Lorem ipsum dolor sit amet consectetur adipisicing elit. Provident asperiores minima quae minus numquam perferendis iusto excepturi";
+
+            return bio;
+          })()}
+        </p>
+      </div>
+
+      <div className="col-start-1 col-span-2">
         <FollowCountsNav />
-      </header>
-      <div>
+      </div>
+
+      <div className="col-start-2 row-start-1">
         <FollowButtonDecider />
       </div>
-      <div className="ml-auto">
+
+      <div className="col-start-3 row-start-1 row-span-2">
         <img
           src={portraitUrl}
           alt={`Portrait of "${handleName}"`}
