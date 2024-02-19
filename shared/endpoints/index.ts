@@ -148,6 +148,22 @@ export const endpointMap = {
       output: z.object({}),
     },
   },
+  "/api/v0/posts/feed": {
+    GET: {
+      input: z.object({
+        headers: z.object({
+          Authorization: z.string(),
+        }),
+        query: z.object({
+          beforeISODateStr: z.string().datetime().optional(),
+          size: z.coerce.number().max(POST_CT_CAP).optional(),
+        }),
+      }),
+      output: z.object({
+        data: z.array(zodPostWithAuthor),
+      }),
+    },
+  },
   "/api/v0/posts/:postId": {
     GET: {
       input: z.object({
