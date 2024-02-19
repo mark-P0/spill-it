@@ -160,9 +160,20 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
     [posts],
   );
 
+  /** Possible to be de-synced with database... */
+  const removePostFromState = useCallback(
+    (post: PostWithAuthor) => {
+      const deletedPostId = post.id;
+      const newPosts = posts.filter((post) => post.id !== deletedPostId);
+      setPosts(newPosts);
+    },
+    [posts],
+  );
+
   return {
     postsStatus,
     ...{ posts, initializePosts },
     ...{ hasNextPosts, extendPosts, extendPostsWithRecent, deletePost },
+    removePostFromState,
   };
 });
