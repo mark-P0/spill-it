@@ -10,6 +10,7 @@ import {
   LoadingCursorAbsoluteOverlay,
   LoadingIndicator,
 } from "../../_app/Loading";
+import { useUserContext } from "../../_app/UserContext";
 import { ModalContent } from "../../_app/modal/Modal";
 import { useModalContext } from "../../_app/modal/ModalContext";
 import { useToastContext } from "../../_app/toast/ToastContext";
@@ -113,6 +114,7 @@ function formatPostDate(date: PostWithAuthor["timestamp"]): string {
   });
 }
 function PostCard(props: { post: PostWithAuthor }) {
+  const { user } = useUserContext();
   const { showOnModal } = useModalContext();
   const { post } = props;
   const { content, timestamp, author } = post;
@@ -141,15 +143,17 @@ function PostCard(props: { post: PostWithAuthor }) {
         <p>{content}</p>
       </div>
       <div>
-        <button
-          onClick={promptDelete}
-          className={clsx(
-            "rounded-full p-2",
-            ...["transition", "hover:bg-white/25 active:scale-90"],
-          )}
-        >
-          <BsTrashFill />
-        </button>
+        {user?.id === author?.id && (
+          <button
+            onClick={promptDelete}
+            className={clsx(
+              "rounded-full p-2",
+              ...["transition", "hover:bg-white/25 active:scale-90"],
+            )}
+          >
+            <BsTrashFill />
+          </button>
+        )}
       </div>
     </article>
   );
