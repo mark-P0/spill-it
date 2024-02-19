@@ -10,8 +10,8 @@ import { LoadingCursorAbsoluteOverlay } from "../_app/Loading";
 import { Screen } from "../_app/Screen";
 import { useUserContext } from "../_app/UserContext";
 import { useToastContext } from "../_app/toast/ToastContext";
-import { PostsProvider, usePostsContext } from "./posts/PostsContext";
-import { PostsList } from "./posts/PostsList";
+import { FeedProvider, useFeedContext } from "./posts/PostsContext";
+import { Feed } from "./posts/PostsList";
 
 function ProfileButtonLink() {
   const { user } = useUserContext();
@@ -40,7 +40,7 @@ function ProfileButtonLink() {
 
 function PostForm() {
   const { showOnToast } = useToastContext();
-  const { extendPostsWithRecent } = usePostsContext();
+  const { extendFeedWithRecent } = useFeedContext();
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -76,7 +76,7 @@ function PostForm() {
     }
 
     logger.debug("Finishing submission...");
-    extendPostsWithRecent();
+    extendFeedWithRecent();
     showOnToast(<>Spilt! 😋</>, "info");
     setIsSubmitting(false);
     reset();
@@ -126,7 +126,7 @@ export function HomeScreen() {
   document.title = "Home 🍵 Spill.it!";
 
   return (
-    <PostsProvider>
+    <FeedProvider>
       <Screen className="grid auto-rows-min gap-6 p-6">
         <header className="flex items-center justify-between gap-3">
           <h1 className="text-3xl">Home</h1>
@@ -138,9 +138,9 @@ export function HomeScreen() {
         <main>
           <h2 className="sr-only">Spills 🍵</h2>
 
-          <PostsList />
+          <Feed />
         </main>
       </Screen>
-    </PostsProvider>
+    </FeedProvider>
   );
 }

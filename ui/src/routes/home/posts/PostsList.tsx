@@ -14,20 +14,20 @@ import { useUserContext } from "../../_app/UserContext";
 import { ModalContent } from "../../_app/modal/Modal";
 import { useModalContext } from "../../_app/modal/ModalContext";
 import { useToastContext } from "../../_app/toast/ToastContext";
-import { usePostsContext } from "./PostsContext";
+import { useFeedContext } from "./PostsContext";
 
-function PostsListEndObserver() {
+function FeedEndObserver() {
   const [divRef, isIntersecting] = useObserver<HTMLDivElement>();
 
-  const { extendPosts } = usePostsContext();
+  const { extendFeed } = useFeedContext();
   useEffect(() => {
     if (!isIntersecting) return;
     const ctl: Controller = { shouldProceed: true };
-    extendPosts(ctl);
+    extendFeed(ctl);
     return () => {
       ctl.shouldProceed = false;
     };
-  }, [isIntersecting, extendPosts]);
+  }, [isIntersecting, extendFeed]);
 
   return <div ref={divRef}>{isIntersecting && <LoadingIndicator />}</div>;
 }
@@ -35,7 +35,7 @@ function PostsListEndObserver() {
 function DeletePostModalContent(props: { postToDelete: PostWithAuthor }) {
   const { showOnToast } = useToastContext();
   const { closeModal, makeModalCancellable } = useModalContext();
-  const { deletePost } = usePostsContext();
+  const { deletePost } = useFeedContext();
   const { postToDelete } = props;
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -159,20 +159,19 @@ function PostCard(props: { post: PostWithAuthor }) {
   );
 }
 
-export function PostsList() {
+export function Feed() {
   const { showOnToast } = useToastContext();
-  const { postsStatus, posts, hasNextPosts, initializePosts } =
-    usePostsContext();
+  const { feedStatus, feed, hasNextPosts, initializeFeed } = useFeedContext();
 
   useEffect(() => {
-    if (postsStatus !== "error") return;
+    if (feedStatus !== "error") return;
     showOnToast(<>🥶 We spilt things along the way</>, "warn");
-  }, [postsStatus, showOnToast]);
-  if (postsStatus === "error") {
+  }, [feedStatus, showOnToast]);
+  if (feedStatus === "error") {
     return (
       <div className="grid place-items-center">
         <button
-          onClick={initializePosts}
+          onClick={initializeFeed}
           className={clsx(
             "select-none",
             "rounded-full px-6 py-3",
@@ -191,7 +190,7 @@ export function PostsList() {
     );
   }
 
-  if (postsStatus === "fetching") {
+  if (feedStatus === "fetching") {
     return (
       <div className="grid place-items-center">
         <LoadingIndicator />
@@ -200,14 +199,14 @@ export function PostsList() {
   }
   return (
     <ol className="grid gap-3">
-      {posts.map((post) => (
+      {feed.map((post) => (
         <li key={post.id}>
           <PostCard post={post} />
         </li>
       ))}
       <li className="grid place-items-center mt-6 mb-3">
         {hasNextPosts ? (
-          <PostsListEndObserver />
+          <FeedEndObserver />
         ) : (
           <p>
             <span className="italic tracking-wide text-white/50">
