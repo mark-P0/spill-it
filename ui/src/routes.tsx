@@ -5,7 +5,7 @@ import { z } from "zod";
 import {
   FollowersModal,
   FollowingModal,
-} from "./routes/[profile]/FollowsModals";
+} from "./routes/[profile]/ProfileModals";
 import { ProfileScreen } from "./routes/[profile]/ProfileScreen";
 import { ErrorScreen } from "./routes/_app/ErrorScreen";
 import { HomeScreen } from "./routes/home/HomeScreen";
