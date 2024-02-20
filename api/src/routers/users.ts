@@ -195,6 +195,18 @@ export const UsersRouter = Router();
     }
     const user = userResult.value;
 
+    {
+      const { username } = details;
+      if (username !== undefined) {
+        logger.info("Checking username against database...");
+        const existingUser = await readUserViaUsername(username);
+        if (existingUser !== null) {
+          logger.error("Username already taken");
+          return res.sendStatus(StatusCodes.BAD_REQUEST);
+        }
+      }
+    }
+
     logger.info("Updating user...");
     const updatedUserResult = await safeAsync(() =>
       updateUser(user.id, details),
