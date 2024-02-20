@@ -189,7 +189,6 @@ function EditProfileForm() {
       return;
     }
 
-    let isSuccess = true;
     setIsProcessing(true);
     makeModalCancellable(false);
     try {
@@ -213,11 +212,9 @@ function EditProfileForm() {
       });
       if (!result.success) raise("Failed updating profile info", result.error);
     } catch (caughtError) {
-      isSuccess = false;
       logger.error(ensureError(caughtError));
       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
-    }
-    if (!isSuccess) {
+
       setIsProcessing(false);
       makeModalCancellable(true);
       return;
