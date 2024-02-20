@@ -74,6 +74,19 @@ const drizzleZodUserPublic = drizzleZodUser.pick({
 export type DrizzleZodUserPublic = typeof drizzleZodUserPublic;
 export type UserPublic = z.infer<DrizzleZodUserPublic>;
 
+const drizzleZodUserPublicDetails = drizzleZodUser
+  .pick({
+    // id: true,
+    username: true,
+    handleName: true,
+    portraitUrl: true,
+    // googleId: true,
+    // loginCt: true,
+  })
+  .partial();
+export type DrizzleZodUserPublicDetails = typeof drizzleZodUserPublicDetails;
+export type UserPublicDetails = z.infer<DrizzleZodUserPublicDetails>;
+
 export const UsersRelations = relations(UsersTable, ({ many }) => ({
   followers: many(FollowsTable, { relationName: "following" }), // The followers of a user are users that are following them
   followings: many(FollowsTable, { relationName: "follower" }), // The followings of a user are users that they are a follower of

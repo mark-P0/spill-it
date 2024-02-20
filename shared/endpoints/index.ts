@@ -7,6 +7,7 @@ import {
   zodPostWithAuthor,
   zodSample,
   zodUserPublic,
+  zodUserPublicDetails,
 } from "@spill-it/db/schema/zod";
 import { POST_CT_CAP } from "@spill-it/db/utils/constants";
 import { z } from "zod";
@@ -29,6 +30,19 @@ export const endpointMap = {
       input: z.object({
         headers: z.object({
           Authorization: z.string(),
+        }),
+      }),
+      output: z.object({
+        data: zodUserPublic,
+      }),
+    },
+    PATCH: {
+      input: z.object({
+        headers: z.object({
+          Authorization: z.string(),
+        }),
+        body: z.object({
+          details: zodUserPublicDetails,
         }),
       }),
       output: z.object({
@@ -262,10 +276,11 @@ export const endpointMap = {
   },
 };
 
+// TODO Does not seem to work anymore...
 // TODO Type endpoint map statically? Would lose information about the schema...
 /** Check endpoint map via types */
 {
-  type Method = "GET" | "POST" | "PUT" | "DELETE"; // Add more types here to be checked
+  type Method = "GET" | "POST" | "PATCH" | "DELETE"; // Add more types here to be checked
   type Signature = {
     input: z.AnyZodObject;
     output: z.AnyZodObject;
