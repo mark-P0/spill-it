@@ -10,6 +10,8 @@ import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
+import { Toast } from "../_app/toast/Toast";
+import { ToastProvider, useToastContext } from "../_app/toast/ToastContext";
 import { useProfileContext } from "./ProfileContext";
 
 function UserCard(props: { user: UserPublic }) {
@@ -161,6 +163,7 @@ function EditProfileForm() {
   const navigate = useNavigate();
   const { profile } = useProfileContext();
   const { closeModal, makeModalCancellable } = useModalContext();
+  const { showOnToast } = useToastContext();
 
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -207,12 +210,18 @@ function EditProfileForm() {
     } catch (caughtError) {
       isSuccess = false;
       logger.error(ensureError(caughtError));
+      showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
     }
-    setIsProcessing(false);
-    makeModalCancellable(true);
-    if (!isSuccess) return;
+    if (!isSuccess) {
+      setIsProcessing(false);
+      makeModalCancellable(true);
+      return;
+    }
 
-    navigate(endpointWithParam("/:username", { username: newUsername }));
+    showOnToast(<>Success! ✨ Redirecting...</>, "info");
+    setTimeout(() => {
+      navigate(endpointWithParam("/:username", { username: newUsername }));
+    }, 2 * 1000);
   }
 
   const isFormUnedited =
@@ -294,7 +303,11 @@ function EditProfileForm() {
 function EditProfileModalContent() {
   return (
     <ModalContent>
-      <EditProfileForm />
+      <ToastProvider>
+        <EditProfileForm />
+
+        <Toast />
+      </ToastProvider>
     </ModalContent>
   );
 }
