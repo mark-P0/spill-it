@@ -157,8 +157,7 @@ export function FollowingModal() {
     </ModalProvider>
   );
 }
-
-function EditProfileModalContent() {
+function EditProfileForm() {
   const navigate = useNavigate();
   const { profile } = useProfileContext();
   const { closeModal, makeModalCancellable } = useModalContext();
@@ -220,77 +219,82 @@ function EditProfileModalContent() {
     newUsername === profile.username && newHandleName === profile.handleName;
 
   return (
-    <ModalContent>
-      <form onSubmit={save}>
-        <fieldset disabled={isProcessing} className="grid gap-6">
-          <header className="flex gap-6">
-            <h2 className="text-3xl font-bold">Edit Profile</h2>
+    <form onSubmit={save}>
+      <fieldset disabled={isProcessing} className="grid gap-6">
+        <header className="flex gap-6">
+          <h2 className="text-3xl font-bold">Edit Profile</h2>
 
-            <div className="ml-auto">
-              <button
-                type="button"
-                onClick={closeModal}
-                className={clsx(
-                  "w-9 aspect-square rounded-full p-2",
-                  ...[
-                    "transition",
-                    "disabled:opacity-50 enabled:active:scale-90 enabled:hover:bg-white/25 ",
-                  ],
-                )}
-              >
-                <BsXLg className="w-full h-full" />
-              </button>
-            </div>
-          </header>
-
-          <div className="grid gap-3">
-            <label className="grid gap-1 group/input">
-              <span className="text-xs uppercase tracking-wide transition text-white/50 group-focus-within/input:text-white">
-                Username
-              </span>
-              <input
-                type="text"
-                name="username"
-                value={newUsername}
-                onChange={(event) => setNewUsername(event.target.value)}
-                className="rounded px-2 py-1 bg-transparent transition border border-white/25 group-focus-within/input:text-white"
-              />
-            </label>
-
-            <label className="grid gap-1 group/input">
-              <span className="text-xs uppercase tracking-wide transition text-white/50 group-focus-within/input:text-white">
-                Handle Name
-              </span>
-              <input
-                type="text"
-                name="handleName"
-                value={newHandleName}
-                onChange={(event) => setNewHandleName(event.target.value)}
-                className="rounded px-2 py-1 bg-transparent transition border border-white/25 group-focus-within/input:text-white"
-              />
-            </label>
-          </div>
-
-          <footer className="flex flex-row-reverse gap-3">
+          <div className="ml-auto">
             <button
-              disabled={isFormUnedited}
+              type="button"
+              onClick={closeModal}
               className={clsx(
-                "select-none",
-                "rounded-full px-6 py-3",
-                "font-bold tracking-wide",
+                "w-9 aspect-square rounded-full p-2",
                 ...[
                   "transition",
-                  "disabled:opacity-50",
-                  "enabled:active:scale-95",
-                  "bg-fuchsia-500 enabled:hover:bg-fuchsia-600",
+                  "disabled:opacity-50 enabled:active:scale-90 enabled:hover:bg-white/25 ",
                 ],
               )}
             >
-              Save
+              <BsXLg className="w-full h-full" />
             </button>
-          </footer>
-        </fieldset>
-      </form>
+          </div>
+        </header>
+
+        <div className="grid gap-3">
+          <label className="grid gap-1 group/input">
+            <span className="text-xs uppercase tracking-wide transition text-white/50 group-focus-within/input:text-white">
+              Username
+            </span>
+            <input
+              type="text"
+              name="username"
+              value={newUsername}
+              onChange={(event) => setNewUsername(event.target.value)}
+              className="rounded px-2 py-1 bg-transparent transition border border-white/25 group-focus-within/input:text-white"
+            />
+          </label>
+
+          <label className="grid gap-1 group/input">
+            <span className="text-xs uppercase tracking-wide transition text-white/50 group-focus-within/input:text-white">
+              Handle Name
+            </span>
+            <input
+              type="text"
+              name="handleName"
+              value={newHandleName}
+              onChange={(event) => setNewHandleName(event.target.value)}
+              className="rounded px-2 py-1 bg-transparent transition border border-white/25 group-focus-within/input:text-white"
+            />
+          </label>
+        </div>
+
+        <footer className="flex flex-row-reverse gap-3">
+          <button
+            disabled={isFormUnedited}
+            className={clsx(
+              "select-none",
+              "rounded-full px-6 py-3",
+              "font-bold tracking-wide",
+              ...[
+                "transition",
+                "disabled:opacity-50",
+                "enabled:active:scale-95",
+                "bg-fuchsia-500 enabled:hover:bg-fuchsia-600",
+              ],
+            )}
+          >
+            Save
+          </button>
+        </footer>
+      </fieldset>
+    </form>
+  );
+}
+function EditProfileModalContent() {
+  return (
+    <ModalContent>
+      <EditProfileForm />
     </ModalContent>
   );
 }
