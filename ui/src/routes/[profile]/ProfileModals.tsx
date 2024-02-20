@@ -159,6 +159,7 @@ export function FollowingModal() {
 }
 
 function EditProfileModalContent() {
+  const navigate = useNavigate();
   const { profile } = useProfileContext();
   const { closeModal, makeModalCancellable } = useModalContext();
 
@@ -212,7 +213,7 @@ function EditProfileModalContent() {
     makeModalCancellable(true);
     if (!isSuccess) return;
 
-    closeModal();
+    navigate(endpointWithParam("/:username", { username: newUsername }));
   }
 
   const isFormUnedited =
