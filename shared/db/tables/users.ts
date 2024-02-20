@@ -5,6 +5,7 @@ import { eq, sql } from "drizzle-orm";
 import { DBTransaction, db } from "../db";
 import { User, UserDetails, UsersTable } from "../schema/drizzle";
 import { UserPublicWithFollows } from "../schema/zod";
+import { USERNAME_LEN_MAX, USERNAME_LEN_MIN } from "../utils/constants";
 
 export async function readUser(id: User["id"]): Promise<User | null> {
   const users = await db
@@ -90,18 +91,27 @@ export async function readUserWithFollowsViaUsername(
 }
 
 const charset = new Set([...letters, ...digits]);
-async function _buildUsernameFromHandle(
-  tx: DBTransaction,
-  handleName: string,
-  maxLen = 16,
-  maxRetries = 8,
-): Promise<string> {
-  const base = handleName
+function buildUsernameBase(handleName: string): string {
+  let base = handleName
     .toLowerCase()
     .split("")
     .filter((char) => charset.has(char))
-    .slice(0, maxLen - 3) // Allot spaces at the end for random suffix
     .join("");
+
+  const missingCharCt = USERNAME_LEN_MIN - base.length;
+  for (let _ = 0; _ < missingCharCt; _++) {
+    base += randomChoice(digits); // Pad base username until it reaches minimum length
+  }
+  base = base.slice(0, USERNAME_LEN_MAX - 3); // Allot spaces at the end for random suffix
+
+  return base;
+}
+async function _buildUsernameFromHandle(
+  tx: DBTransaction,
+  handleName: string,
+  maxRetries = 8,
+): Promise<string> {
+  const base = buildUsernameBase(handleName);
 
   let retryCt = 0;
   let username = base;
@@ -112,12 +122,13 @@ async function _buildUsernameFromHandle(
     const existingUser = await _readUserViaUsername(tx, username);
     if (existingUser === null) break;
 
-    if (username.length === maxLen) username = base; // Restart the process when max length has been reached and username still is not unique
+    if (username.length === USERNAME_LEN_MAX) username = base; // Restart the process when max length has been reached and username still is not unique
     username += randomChoice(digits);
   }
 
   return username;
 }
+
 export async function createUserFromGoogle(
   googleId: string,
   handleName: string,
