@@ -200,7 +200,7 @@ export const UsersRouter = Router();
       if (username !== undefined) {
         logger.info("Checking username against database...");
         const existingUser = await readUserViaUsername(username);
-        if (existingUser !== null) {
+        if (existingUser !== null && existingUser.id !== user.id) {
           logger.error("Username already taken");
           return res.sendStatus(StatusCodes.BAD_REQUEST);
         }
