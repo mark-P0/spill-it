@@ -1,4 +1,8 @@
-import { readUserViaUsername, updateUser } from "@spill-it/db/tables/users";
+import {
+  isUsernameCharsValid,
+  readUserViaUsername,
+  updateUser,
+} from "@spill-it/db/tables/users";
 import {
   HANDLE_LEN_MAX,
   HANDLE_LEN_MIN,
@@ -154,6 +158,7 @@ export const UsersRouter = Router();
         .string()
         .min(USERNAME_LEN_MIN)
         .max(USERNAME_LEN_MAX)
+        .refine(isUsernameCharsValid, "Invalid username characters")
         .optional();
       username satisfies z.infer<typeof schema>;
 

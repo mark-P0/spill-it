@@ -91,6 +91,9 @@ export async function readUserWithFollowsViaUsername(
 }
 
 const charset = new Set([...letters, ...digits]);
+export function isUsernameCharsValid(username: User["username"]): boolean {
+  return username.split("").every((char) => charset.has(char));
+}
 function buildUsernameBase(handleName: string): string {
   let base = handleName
     .toLowerCase()
