@@ -5,7 +5,9 @@ import { FormEvent, useEffect, useState } from "react";
 import { BsXLg } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
+import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
+import { getFromStorage } from "../../utils/storage";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
 import { useProfileContext } from "./ProfileContext";
@@ -156,25 +158,22 @@ export function FollowingModal() {
   );
 }
 
-async function sleep(seconds: number) {
-  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
-}
 function EditProfileModalContent() {
   const { profile } = useProfileContext();
   const { closeModal, makeModalCancellable } = useModalContext();
 
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const [username, setUsername] = useState("");
+  const [newUsername, setNewUsername] = useState("");
   useEffect(() => {
     if (profile === null) return;
-    setUsername(profile.username);
+    setNewUsername(profile.username);
   }, [profile]);
 
-  const [handleName, setHandleName] = useState("");
+  const [newHandleName, setNewHandleName] = useState("");
   useEffect(() => {
     if (profile === null) return;
-    setHandleName(profile.handleName);
+    setNewHandleName(profile.handleName);
   }, [profile]);
 
   if (profile === null) return null;
@@ -182,12 +181,29 @@ function EditProfileModalContent() {
   async function save(event: FormEvent) {
     event.preventDefault();
 
+    if (profile === null) return;
+
     let isSuccess = true;
     setIsProcessing(true);
     makeModalCancellable(false);
     try {
-      await sleep(1);
-      raise("TODO");
+      const headerAuth = getFromStorage("SESS");
+
+      let username: string | undefined;
+      if (newUsername !== profile.username && newUsername !== "") {
+        username = newUsername;
+      }
+
+      let handleName: string | undefined;
+      if (newHandleName !== profile.handleName && newHandleName !== "") {
+        handleName = newHandleName;
+      }
+
+      const result = await fetchAPI("/api/v0/users/me", "PATCH", {
+        headers: { Authorization: headerAuth },
+        body: { details: { username, handleName } },
+      });
+      if (!result.success) raise("Failed updating profile info", result.error);
     } catch (caughtError) {
       isSuccess = false;
       logger.error(ensureError(caughtError));
@@ -200,7 +216,7 @@ function EditProfileModalContent() {
   }
 
   const isFormUnedited =
-    username === profile.username && handleName === profile.handleName;
+    newUsername === profile.username && newHandleName === profile.handleName;
 
   return (
     <ModalContent>
@@ -234,8 +250,8 @@ function EditProfileModalContent() {
               <input
                 type="text"
                 name="username"
-                value={username}
-                onChange={(event) => setUsername(event.target.value)}
+                value={newUsername}
+                onChange={(event) => setNewUsername(event.target.value)}
                 className="rounded px-2 py-1 bg-transparent transition border border-white/25 group-focus-within/input:text-white"
               />
             </label>
@@ -247,8 +263,8 @@ function EditProfileModalContent() {
               <input
                 type="text"
                 name="handleName"
-                value={handleName}
-                onChange={(event) => setHandleName(event.target.value)}
+                value={newHandleName}
+                onChange={(event) => setNewHandleName(event.target.value)}
                 className="rounded px-2 py-1 bg-transparent transition border border-white/25 group-focus-within/input:text-white"
               />
             </label>
