@@ -1,4 +1,10 @@
 import { readUserViaUsername, updateUser } from "@spill-it/db/tables/users";
+import {
+  HANDLE_LEN_MAX,
+  HANDLE_LEN_MIN,
+  USERNAME_LEN_MAX,
+  USERNAME_LEN_MIN,
+} from "@spill-it/db/utils/constants";
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
 import { removeFalseish } from "@spill-it/utils/falseish";
@@ -137,6 +143,44 @@ export const UsersRouter = Router();
     }
     const input = inputParsing.data;
 
+    // TODO Set these on endpoint schema?
+    logger.info("Checking provided details...");
+    const { details } = input.body;
+    {
+      logger.info("Checking username...");
+      const { username } = details;
+
+      const schema = z
+        .string()
+        .min(USERNAME_LEN_MIN)
+        .max(USERNAME_LEN_MAX)
+        .optional();
+      username satisfies z.infer<typeof schema>;
+
+      const parsing = schema.safeParse(username);
+      if (!parsing.success) {
+        logger.error(formatError(parsing.error));
+        return res.sendStatus(StatusCodes.BAD_REQUEST);
+      }
+    }
+    {
+      logger.info("Checking handle name...");
+      const { handleName } = details;
+
+      const schema = z
+        .string()
+        .min(HANDLE_LEN_MIN)
+        .max(HANDLE_LEN_MAX)
+        .optional();
+      handleName satisfies z.infer<typeof schema>;
+
+      const parsing = schema.safeParse(handleName);
+      if (!parsing.success) {
+        logger.error(formatError(parsing.error));
+        return res.sendStatus(StatusCodes.BAD_REQUEST);
+      }
+    }
+
     logger.info("Converting header authorization to user info...");
     const { headers } = input;
     const userResult = await convertHeaderAuthToUser(headers.Authorization);
@@ -147,7 +191,6 @@ export const UsersRouter = Router();
     const user = userResult.value;
 
     logger.info("Updating user...");
-    const { details } = input.body;
     const updatedUserResult = await safeAsync(() =>
       updateUser(user.id, details),
     );
