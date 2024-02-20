@@ -184,12 +184,16 @@ function EditProfileForm() {
   async function save(event: FormEvent) {
     event.preventDefault();
 
-    if (profile === null) return;
+    if (profile === null) {
+      logger.warn("Profile not available; ignoring update...");
+      return;
+    }
 
     let isSuccess = true;
     setIsProcessing(true);
     makeModalCancellable(false);
     try {
+      logger.debug("Retrieving session info...");
       const headerAuth = getFromStorage("SESS");
 
       let username: string | undefined;
@@ -202,6 +206,7 @@ function EditProfileForm() {
         handleName = newHandleName;
       }
 
+      logger.debug("Requesting update...");
       const result = await fetchAPI("/api/v0/users/me", "PATCH", {
         headers: { Authorization: headerAuth },
         body: { details: { username, handleName } },
@@ -218,6 +223,7 @@ function EditProfileForm() {
       return;
     }
 
+    logger.debug("Finalizing update...");
     showOnToast(<>Success! ✨ Redirecting...</>, "info");
     setTimeout(() => {
       navigate(endpointWithParam("/:username", { username: newUsername }));
