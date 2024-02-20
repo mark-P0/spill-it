@@ -224,7 +224,7 @@ function EditProfileForm() {
     showOnToast(<>Success! ✨ Redirecting...</>, "info");
     setTimeout(() => {
       navigate(endpointWithParam("/:username", { username: newUsername }));
-    }, 2 * 1000);
+    }, 1 * 1000);
   }
 
   const isFormUnedited =
