@@ -50,6 +50,7 @@ export type DrizzleZodSample = typeof drizzleZodSample;
 export type Sample = typeof SamplesTable.$inferSelect;
 export type SampleDetails = typeof SamplesTable.$inferInsert;
 
+// TODO Reflect validations? Via `varchar()`? `CONSTRAINT` seems to be best and least intrusive but is not yet supported by Drizzle...
 export const UsersTable = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   username: text("username").notNull().unique(),
@@ -73,6 +74,19 @@ const drizzleZodUserPublic = drizzleZodUser.pick({
 });
 export type DrizzleZodUserPublic = typeof drizzleZodUserPublic;
 export type UserPublic = z.infer<DrizzleZodUserPublic>;
+
+const drizzleZodUserPublicDetails = drizzleZodUser
+  .pick({
+    // id: true,
+    username: true,
+    handleName: true,
+    portraitUrl: true,
+    // googleId: true,
+    // loginCt: true,
+  })
+  .partial();
+export type DrizzleZodUserPublicDetails = typeof drizzleZodUserPublicDetails;
+export type UserPublicDetails = z.infer<DrizzleZodUserPublicDetails>;
 
 export const UsersRelations = relations(UsersTable, ({ many }) => ({
   followers: many(FollowsTable, { relationName: "following" }), // The followers of a user are users that are following them

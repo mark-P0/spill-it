@@ -9,6 +9,7 @@ import {
   DrizzleZodSessionWithUser,
   DrizzleZodUser,
   DrizzleZodUserPublic,
+  DrizzleZodUserPublicDetails,
   Sample,
 } from "./drizzle";
 
@@ -25,11 +26,10 @@ export const zodUser: DrizzleZodUser = z.object({
   id: z.string().uuid(),
   username: z.string(),
   handleName: z.string(),
-  portraitUrl: z.string(),
+  portraitUrl: z.string().url(),
   googleId: z.string().nullable(),
   loginCt: z.number(),
 });
-
 export const zodUserPublic: DrizzleZodUserPublic = zodUser.pick({
   id: true,
   username: true,
@@ -38,6 +38,16 @@ export const zodUserPublic: DrizzleZodUserPublic = zodUser.pick({
   // googleId: true,
   loginCt: true,
 });
+export const zodUserPublicDetails: DrizzleZodUserPublicDetails = zodUser
+  .pick({
+    // id: true,
+    username: true,
+    handleName: true,
+    portraitUrl: true,
+    // googleId: true,
+    // loginCt: true,
+  })
+  .partial();
 
 export const zodFollow: DrizzleZodFollow = z.object({
   id: z.string().uuid(),
