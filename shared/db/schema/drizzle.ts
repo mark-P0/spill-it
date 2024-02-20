@@ -50,6 +50,7 @@ export type DrizzleZodSample = typeof drizzleZodSample;
 export type Sample = typeof SamplesTable.$inferSelect;
 export type SampleDetails = typeof SamplesTable.$inferInsert;
 
+// TODO Reflect validations? Via `varchar()`? `CONSTRAINT` seems to be best and least intrusive but is not yet supported by Drizzle...
 export const UsersTable = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   username: text("username").notNull().unique(),
