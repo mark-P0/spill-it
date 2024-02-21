@@ -1,12 +1,32 @@
 import clsx from "clsx";
-import { useEffect } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { BsXLg } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
+import { useProfileContext } from "./ProfileContext";
 
 function EditProfileForm() {
+  const { profile } = useProfileContext();
   const { closeModal } = useModalContext();
+
+  const [newHandleName, setNewHandleName] = useState("");
+  useEffect(() => {
+    if (profile === null) return;
+    setNewHandleName(profile.handleName);
+  }, [profile]);
+  function reflectNewHandleName(event: ChangeEvent<HTMLInputElement>) {
+    setNewHandleName(event.target.value);
+  }
+
+  const [newUsername, setNewUsername] = useState("");
+  useEffect(() => {
+    if (profile === null) return;
+    setNewUsername(profile.username);
+  }, [profile]);
+  function reflectNewUsername(event: ChangeEvent<HTMLInputElement>) {
+    setNewUsername(event.target.value);
+  }
 
   return (
     <form>
@@ -50,6 +70,8 @@ function EditProfileForm() {
             <input
               type="text"
               name="handleName"
+              value={newHandleName}
+              onChange={reflectNewHandleName}
               className={clsx(
                 "bg-transparent",
                 "border border-white/25 rounded px-2 py-1",
@@ -72,6 +94,8 @@ function EditProfileForm() {
             <input
               type="text"
               name="username"
+              value={newUsername}
+              onChange={reflectNewUsername}
               className={clsx(
                 "bg-transparent",
                 "border border-white/25 rounded px-2 py-1",
