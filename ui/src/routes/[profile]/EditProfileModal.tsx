@@ -6,6 +6,7 @@ import clsx from "clsx";
 import {
   ChangeEvent,
   ComponentProps,
+  FormEvent,
   useEffect,
   useRef,
   useState,
@@ -106,7 +107,8 @@ function EditProfileForm() {
   }
 
   const [isProcessing, setIsProcessing] = useState(false);
-  async function save() {
+  async function save(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     if (profile === null) {
       logger.warn("Profile not available; ignoring update...");
       return;
@@ -157,7 +159,7 @@ function EditProfileForm() {
     !isFormEmpty;
 
   return (
-    <form className="relative">
+    <form onSubmit={save} className="relative">
       <fieldset disabled={isProcessing} className="grid gap-6">
         <header className="flex items-center gap-6">
           <h2 className="text-3xl font-bold">Edit Profile</h2>
@@ -238,9 +240,7 @@ function EditProfileForm() {
 
         <footer className="flex flex-row-reverse">
           <button
-            type="button"
             disabled={!canSave}
-            onClick={save}
             className={clsx(
               "select-none",
               "rounded-full px-6 py-3",
