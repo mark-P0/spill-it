@@ -1,15 +1,19 @@
+import { User } from "@spill-it/db/schema/drizzle";
 import { ensureError, raise } from "@spill-it/utils/errors";
 import { sleep } from "@spill-it/utils/sleep";
+import { digits, letters } from "@spill-it/utils/strings";
 import clsx from "clsx";
 import {
   ChangeEvent,
   ComponentProps,
+  useCallback,
   useEffect,
   useRef,
   useState,
 } from "react";
 import { BsXLg } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import { z } from "zod";
 import { endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
@@ -43,28 +47,94 @@ function Input(
   return <input {...attributes} ref={inputRef} />;
 }
 
+/** `useCallback()` hell... */
+function useFieldState<T, U>(
+  defaultValue: T,
+  defaultValidity: U,
+  validator: (newValue: T) => U,
+): [T, U, (newValue: T) => void] {
+  const [value, setValue] = useState(defaultValue);
+  const [validity, setValidity] = useState(defaultValidity);
+
+  const updateValue = useCallback(
+    (newValue: T) => {
+      setValue(newValue);
+      setValidity(validator(newValue));
+    },
+    [validator],
+  );
+
+  return [value, validity, updateValue];
+}
+
+// TODO Reuse these from DB package?
+const charset = new Set([...letters, ...digits]);
+function isUsernameCharsValid(username: User["username"]): boolean {
+  return username.split("").every((char) => charset.has(char));
+}
+
+const HANDLE_LEN_MIN = 1;
+const HANDLE_LEN_MAX = 24;
+const zodHandle = z.string().min(HANDLE_LEN_MIN).max(HANDLE_LEN_MAX).optional();
+
+const USERNAME_LEN_MIN = 6;
+const USERNAME_LEN_MAX = 18;
+const zodUsername = z
+  .string()
+  .min(USERNAME_LEN_MIN)
+  .max(USERNAME_LEN_MAX)
+  .refine(isUsernameCharsValid, "Invalid username characters")
+  .optional();
+
 function EditProfileForm() {
   const navigate = useNavigate();
   const { profile } = useProfileContext();
   const { closeModal, makeModalCancellable } = useModalContext();
   const { showOnToast } = useToastContext();
 
-  const [newHandleName, setNewHandleName] = useState("");
+  const newHandleNameDefault: string = "";
+  const newHandleNameValidityDefault: string = "";
+  const [newHandleName, newHandleNameValidity, updateNewHandleName] =
+    useFieldState(
+      newHandleNameDefault,
+      newHandleNameValidityDefault,
+      useCallback((value) => {
+        const parsing = zodHandle.safeParse(value);
+        if (!parsing.success) {
+          return parsing.error.issues[0]?.message ?? "Invalid handle name";
+        }
+
+        return "";
+      }, []),
+    );
   useEffect(() => {
     if (profile === null) return;
-    setNewHandleName(profile.handleName);
-  }, [profile]);
+    updateNewHandleName(profile.handleName);
+  }, [profile, updateNewHandleName]);
   function reflectNewHandleName(event: ChangeEvent<HTMLInputElement>) {
-    setNewHandleName(event.target.value);
+    updateNewHandleName(event.target.value);
   }
 
-  const [newUsername, setNewUsername] = useState("");
+  const newUsernameDefault: string = "";
+  const newUsernameValidityDefault: string = "";
+  const [newUsername, newUsernameValidity, updateNewUsername] = useFieldState(
+    newUsernameDefault,
+    newUsernameValidityDefault,
+    useCallback((value) => {
+      const parsing = zodUsername.safeParse(value);
+      if (!parsing.success) {
+        return parsing.error.issues[0]?.message ?? "Invalid handle name";
+      }
+
+      return "";
+    }, []),
+  );
   useEffect(() => {
     if (profile === null) return;
-    setNewUsername(profile.username);
-  }, [profile]);
+    updateNewUsername(profile.username);
+  }, [profile, updateNewUsername]);
   function reflectNewUsername(event: ChangeEvent<HTMLInputElement>) {
-    setNewUsername(event.target.value);
+    updateNewUsername(event.target.value);
   }
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -162,6 +232,8 @@ function EditProfileForm() {
               name="handleName"
               value={newHandleName}
               onChange={reflectNewHandleName}
+              validity={newHandleNameValidity}
+              reportValidity
               className={clsx(
                 "bg-transparent",
                 "border border-white/25 rounded px-2 py-1",
@@ -186,6 +258,8 @@ function EditProfileForm() {
               name="username"
               value={newUsername}
               onChange={reflectNewUsername}
+              validity={newUsernameValidity}
+              reportValidity
               className={clsx(
                 "bg-transparent",
                 "border border-white/25 rounded px-2 py-1",
