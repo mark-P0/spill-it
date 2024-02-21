@@ -1,9 +1,12 @@
+import { User } from "@spill-it/db/schema/drizzle";
 import { ensureError, raise } from "@spill-it/utils/errors";
 import { sleep } from "@spill-it/utils/sleep";
+import { digits, letters } from "@spill-it/utils/strings";
 import clsx from "clsx";
 import { ChangeEvent, useEffect, useState } from "react";
 import { BsXLg } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import { z } from "zod";
 import { endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
@@ -14,6 +17,25 @@ import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
 import { Toast } from "../_app/toast/Toast";
 import { ToastProvider, useToastContext } from "../_app/toast/ToastContext";
 import { useProfileContext } from "./ProfileContext";
+
+// TODO Reuse these from DB package?
+const charset = new Set([...letters, ...digits]);
+function isUsernameCharsValid(username: User["username"]): boolean {
+  return username.split("").every((char) => charset.has(char));
+}
+
+const HANDLE_LEN_MIN = 1;
+const HANDLE_LEN_MAX = 24;
+const zodHandle = z.string().min(HANDLE_LEN_MIN).max(HANDLE_LEN_MAX).optional();
+
+const USERNAME_LEN_MIN = 6;
+const USERNAME_LEN_MAX = 18;
+const zodUsername = z
+  .string()
+  .min(USERNAME_LEN_MIN)
+  .max(USERNAME_LEN_MAX)
+  .refine(isUsernameCharsValid, "Invalid username characters")
+  .optional();
 
 function EditProfileForm() {
   const navigate = useNavigate();
@@ -27,7 +49,15 @@ function EditProfileForm() {
     setNewHandleName(profile.handleName);
   }, [profile]);
   function reflectNewHandleName(event: ChangeEvent<HTMLInputElement>) {
-    setNewHandleName(event.target.value);
+    const input = event.target;
+    setNewHandleName(input.value);
+
+    const parsing = zodHandle.safeParse(input.value);
+    const validity = parsing.success
+      ? ""
+      : parsing.error.issues[0]?.message ?? "Invalid handle name";
+    input.setCustomValidity(validity);
+    input.reportValidity(); // Use?
   }
 
   const [newUsername, setNewUsername] = useState("");
@@ -36,7 +66,15 @@ function EditProfileForm() {
     setNewUsername(profile.username);
   }, [profile]);
   function reflectNewUsername(event: ChangeEvent<HTMLInputElement>) {
-    setNewUsername(event.target.value);
+    const input = event.target;
+    setNewUsername(input.value);
+
+    const parsing = zodUsername.safeParse(input.value);
+    const validity = parsing.success
+      ? ""
+      : parsing.error.issues[0]?.message ?? "Invalid username";
+    input.setCustomValidity(validity);
+    input.reportValidity(); // Use?
   }
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -120,14 +158,18 @@ function EditProfileForm() {
           <label className="select-none grid gap-1 group/handle">
             <span
               className={clsx(
+                "flex justify-between items-center gap-3",
                 "text-xs uppercase tracking-wide",
                 ...[
                   "transition",
-                  "text-white/50 group-focus-within/handle:text-white",
+                  "text-white/50 group-focus-within/handle:text-white group-has-[:invalid]/handle:text-red-500",
                 ],
               )}
             >
-              Handle Name
+              <span>Handle Name</span>
+              <span>
+                {newHandleName.length}/{HANDLE_LEN_MAX}
+              </span>
             </span>
             <input
               type="text"
@@ -136,7 +178,11 @@ function EditProfileForm() {
               onChange={reflectNewHandleName}
               className={clsx(
                 "bg-transparent",
-                "border border-white/25 rounded px-2 py-1",
+                "border rounded px-2 py-1",
+                ...[
+                  "transition",
+                  "border-white/25 group-focus-within/handle:border-white group-has-[:invalid]/handle:border-red-500",
+                ],
               )}
             />
           </label>
@@ -144,14 +190,18 @@ function EditProfileForm() {
           <label className="select-none grid gap-1 group/username">
             <span
               className={clsx(
+                "flex justify-between items-center gap-3",
                 "text-xs uppercase tracking-wide",
                 ...[
                   "transition",
-                  "text-white/50 group-focus-within/username:text-white",
+                  "text-white/50 group-focus-within/username:text-white group-has-[:invalid]/username:text-red-500",
                 ],
               )}
             >
-              Username
+              <span>Username</span>
+              <span>
+                {newUsername.length}/{USERNAME_LEN_MAX}
+              </span>
             </span>
             <input
               type="text"
@@ -160,7 +210,11 @@ function EditProfileForm() {
               onChange={reflectNewUsername}
               className={clsx(
                 "bg-transparent",
-                "border border-white/25 rounded px-2 py-1",
+                "border rounded px-2 py-1",
+                ...[
+                  "transition",
+                  "border-white/25 group-focus-within/username:border-white group-has-[:invalid]/username:border-red-500",
+                ],
               )}
             />
           </label>
