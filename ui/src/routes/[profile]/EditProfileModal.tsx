@@ -1,7 +1,13 @@
 import { ensureError, raise } from "@spill-it/utils/errors";
 import { sleep } from "@spill-it/utils/sleep";
 import clsx from "clsx";
-import { ChangeEvent, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  ComponentProps,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { BsXLg } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
@@ -14,6 +20,28 @@ import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
 import { Toast } from "../_app/toast/Toast";
 import { ToastProvider, useToastContext } from "../_app/toast/ToastContext";
 import { useProfileContext } from "./ProfileContext";
+
+// TODO Allow providing refs?
+/** Allow specifying custom validity(ies) as props */
+function Input(
+  props: Omit<ComponentProps<"input">, "ref"> & {
+    validity?: string;
+    reportValidity?: boolean;
+  },
+) {
+  const { validity, reportValidity, ...attributes } = props;
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  useEffect(() => {
+    const input = inputRef.current;
+    if (input === null) return;
+
+    input.setCustomValidity(validity ?? "");
+    if (reportValidity) input.reportValidity();
+  }, [validity, reportValidity]);
+
+  return <input {...attributes} ref={inputRef} />;
+}
 
 function EditProfileForm() {
   const navigate = useNavigate();
@@ -129,7 +157,7 @@ function EditProfileForm() {
             >
               Handle Name
             </span>
-            <input
+            <Input
               type="text"
               name="handleName"
               value={newHandleName}
@@ -153,7 +181,7 @@ function EditProfileForm() {
             >
               Username
             </span>
-            <input
+            <Input
               type="text"
               name="username"
               value={newUsername}
