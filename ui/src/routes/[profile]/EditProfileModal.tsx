@@ -1,12 +1,13 @@
 import { ensureError, raise } from "@spill-it/utils/errors";
-import { randomChoice } from "@spill-it/utils/random";
 import { sleep } from "@spill-it/utils/sleep";
 import clsx from "clsx";
 import { ChangeEvent, useEffect, useState } from "react";
 import { BsXLg } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
+import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
+import { getFromStorage } from "../../utils/storage";
 import { LoadingCursorAbsoluteOverlay } from "../_app/Loading";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
@@ -48,14 +49,23 @@ function EditProfileForm() {
     setIsProcessing(true);
     makeModalCancellable(false);
     try {
-      // DELETEME
-      {
-        await sleep(3);
-        randomChoice([
-          () => console.warn("save success"),
-          () => raise("save failed"),
-        ])();
+      logger.debug("Retrieving session info...");
+      const headerAuth = getFromStorage("SESS");
+
+      logger.debug("Requesting update...");
+      let username: string | undefined;
+      if (newUsername !== profile.username && newUsername !== "") {
+        username = newUsername;
       }
+      let handleName: string | undefined;
+      if (newHandleName !== profile.handleName && newHandleName !== "") {
+        handleName = newHandleName;
+      }
+      const result = await fetchAPI("/api/v0/users/me", "PATCH", {
+        headers: { Authorization: headerAuth },
+        body: { details: { username, handleName } },
+      });
+      if (!result.success) raise("Failed updating profile info", result.error);
 
       logger.debug("Redirecting to [new] username...");
       showOnToast(<>Success! ✨ Redirecting...</>, "info");
