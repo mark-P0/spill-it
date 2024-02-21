@@ -10,12 +10,15 @@ import { logger } from "../../utils/logger";
 import { LoadingCursorAbsoluteOverlay } from "../_app/Loading";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
+import { Toast } from "../_app/toast/Toast";
+import { ToastProvider, useToastContext } from "../_app/toast/ToastContext";
 import { useProfileContext } from "./ProfileContext";
 
 function EditProfileForm() {
   const navigate = useNavigate();
   const { profile } = useProfileContext();
   const { closeModal, makeModalCancellable } = useModalContext();
+  const { showOnToast } = useToastContext();
 
   const [newHandleName, setNewHandleName] = useState("");
   useEffect(() => {
@@ -54,10 +57,14 @@ function EditProfileForm() {
         ])();
       }
 
+      logger.debug("Redirecting to [new] username...");
+      showOnToast(<>Success! ✨ Redirecting...</>, "info");
+      await sleep(1); // Give time for user to digest toast // TODO Is this time enough?
       navigate(endpointWithParam("/:username", { username: newUsername }));
       return; // Operations after the try-catch block should not matter as the app will redirect anyway
     } catch (caughtError) {
       logger.error(ensureError(caughtError));
+      showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
     }
     setIsProcessing(false);
     makeModalCancellable(true);
@@ -169,7 +176,15 @@ function EditProfileForm() {
 function EditProfileModalContent() {
   return (
     <ModalContent>
-      <EditProfileForm />
+      {
+        // TODO Create local toast for ALL modals? i.e. in the Modal component
+        /** Localize toast in modal content so that it maybe shown on [top] of the "top layer" */
+      }
+      <ToastProvider>
+        <EditProfileForm />
+
+        <Toast />
+      </ToastProvider>
     </ModalContent>
   );
 }
