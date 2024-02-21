@@ -2,6 +2,7 @@ import { buildHeaderAuth } from "@spill-it/auth/headers";
 import { raise } from "@spill-it/utils/errors";
 import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";
+import { EditProfileModal } from "./routes/[profile]/EditProfileModal";
 import {
   FollowersModal,
   FollowingModal,
@@ -28,6 +29,10 @@ export const ProfileRoute: RouteObject = {
     {
       path: endpoint("/:username/following"),
       element: <FollowingModal />,
+    },
+    {
+      path: endpoint("/:username/edit"),
+      element: <EditProfileModal />,
     },
   ],
 };
