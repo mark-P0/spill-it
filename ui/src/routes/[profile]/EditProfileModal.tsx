@@ -191,7 +191,7 @@ function EditProfileForm() {
                 "text-xs uppercase tracking-wide",
                 ...[
                   "transition",
-                  "text-white/50 group-focus-within/handle:text-white",
+                  "text-white/50 group-focus-within/handle:text-white group-has-[:invalid]/handle:text-red-500",
                 ],
               )}
             >
@@ -206,7 +206,11 @@ function EditProfileForm() {
               reportValidity
               className={clsx(
                 "bg-transparent",
-                "border border-white/25 rounded px-2 py-1",
+                "border rounded px-2 py-1",
+                ...[
+                  "transition",
+                  "border-white/25 group-focus-within/handle:border-white group-has-[:invalid]/handle:border-red-500",
+                ],
               )}
             />
           </label>
@@ -217,7 +221,7 @@ function EditProfileForm() {
                 "text-xs uppercase tracking-wide",
                 ...[
                   "transition",
-                  "text-white/50 group-focus-within/username:text-white",
+                  "text-white/50 group-focus-within/username:text-white group-has-[:invalid]/username:text-red-500",
                 ],
               )}
             >
@@ -232,7 +236,11 @@ function EditProfileForm() {
               reportValidity
               className={clsx(
                 "bg-transparent",
-                "border border-white/25 rounded px-2 py-1",
+                "border rounded px-2 py-1",
+                ...[
+                  "transition",
+                  "border-white/25 group-focus-within/username:border-white group-has-[:invalid]/username:border-red-500",
+                ],
               )}
             />
           </label>
