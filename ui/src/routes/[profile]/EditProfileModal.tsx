@@ -1,5 +1,7 @@
+import { User } from "@spill-it/db/schema/drizzle";
 import { ensureError, raise } from "@spill-it/utils/errors";
 import { sleep } from "@spill-it/utils/sleep";
+import { digits, letters } from "@spill-it/utils/strings";
 import clsx from "clsx";
 import {
   ChangeEvent,
@@ -10,6 +12,7 @@ import {
 } from "react";
 import { BsXLg } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import { z } from "zod";
 import { endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
@@ -43,6 +46,25 @@ function Input(
   return <input {...attributes} ref={inputRef} />;
 }
 
+// TODO Reuse these from DB package?
+const charset = new Set([...letters, ...digits]);
+function isUsernameCharsValid(username: User["username"]): boolean {
+  return username.split("").every((char) => charset.has(char));
+}
+
+const HANDLE_LEN_MIN = 1;
+const HANDLE_LEN_MAX = 24;
+const zodHandle = z.string().min(HANDLE_LEN_MIN).max(HANDLE_LEN_MAX).optional();
+
+const USERNAME_LEN_MIN = 6;
+const USERNAME_LEN_MAX = 18;
+const zodUsername = z
+  .string()
+  .min(USERNAME_LEN_MIN)
+  .max(USERNAME_LEN_MAX)
+  .refine(isUsernameCharsValid, "Invalid username characters")
+  .optional();
+
 function EditProfileForm() {
   const navigate = useNavigate();
   const { profile } = useProfileContext();
@@ -50,21 +72,37 @@ function EditProfileForm() {
   const { showOnToast } = useToastContext();
 
   const [newHandleName, setNewHandleName] = useState("");
+  const [newHandleNameValidity, setNewHandleNameValidity] = useState("");
   useEffect(() => {
     if (profile === null) return;
     setNewHandleName(profile.handleName);
   }, [profile]);
   function reflectNewHandleName(event: ChangeEvent<HTMLInputElement>) {
-    setNewHandleName(event.target.value);
+    const input = event.target;
+    setNewHandleName(input.value);
+
+    const parsing = zodHandle.safeParse(input.value);
+    const validity = parsing.success
+      ? ""
+      : parsing.error.issues[0]?.message ?? "Inalid handle name";
+    setNewHandleNameValidity(validity);
   }
 
   const [newUsername, setNewUsername] = useState("");
+  const [newUsernameValidity, setNewUsernameValidity] = useState("");
   useEffect(() => {
     if (profile === null) return;
     setNewUsername(profile.username);
   }, [profile]);
   function reflectNewUsername(event: ChangeEvent<HTMLInputElement>) {
-    setNewUsername(event.target.value);
+    const input = event.target;
+    setNewUsername(input.value);
+
+    const parsing = zodUsername.safeParse(input.value);
+    const validity = parsing.success
+      ? ""
+      : parsing.error.issues[0]?.message ?? "Inalid username";
+    setNewUsernameValidity(validity);
   }
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -162,6 +200,8 @@ function EditProfileForm() {
               name="handleName"
               value={newHandleName}
               onChange={reflectNewHandleName}
+              validity={newHandleNameValidity}
+              reportValidity
               className={clsx(
                 "bg-transparent",
                 "border border-white/25 rounded px-2 py-1",
@@ -186,6 +226,8 @@ function EditProfileForm() {
               name="username"
               value={newUsername}
               onChange={reflectNewUsername}
+              validity={newUsernameValidity}
+              reportValidity
               className={clsx(
                 "bg-transparent",
                 "border border-white/25 rounded px-2 py-1",
