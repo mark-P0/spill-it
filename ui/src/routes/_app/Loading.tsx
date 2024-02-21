@@ -3,7 +3,9 @@
  * as interactive elements override it with their respective styles
  */
 export function LoadingCursorAbsoluteOverlay() {
-  return <div className="absolute w-full h-full cursor-wait"></div>;
+  return (
+    <div className="absolute top-0 left-0 w-full h-full cursor-wait"></div>
+  );
 }
 
 export function LoadingIndicator() {

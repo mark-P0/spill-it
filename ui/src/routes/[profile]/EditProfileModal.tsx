@@ -7,6 +7,7 @@ import { BsXLg } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
 import { logger } from "../../utils/logger";
+import { LoadingCursorAbsoluteOverlay } from "../_app/Loading";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
 import { useProfileContext } from "./ProfileContext";
@@ -65,7 +66,7 @@ function EditProfileForm() {
   if (profile === null) return null;
 
   return (
-    <form>
+    <form className="relative">
       <fieldset disabled={isProcessing} className="grid gap-6">
         <header className="flex items-center gap-6">
           <h2 className="text-3xl font-bold">Edit Profile</h2>
@@ -160,6 +161,8 @@ function EditProfileForm() {
           </button>
         </footer>
       </fieldset>
+
+      {isProcessing && <LoadingCursorAbsoluteOverlay />}
     </form>
   );
 }
