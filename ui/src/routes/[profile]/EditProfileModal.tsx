@@ -72,6 +72,14 @@ function EditProfileForm() {
 
   if (profile === null) return null;
 
+  const isFormUnedited =
+    newUsername === profile.username && newHandleName === profile.handleName;
+  const isFormEmpty = newUsername === "" && newHandleName === "";
+  const canSave =
+    !isProcessing && // Should be redundant
+    !isFormUnedited &&
+    !isFormEmpty;
+
   return (
     <form className="relative">
       <fieldset disabled={isProcessing} className="grid gap-6">
@@ -151,6 +159,7 @@ function EditProfileForm() {
         <footer className="flex flex-row-reverse">
           <button
             type="button"
+            disabled={!canSave}
             onClick={save}
             className={clsx(
               "select-none",
