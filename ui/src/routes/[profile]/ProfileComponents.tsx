@@ -285,7 +285,7 @@ function FollowButton() {
     </button>
   );
 }
-function FollowButtonDecider() {
+function ActionButton() {
   const { user } = useUserContext();
   const { profile, followers } = useProfileContext();
 
@@ -313,7 +313,7 @@ export function ProfileCard() {
         <FollowCountsNav />
       </header>
       <div>
-        <FollowButtonDecider />
+        <ActionButton />
       </div>
       <div className="ml-auto">
         <img
