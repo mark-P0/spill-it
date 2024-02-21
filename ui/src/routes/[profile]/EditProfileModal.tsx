@@ -1,14 +1,20 @@
+import { ensureError, raise } from "@spill-it/utils/errors";
+import { randomChoice } from "@spill-it/utils/random";
+import { sleep } from "@spill-it/utils/sleep";
 import clsx from "clsx";
 import { ChangeEvent, useEffect, useState } from "react";
 import { BsXLg } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
+import { endpointWithParam } from "../../utils/endpoints";
+import { logger } from "../../utils/logger";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
 import { useProfileContext } from "./ProfileContext";
 
 function EditProfileForm() {
+  const navigate = useNavigate();
   const { profile } = useProfileContext();
-  const { closeModal } = useModalContext();
+  const { closeModal, makeModalCancellable } = useModalContext();
 
   const [newHandleName, setNewHandleName] = useState("");
   useEffect(() => {
@@ -28,9 +34,39 @@ function EditProfileForm() {
     setNewUsername(event.target.value);
   }
 
+  const [isProcessing, setIsProcessing] = useState(false);
+  async function save() {
+    if (profile === null) {
+      logger.warn("Profile not available; ignoring update...");
+      return;
+    }
+
+    setIsProcessing(true);
+    makeModalCancellable(false);
+    try {
+      // DELETEME
+      {
+        await sleep(3);
+        randomChoice([
+          () => console.warn("save success"),
+          () => raise("save failed"),
+        ])();
+      }
+
+      navigate(endpointWithParam("/:username", { username: newUsername }));
+      return; // Operations after the try-catch block should not matter as the app will redirect anyway
+    } catch (caughtError) {
+      logger.error(ensureError(caughtError));
+    }
+    setIsProcessing(false);
+    makeModalCancellable(true);
+  }
+
+  if (profile === null) return null;
+
   return (
     <form>
-      <fieldset className="grid gap-6">
+      <fieldset disabled={isProcessing} className="grid gap-6">
         <header className="flex items-center gap-6">
           <h2 className="text-3xl font-bold">Edit Profile</h2>
 
@@ -106,6 +142,8 @@ function EditProfileForm() {
 
         <footer className="flex flex-row-reverse">
           <button
+            type="button"
+            onClick={save}
             className={clsx(
               "select-none",
               "rounded-full px-6 py-3",
