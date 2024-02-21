@@ -1,12 +1,9 @@
+import { sleep } from "@spill-it/utils/sleep";
 import { RouteObject, redirect } from "react-router-dom";
 import { logger } from "../utils/logger";
 import { Screen } from "./_app/Screen";
 import { ModalContent } from "./_app/modal/Modal";
 import { useModalContext } from "./_app/modal/ModalContext";
-
-async function sleep(seconds: number) {
-  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
-}
 
 const queryRoute: RouteObject = (() => {
   return {
