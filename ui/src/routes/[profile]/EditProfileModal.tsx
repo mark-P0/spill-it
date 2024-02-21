@@ -68,7 +68,7 @@ const zodUsername = z
 
 function EditProfileForm() {
   const navigate = useNavigate();
-  const { user } = useUserContext();
+  const { user, reflectUser } = useUserContext();
   const { closeModal, makeModalCancellable } = useModalContext();
   const { showOnToast } = useToastContext();
 
@@ -139,6 +139,7 @@ function EditProfileForm() {
       showOnToast(<>Success! ✨ Redirecting...</>, "info");
       await sleep(1); // Give time for user to digest toast // TODO Is this time enough?
       navigate(endpointWithParam("/:username", { username: newUsername }));
+      reflectUser(); // TODO Is this a good enough "time" to update stored user info?
       return; // Operations after the try-catch block should not matter as the app will redirect anyway
     } catch (caughtError) {
       logger.error(ensureError(caughtError));

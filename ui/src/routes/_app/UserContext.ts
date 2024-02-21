@@ -34,5 +34,5 @@ export const [useUserContext, UserProvider] = createNewContext(() => {
     reflectUser();
   }, []);
 
-  return { user };
+  return { user, reflectUser };
 });
