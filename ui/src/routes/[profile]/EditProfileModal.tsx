@@ -19,11 +19,11 @@ import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
 import { LoadingCursorAbsoluteOverlay } from "../_app/Loading";
+import { useUserContext } from "../_app/UserContext";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
 import { Toast } from "../_app/toast/Toast";
 import { ToastProvider, useToastContext } from "../_app/toast/ToastContext";
-import { useProfileContext } from "./ProfileContext";
 
 // TODO Allow providing refs?
 /** Allow specifying custom validity(ies) as props */
@@ -68,16 +68,16 @@ const zodUsername = z
 
 function EditProfileForm() {
   const navigate = useNavigate();
-  const { profile } = useProfileContext();
+  const { user } = useUserContext();
   const { closeModal, makeModalCancellable } = useModalContext();
   const { showOnToast } = useToastContext();
 
   const [newHandleName, setNewHandleName] = useState("");
   const [newHandleNameValidity, setNewHandleNameValidity] = useState("");
   useEffect(() => {
-    if (profile === null) return;
-    setNewHandleName(profile.handleName);
-  }, [profile]);
+    if (user === null) return;
+    setNewHandleName(user.handleName);
+  }, [user]);
   function reflectNewHandleName(event: ChangeEvent<HTMLInputElement>) {
     const input = event.target;
     setNewHandleName(input.value);
@@ -92,9 +92,9 @@ function EditProfileForm() {
   const [newUsername, setNewUsername] = useState("");
   const [newUsernameValidity, setNewUsernameValidity] = useState("");
   useEffect(() => {
-    if (profile === null) return;
-    setNewUsername(profile.username);
-  }, [profile]);
+    if (user === null) return;
+    setNewUsername(user.username);
+  }, [user]);
   function reflectNewUsername(event: ChangeEvent<HTMLInputElement>) {
     const input = event.target;
     setNewUsername(input.value);
@@ -109,8 +109,8 @@ function EditProfileForm() {
   const [isProcessing, setIsProcessing] = useState(false);
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (profile === null) {
-      logger.warn("Profile not available; ignoring update...");
+    if (user === null) {
+      logger.warn("User not available? Ignoring update...");
       return;
     }
 
@@ -122,11 +122,11 @@ function EditProfileForm() {
 
       logger.debug("Requesting update...");
       let username: string | undefined;
-      if (newUsername !== profile.username && newUsername !== "") {
+      if (newUsername !== user.username && newUsername !== "") {
         username = newUsername;
       }
       let handleName: string | undefined;
-      if (newHandleName !== profile.handleName && newHandleName !== "") {
+      if (newHandleName !== user.handleName && newHandleName !== "") {
         handleName = newHandleName;
       }
       const result = await fetchAPI("/api/v0/users/me", "PATCH", {
@@ -148,10 +148,10 @@ function EditProfileForm() {
     makeModalCancellable(true);
   }
 
-  if (profile === null) return null;
+  if (user === null) return null;
 
   const isFormUnedited =
-    newUsername === profile.username && newHandleName === profile.handleName;
+    newUsername === user.username && newHandleName === user.handleName;
   const isFormEmpty = newUsername === "" && newHandleName === "";
   const canSave =
     !isProcessing && // Should be redundant
