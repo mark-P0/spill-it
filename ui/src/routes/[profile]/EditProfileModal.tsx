@@ -3,14 +3,7 @@ import { ensureError, raise } from "@spill-it/utils/errors";
 import { sleep } from "@spill-it/utils/sleep";
 import { digits, letters } from "@spill-it/utils/strings";
 import clsx from "clsx";
-import {
-  ChangeEvent,
-  ComponentProps,
-  FormEvent,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { BsXLg } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -18,34 +11,13 @@ import { endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
+import { Input } from "../_app/Input";
 import { LoadingCursorAbsoluteOverlay } from "../_app/Loading";
 import { useUserContext } from "../_app/UserContext";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
 import { Toast } from "../_app/toast/Toast";
 import { ToastProvider, useToastContext } from "../_app/toast/ToastContext";
-
-// TODO Allow providing refs?
-/** Allow specifying custom validity(ies) as props */
-function Input(
-  props: Omit<ComponentProps<"input">, "ref"> & {
-    validity?: string;
-    reportValidity?: boolean;
-  },
-) {
-  const { validity, reportValidity, ...attributes } = props;
-
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  useEffect(() => {
-    const input = inputRef.current;
-    if (input === null) return;
-
-    input.setCustomValidity(validity ?? "");
-    if (reportValidity) input.reportValidity();
-  }, [validity, reportValidity]);
-
-  return <input {...attributes} ref={inputRef} />;
-}
 
 // TODO Reuse these from DB package?
 const charset = new Set([...letters, ...digits]);
