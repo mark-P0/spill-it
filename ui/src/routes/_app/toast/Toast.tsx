@@ -1,5 +1,7 @@
 import clsx from "clsx";
+import { BsXLg } from "react-icons/bs";
 import { randomKey } from "../../../utils/react";
+import { clsSmallBtnIcon } from "../classes";
 import { useToastContext } from "./ToastContext";
 
 export function Toast() {
@@ -28,14 +30,8 @@ export function Toast() {
     >
       <span className="text-sm tracking-wider">{content}</span>
 
-      <button
-        onClick={discardSelf}
-        className={clsx(
-          "font-bold text-sm uppercase tracking-widest",
-          ...["transition", "opacity-50 hover:opacity-100"],
-        )}
-      >
-        Close
+      <button onClick={discardSelf} className={clsx(clsSmallBtnIcon)}>
+        <BsXLg />
       </button>
     </dialog>
   );
