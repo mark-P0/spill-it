@@ -37,3 +37,27 @@ const _clsBtnIcon = (options?: {
 export const clsBtnIcon = _clsBtnIcon();
 export const clsSmallBtnIcon = _clsBtnIcon({ size: "small" });
 export const clsLinkBtnIcon = _clsBtnIcon({ withoutDisabled: true });
+
+const _clsBtnOutline = (options?: { withoutDisabled?: boolean }) => {
+  const { withoutDisabled = false } = options ?? {};
+  return clsx(
+    "select-none",
+    "rounded-full px-6 py-3",
+    "border border-white/25",
+    ...[
+      "transition",
+      !withoutDisabled && [
+        "disabled:opacity-50",
+        "enabled:active:scale-95",
+        "enabled:hover:bg-white/10",
+      ],
+      withoutDisabled && [
+        // "disabled:opacity-50",
+        "active:scale-95",
+        "hover:bg-white/10",
+      ],
+    ].flat(),
+  );
+};
+export const clsBtnOutline = _clsBtnOutline();
+export const clsLinkBtnOutline = _clsBtnOutline({ withoutDisabled: true });

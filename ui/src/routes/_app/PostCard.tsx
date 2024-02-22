@@ -11,7 +11,7 @@ import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
 import { LoadingCursorAbsoluteOverlay } from "./Loading";
 import { useUserContext } from "./UserContext";
-import { clsSmallBtnIcon } from "./classes";
+import { clsBtnOutline, clsSmallBtnIcon } from "./classes";
 import { ModalContent } from "./modal/Modal";
 import { useModalContext } from "./modal/ModalContext";
 import { useToastContext } from "./toast/ToastContext";
@@ -90,19 +90,9 @@ function DeletePostModalContent(props: {
           <button
             type="button"
             onClick={closeModal}
-            className={clsx(
-              "select-none",
-              "rounded-full px-6 py-3",
-              "disabled:opacity-50",
-              "border border-white/25",
-              ...[
-                "transition",
-                "enabled:hover:bg-white/10",
-                "enabled:active:scale-95",
-              ],
-            )}
+            className={clsx(clsBtnOutline)}
           >
-            Cancel 🙅‍♀️
+            On second thought...
           </button>
 
           {isDeleting && <LoadingCursorAbsoluteOverlay />}

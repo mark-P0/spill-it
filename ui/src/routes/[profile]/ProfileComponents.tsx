@@ -8,7 +8,12 @@ import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
 import { useUserContext } from "../_app/UserContext";
-import { clsBtnIcon, clsLinkBtnIcon } from "../_app/classes";
+import {
+  clsBtnIcon,
+  clsBtnOutline,
+  clsLinkBtnIcon,
+  clsLinkBtnOutline,
+} from "../_app/classes";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
 import { useToastContext } from "../_app/toast/ToastContext";
@@ -59,15 +64,9 @@ function LogoutModalContent() {
         <button
           type="button"
           onClick={closeModal}
-          className={clsx(
-            "select-none",
-            "rounded-full px-6 py-3",
-            "disabled:opacity-50",
-            "border border-white/25",
-            ...["transition", "hover:bg-white/10 active:scale-95"],
-          )}
+          className={clsx(clsBtnOutline)}
         >
-          No 🙅‍♀️
+          On second thought...
         </button>
       </form>
     </ModalContent>
@@ -155,12 +154,9 @@ function EditProfileButtonLink() {
     <Link
       to={endpointWithParam("/:username/edit", { username })}
       className={clsx(
-        "block",
-        "select-none",
-        "rounded-full px-6 py-3",
+        "block", // Seems to work best if inline link|anchor is styled as block element...
         "font-bold tracking-wide",
-        "border border-white/25",
-        ...["transition", "hover:bg-white/10 active:scale-95"],
+        clsLinkBtnOutline,
       )}
     >
       Edit Profile
@@ -210,13 +206,13 @@ function UnfollowButton() {
       disabled={isProcessing}
       onClick={unfollow}
       className={clsx(
-        isProcessing && "cursor-wait",
-        "select-none",
-        "rounded-full px-6 py-3",
-        "disabled:opacity-50",
+        isProcessing && "cursor-wait", // TODO Use overlay?
         "font-bold tracking-wide",
+        "select-none",
+        "rounded-full px-6 py-3", // Based on styles for outline buttons
         ...[
           "transition",
+          "disabled:opacity-50",
           "enabled:active:scale-95",
           ...[
             "border",
