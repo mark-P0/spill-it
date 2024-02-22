@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Modal, ModalContent } from "../_app/modal/Modal";
-import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
-import { Toast } from "../_app/toast/Toast";
-import { ToastProvider } from "../_app/toast/ToastContext";
+import { Modal, ModalContent } from "../../_app/modal/Modal";
+import { ModalProvider, useModalContext } from "../../_app/modal/ModalContext";
+import { Toast } from "../../_app/toast/Toast";
+import { ToastProvider } from "../../_app/toast/ToastContext";
 import { EditProfileForm } from "./EditProfileForm";
 
 function EditProfileModalContent() {

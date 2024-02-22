@@ -2,12 +2,12 @@ import { buildHeaderAuth } from "@spill-it/auth/headers";
 import { raise } from "@spill-it/utils/errors";
 import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";
-import { EditProfileModal } from "./routes/[profile]/EditProfileModal";
 import {
   FollowersModal,
   FollowingModal,
 } from "./routes/[profile]/FollowsModals";
 import { ProfileScreen } from "./routes/[profile]/ProfileScreen";
+import { EditProfileModal } from "./routes/[profile]/edit-profile/EditProfileModal";
 import { ErrorScreen } from "./routes/_app/ErrorScreen";
 import { HomeScreen } from "./routes/home/HomeScreen";
 import { WelcomeScreen } from "./routes/welcome/WelcomeScreen";
