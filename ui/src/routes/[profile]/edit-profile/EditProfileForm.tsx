@@ -121,6 +121,7 @@ export function EditProfileForm() {
 
   if (user === null) return null;
 
+  // TODO Set these as constraints?
   const isFormUnedited =
     newUsername === user.username && newHandleName === user.handleName;
   const isFormEmpty = newUsername === "" && newHandleName === "";
