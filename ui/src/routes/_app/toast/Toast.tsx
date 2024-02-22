@@ -19,7 +19,7 @@ export function Toast() {
       onAnimationEnd={discardSelf}
       className={clsx(
         "fixed bottom-9",
-        "flex gap-6",
+        "flex items-center gap-3",
         "rounded px-6 py-3",
         "shadow-lg shadow-black/50",
         level === "info" && "bg-fuchsia-500 text-white",
@@ -28,7 +28,7 @@ export function Toast() {
         "animate-toast",
       )}
     >
-      <span className="text-sm tracking-wider">{content}</span>
+      <span className="tracking-wider">{content}</span>
 
       <button onClick={discardSelf} className={clsx(clsSmallBtnIcon)}>
         <BsXLg />
