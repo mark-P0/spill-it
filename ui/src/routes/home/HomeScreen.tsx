@@ -24,9 +24,9 @@ function ProfileButtonLink() {
       to={endpointWithParam("/:username", { username })}
       className={clsx(
         "overflow-clip",
-        "w-9 aspect-square rounded-full",
+        "w-9 aspect-square rounded-full", // Based on styles for icon buttons
         "border-2 border-white/50",
-        ...["transition", "hover:brightness-90 active:scale-95"],
+        ...["transition", "active:scale-90 hover:brightness-90"],
       )}
     >
       <img

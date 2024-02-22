@@ -14,6 +14,7 @@ import { getFromStorage } from "../../../utils/storage";
 import { Input } from "../../_app/Input";
 import { LoadingCursorAbsoluteOverlay } from "../../_app/Loading";
 import { useUserContext } from "../../_app/UserContext";
+import { clsBtnIcon } from "../../_app/classes";
 import { useModalContext } from "../../_app/modal/ModalContext";
 import { useToastContext } from "../../_app/toast/ToastContext";
 
@@ -143,18 +144,9 @@ export function EditProfileForm() {
             <button
               type="button"
               onClick={closeModal}
-              className={clsx(
-                "w-9 aspect-square",
-                "rounded-full p-2",
-                ...[
-                  "transition",
-                  "disabled:opacity-50",
-                  "enabled:active:scale-90",
-                  "enabled:hover:bg-white/25",
-                ],
-              )}
+              className={clsx(clsBtnIcon)}
             >
-              <BsXLg className="w-full h-full" />
+              <BsXLg />
             </button>
           </div>
         </header>

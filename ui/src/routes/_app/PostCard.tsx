@@ -11,6 +11,7 @@ import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
 import { LoadingCursorAbsoluteOverlay } from "./Loading";
 import { useUserContext } from "./UserContext";
+import { clsSmallBtnIcon } from "./classes";
 import { ModalContent } from "./modal/Modal";
 import { useModalContext } from "./modal/ModalContext";
 import { useToastContext } from "./toast/ToastContext";
@@ -174,13 +175,7 @@ export function PostCard(props: {
 
       <div>
         {canDelete && (
-          <button
-            onClick={promptDelete}
-            className={clsx(
-              "rounded-full p-2",
-              ...["transition", "hover:bg-white/25 active:scale-90"],
-            )}
-          >
+          <button onClick={promptDelete} className={clsx(clsSmallBtnIcon)}>
             <BsTrashFill />
           </button>
         )}

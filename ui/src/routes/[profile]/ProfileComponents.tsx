@@ -8,6 +8,7 @@ import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
 import { useUserContext } from "../_app/UserContext";
+import { clsBtnIcon, clsLinkBtnIcon } from "../_app/classes";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
 import { useToastContext } from "../_app/toast/ToastContext";
@@ -81,14 +82,8 @@ function LogoutButton() {
   }
 
   return (
-    <button
-      onClick={promptLogout}
-      className={clsx(
-        "w-9 aspect-square rounded-full p-2",
-        ...["transition", "hover:bg-white/25 active:scale-90"],
-      )}
-    >
-      <BsBoxArrowLeft className="w-full h-full" />
+    <button onClick={promptLogout} className={clsx(clsBtnIcon)}>
+      <BsBoxArrowLeft />
     </button>
   );
 }
@@ -104,14 +99,8 @@ export function NavBar() {
         isProfileOfUser ? <LogoutButton /> : <Nothing /> // Use placeholder to not affect layout
       }
 
-      <Link
-        to={endpoint("/home")}
-        className={clsx(
-          "w-9 aspect-square rounded-full p-2",
-          ...["transition", "hover:bg-white/25 active:scale-90"],
-        )}
-      >
-        <BsHouseFill className="w-full h-full" />
+      <Link to={endpoint("/home")} className={clsx(clsLinkBtnIcon)}>
+        <BsHouseFill />
       </Link>
     </nav>
   );
