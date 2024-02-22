@@ -16,9 +16,9 @@ export function Toast() {
       open
       onAnimationEnd={discardSelf}
       className={clsx(
-        "fixed bottom-[5%]",
-        "flex gap-4",
-        "rounded px-4 py-2",
+        "fixed bottom-9",
+        "flex gap-6",
+        "rounded px-6 py-3",
         "shadow-lg shadow-black/50",
         level === "info" && "bg-fuchsia-500 text-white",
         level === "warn" && "bg-yellow-500 text-black",
