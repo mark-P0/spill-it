@@ -1,5 +1,7 @@
 import clsx from "clsx";
+import { BsXLg } from "react-icons/bs";
 import { randomKey } from "../../../utils/react";
+import { clsSmallBtnIcon } from "../classes";
 import { useToastContext } from "./ToastContext";
 
 export function Toast() {
@@ -16,9 +18,9 @@ export function Toast() {
       open
       onAnimationEnd={discardSelf}
       className={clsx(
-        "fixed bottom-[5%]",
-        "flex gap-4",
-        "rounded px-4 py-2",
+        "fixed bottom-9",
+        "flex items-center gap-3",
+        "rounded px-6 py-3",
         "shadow-lg shadow-black/50",
         level === "info" && "bg-fuchsia-500 text-white",
         level === "warn" && "bg-yellow-500 text-black",
@@ -26,16 +28,10 @@ export function Toast() {
         "animate-toast",
       )}
     >
-      <span className="text-sm tracking-wider">{content}</span>
+      <span className="tracking-wider">{content}</span>
 
-      <button
-        onClick={discardSelf}
-        className={clsx(
-          "font-bold text-sm uppercase tracking-widest",
-          ...["transition", "opacity-50 hover:opacity-100"],
-        )}
-      >
-        Close
+      <button onClick={discardSelf} className={clsx(clsSmallBtnIcon)}>
+        <BsXLg />
       </button>
     </dialog>
   );
