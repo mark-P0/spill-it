@@ -124,10 +124,13 @@ export function EditProfileForm() {
   const isFormUnedited =
     newUsername === user.username && newHandleName === user.handleName;
   const isFormEmpty = newUsername === "" && newHandleName === "";
+  const areConstraintsSatisfied =
+    newUsernameValidity === "" && newHandleNameValidity === "";
   const canSave =
     !isProcessing && // Should be redundant
     !isFormUnedited &&
-    !isFormEmpty;
+    !isFormEmpty && // Possibly redundant with constraints
+    areConstraintsSatisfied;
 
   return (
     <form onSubmit={save} className="relative">
