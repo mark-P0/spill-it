@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 html {
-  @apply selection:bg-emerald-700;
+  @apply selection:bg-emerald-700 selection:text-white;
 }
