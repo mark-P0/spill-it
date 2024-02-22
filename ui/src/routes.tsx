@@ -7,6 +7,7 @@ import {
   FollowingModal,
 } from "./routes/[profile]/FollowsModals";
 import { ProfileScreen } from "./routes/[profile]/ProfileScreen";
+import { EditProfileModal } from "./routes/[profile]/edit-profile/EditProfileModal";
 import { ErrorScreen } from "./routes/_app/ErrorScreen";
 import { HomeScreen } from "./routes/home/HomeScreen";
 import { WelcomeScreen } from "./routes/welcome/WelcomeScreen";
@@ -28,6 +29,10 @@ export const ProfileRoute: RouteObject = {
     {
       path: endpoint("/:username/following"),
       element: <FollowingModal />,
+    },
+    {
+      path: endpoint("/:username/edit"),
+      element: <EditProfileModal />,
     },
   ],
 };
