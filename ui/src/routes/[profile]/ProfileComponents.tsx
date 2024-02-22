@@ -11,6 +11,7 @@ import { useUserContext } from "../_app/UserContext";
 import {
   clsBtnIcon,
   clsBtnOutline,
+  clsLinkBlock,
   clsLinkBtnIcon,
   clsLinkBtnOutline,
 } from "../_app/classes";
@@ -93,14 +94,19 @@ export function NavBar() {
 
   const isProfileOfUser = profile?.id === user?.id;
   return (
-    <nav className="flex justify-between items-center">
+    <nav className="flex items-center">
       {
         isProfileOfUser ? <LogoutButton /> : <Nothing /> // Use placeholder to not affect layout
       }
 
-      <Link to={endpoint("/home")} className={clsx(clsLinkBtnIcon)}>
-        <BsHouseFill />
-      </Link>
+      <div className="ml-auto">
+        <Link
+          to={endpoint("/home")}
+          className={clsx(clsLinkBlock, clsLinkBtnIcon)}
+        >
+          <BsHouseFill />
+        </Link>
+      </div>
     </nav>
   );
 }
@@ -154,8 +160,8 @@ function EditProfileButtonLink() {
     <Link
       to={endpointWithParam("/:username/edit", { username })}
       className={clsx(
-        "block", // Seems to work best if inline link|anchor is styled as block element...
         "font-bold tracking-wide",
+        clsLinkBlock,
         clsLinkBtnOutline,
       )}
     >

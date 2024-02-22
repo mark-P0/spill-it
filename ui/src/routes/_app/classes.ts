@@ -1,5 +1,15 @@
 import clsx from "clsx";
 
+/**
+ * Styling links/anchors seem to work best if set as block elements;
+ * they are inline by default
+ *
+ * "Non-replaced" inline element?
+ * - https://stackoverflow.com/a/54773166
+ * - https://developer.mozilla.org/en-US/docs/Web/CSS/transform#sect1
+ */
+export const clsLinkBlock = "block";
+
 const _clsBtnIcon = (options?: {
   size?: "base" | "small";
   withoutDisabled?: boolean;

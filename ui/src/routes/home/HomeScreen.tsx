@@ -9,6 +9,7 @@ import { getFromStorage } from "../../utils/storage";
 import { LoadingCursorAbsoluteOverlay } from "../_app/Loading";
 import { Screen } from "../_app/Screen";
 import { useUserContext } from "../_app/UserContext";
+import { clsLinkBlock } from "../_app/classes";
 import { useToastContext } from "../_app/toast/ToastContext";
 import { Feed } from "./feed/Feed";
 import { FeedProvider, useFeedContext } from "./feed/FeedContext";
@@ -24,8 +25,9 @@ function ProfileButtonLink() {
       to={endpointWithParam("/:username", { username })}
       className={clsx(
         "overflow-clip",
-        "w-9 aspect-square rounded-full", // Based on styles for icon buttons
         "border-2 border-white/50",
+        clsLinkBlock,
+        "w-9 aspect-square rounded-full", // Based on styles for icon buttons
         ...["transition", "active:scale-90 hover:brightness-90"],
       )}
     >
@@ -128,10 +130,12 @@ export function HomeScreen() {
   return (
     <FeedProvider>
       <Screen className="grid auto-rows-min gap-6 p-6">
-        <header className="flex items-center justify-between gap-3">
+        <header className="flex items-center gap-3">
           <h1 className="text-3xl">Home</h1>
 
-          <ProfileButtonLink />
+          <div className="ml-auto">
+            <ProfileButtonLink />
+          </div>
         </header>
         <PostForm />
 
