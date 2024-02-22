@@ -14,6 +14,7 @@ import { getFromStorage } from "../../../utils/storage";
 import { Input } from "../../_app/Input";
 import { LoadingCursorAbsoluteOverlay } from "../../_app/Loading";
 import { useUserContext } from "../../_app/UserContext";
+import { clsBtn, clsBtnIcon } from "../../_app/classes";
 import { useModalContext } from "../../_app/modal/ModalContext";
 import { useToastContext } from "../../_app/toast/ToastContext";
 
@@ -143,18 +144,9 @@ export function EditProfileForm() {
             <button
               type="button"
               onClick={closeModal}
-              className={clsx(
-                "w-9 aspect-square",
-                "rounded-full p-2",
-                ...[
-                  "transition",
-                  "disabled:opacity-50",
-                  "enabled:active:scale-90",
-                  "enabled:hover:bg-white/25",
-                ],
-              )}
+              className={clsx(clsBtnIcon)}
             >
-              <BsXLg className="w-full h-full" />
+              <BsXLg />
             </button>
           </div>
         </header>
@@ -222,20 +214,7 @@ export function EditProfileForm() {
         </div>
 
         <footer className="flex flex-row-reverse">
-          <button
-            disabled={!canSave}
-            className={clsx(
-              "select-none",
-              "rounded-full px-6 py-3",
-              "font-bold tracking-wide",
-              ...[
-                "transition",
-                "disabled:opacity-50",
-                "enabled:active:scale-95",
-                "bg-fuchsia-500 enabled:hover:bg-fuchsia-600",
-              ],
-            )}
-          >
+          <button disabled={!canSave} className={clsx(clsBtn)}>
             Save
           </button>
         </footer>

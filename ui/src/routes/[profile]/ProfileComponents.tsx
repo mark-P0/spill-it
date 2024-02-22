@@ -8,6 +8,16 @@ import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
 import { useUserContext } from "../_app/UserContext";
+import {
+  clsBtn,
+  clsBtnIcon,
+  clsBtnOutline,
+  clsLinkBlock,
+  clsLinkBtn,
+  clsLinkBtnIcon,
+  clsLinkBtnOutline,
+  clsLinkTranslucent,
+} from "../_app/classes";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
 import { useToastContext } from "../_app/toast/ToastContext";
@@ -42,15 +52,8 @@ function LogoutModalContent() {
         <Link
           to={endpoint("/logout")}
           className={clsx(
-            "text-center select-none",
-            "rounded-full px-6 py-3",
-            "disabled:opacity-50",
-            "font-bold tracking-wide",
-            ...[
-              "transition",
-              "bg-fuchsia-500 hover:bg-fuchsia-600",
-              "active:scale-95",
-            ],
+            "text-center", // Link/Anchor texts are not centered by default like in buttons
+            clsLinkBtn,
           )}
         >
           Yes 👋
@@ -58,15 +61,9 @@ function LogoutModalContent() {
         <button
           type="button"
           onClick={closeModal}
-          className={clsx(
-            "select-none",
-            "rounded-full px-6 py-3",
-            "disabled:opacity-50",
-            "border border-white/25",
-            ...["transition", "hover:bg-white/10 active:scale-95"],
-          )}
+          className={clsx(clsBtnOutline)}
         >
-          No 🙅‍♀️
+          On second thought...
         </button>
       </form>
     </ModalContent>
@@ -81,14 +78,8 @@ function LogoutButton() {
   }
 
   return (
-    <button
-      onClick={promptLogout}
-      className={clsx(
-        "w-9 aspect-square rounded-full p-2",
-        ...["transition", "hover:bg-white/25 active:scale-90"],
-      )}
-    >
-      <BsBoxArrowLeft className="w-full h-full" />
+    <button onClick={promptLogout} className={clsx(clsBtnIcon)}>
+      <BsBoxArrowLeft />
     </button>
   );
 }
@@ -99,20 +90,19 @@ export function NavBar() {
 
   const isProfileOfUser = profile?.id === user?.id;
   return (
-    <nav className="flex justify-between items-center">
+    <nav className="flex items-center">
       {
         isProfileOfUser ? <LogoutButton /> : <Nothing /> // Use placeholder to not affect layout
       }
 
-      <Link
-        to={endpoint("/home")}
-        className={clsx(
-          "w-9 aspect-square rounded-full p-2",
-          ...["transition", "hover:bg-white/25 active:scale-90"],
-        )}
-      >
-        <BsHouseFill className="w-full h-full" />
-      </Link>
+      <div className="ml-auto">
+        <Link
+          to={endpoint("/home")}
+          className={clsx(clsLinkBlock, clsLinkBtnIcon)}
+        >
+          <BsHouseFill />
+        </Link>
+      </div>
     </nav>
   );
 }
@@ -127,11 +117,7 @@ function FollowCountsNav() {
     <nav className="flex gap-3">
       <Link
         to={endpointWithParam("/:username/followers", { username })}
-        className={clsx(
-          "text-xs uppercase tracking-wide",
-          "underline underline-offset-4",
-          ...["transition", "text-white/50 hover:text-fuchsia-500"],
-        )}
+        className={clsx("text-xs uppercase tracking-wide", clsLinkTranslucent)}
       >
         <span className="font-bold text-base">
           {followers?.length ?? <>...</>}
@@ -141,11 +127,7 @@ function FollowCountsNav() {
 
       <Link
         to={endpointWithParam("/:username/following", { username })}
-        className={clsx(
-          "text-xs uppercase tracking-wide",
-          "underline underline-offset-4",
-          ...["transition", "text-white/50 hover:text-fuchsia-500"],
-        )}
+        className={clsx("text-xs uppercase tracking-wide", clsLinkTranslucent)}
       >
         <span className="font-bold text-base">
           {followings?.length ?? <>...</>}
@@ -166,12 +148,9 @@ function EditProfileButtonLink() {
     <Link
       to={endpointWithParam("/:username/edit", { username })}
       className={clsx(
-        "block",
-        "select-none",
-        "rounded-full px-6 py-3",
         "font-bold tracking-wide",
-        "border border-white/25",
-        ...["transition", "hover:bg-white/10 active:scale-95"],
+        clsLinkBlock,
+        clsLinkBtnOutline,
       )}
     >
       Edit Profile
@@ -221,13 +200,13 @@ function UnfollowButton() {
       disabled={isProcessing}
       onClick={unfollow}
       className={clsx(
-        isProcessing && "cursor-wait",
-        "select-none",
-        "rounded-full px-6 py-3",
-        "disabled:opacity-50",
+        isProcessing && "cursor-wait", // TODO Use overlay?
         "font-bold tracking-wide",
+        "select-none",
+        "rounded-full px-6 py-3", // Based on styles for outline buttons
         ...[
           "transition",
+          "disabled:opacity-50",
           "enabled:active:scale-95",
           ...[
             "border",
@@ -291,16 +270,8 @@ function FollowButton() {
       disabled={isProcessing}
       onClick={follow}
       className={clsx(
-        isProcessing && "cursor-wait",
-        "select-none",
-        "rounded-full px-6 py-3",
-        "disabled:opacity-50",
-        "font-bold tracking-wide",
-        ...[
-          "transition",
-          "enabled:active:scale-95",
-          "bg-fuchsia-500 enabled:hover:bg-fuchsia-600",
-        ],
+        isProcessing && "cursor-wait", // TODO Use overlay?
+        clsBtn,
       )}
     >
       Follow

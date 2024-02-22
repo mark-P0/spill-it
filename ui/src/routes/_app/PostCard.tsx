@@ -11,6 +11,12 @@ import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
 import { LoadingCursorAbsoluteOverlay } from "./Loading";
 import { useUserContext } from "./UserContext";
+import {
+  clsBtnNegative,
+  clsBtnOutline,
+  clsLink,
+  clsSmallBtnIcon,
+} from "./classes";
 import { ModalContent } from "./modal/Modal";
 import { useModalContext } from "./modal/ModalContext";
 import { useToastContext } from "./toast/ToastContext";
@@ -67,45 +73,25 @@ function DeletePostModalContent(props: {
       </h4>
       <p>This cannot be undone!</p>
 
-      <form>
-        <fieldset disabled={isDeleting} className="relative grid gap-3 mt-6">
+      <form className="relative">
+        <fieldset disabled={isDeleting} className="grid gap-3 mt-6">
           <button
             type="button"
             onClick={triggerDelete}
-            className={clsx(
-              "select-none",
-              "rounded-full px-6 py-3",
-              "disabled:opacity-50",
-              "font-bold tracking-wide",
-              ...[
-                "transition",
-                "bg-rose-500 enabled:hover:bg-red-700",
-                "enabled:active:scale-95",
-              ],
-            )}
+            className={clsx(clsBtnNegative)}
           >
             Delete 🗑
           </button>
           <button
             type="button"
             onClick={closeModal}
-            className={clsx(
-              "select-none",
-              "rounded-full px-6 py-3",
-              "disabled:opacity-50",
-              "border border-white/25",
-              ...[
-                "transition",
-                "enabled:hover:bg-white/10",
-                "enabled:active:scale-95",
-              ],
-            )}
+            className={clsx(clsBtnOutline)}
           >
-            Cancel 🙅‍♀️
+            On second thought...
           </button>
-
-          {isDeleting && <LoadingCursorAbsoluteOverlay />}
         </fieldset>
+
+        {isDeleting && <LoadingCursorAbsoluteOverlay />}
       </form>
     </ModalContent>
   );
@@ -150,11 +136,7 @@ export function PostCard(props: {
           <h3>
             <Link
               to={endpointWithParam("/:username", { username })}
-              className={clsx(
-                "font-bold",
-                "underline underline-offset-4",
-                ...["transition", "text-white hover:text-fuchsia-500"],
-              )}
+              className={clsx("font-bold", clsLink)}
             >
               {handleName}
             </Link>
@@ -174,13 +156,7 @@ export function PostCard(props: {
 
       <div>
         {canDelete && (
-          <button
-            onClick={promptDelete}
-            className={clsx(
-              "rounded-full p-2",
-              ...["transition", "hover:bg-white/25 active:scale-90"],
-            )}
-          >
+          <button onClick={promptDelete} className={clsx(clsSmallBtnIcon)}>
             <BsTrashFill />
           </button>
         )}

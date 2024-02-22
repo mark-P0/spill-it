@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { BsXLg } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
+import { clsBtnIcon, clsLink } from "../_app/classes";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
 import { useProfileContext } from "./ProfileContext";
@@ -23,11 +24,7 @@ function UserCard(props: { user: UserPublic }) {
         <h3>
           <Link
             to={endpointWithParam("/:username", { username })}
-            className={clsx(
-              "font-bold",
-              "underline underline-offset-4",
-              ...["transition", "text-white hover:text-fuchsia-500"],
-            )}
+            className={clsx("font-bold", clsLink)}
           >
             {handleName}
           </Link>
@@ -54,14 +51,8 @@ function FollowersModalContent() {
         </h2>
 
         <div className="ml-auto">
-          <button
-            onClick={closeModal}
-            className={clsx(
-              "w-9 aspect-square rounded-full p-2",
-              ...["transition", "hover:bg-white/25 active:scale-90"],
-            )}
-          >
-            <BsXLg className="w-full h-full" />
+          <button onClick={closeModal} className={clsx(clsBtnIcon)}>
+            <BsXLg />
           </button>
         </div>
       </header>
@@ -112,13 +103,7 @@ function FollowingModalContent() {
         </h2>
 
         <div className="ml-auto">
-          <button
-            onClick={closeModal}
-            className={clsx(
-              "w-9 aspect-square rounded-full p-2",
-              ...["transition", "hover:bg-white/25 active:scale-90"],
-            )}
-          >
+          <button onClick={closeModal} className={clsx(clsBtnIcon)}>
             <BsXLg className="w-full h-full" />
           </button>
         </div>

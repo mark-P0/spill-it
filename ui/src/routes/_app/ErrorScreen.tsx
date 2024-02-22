@@ -3,6 +3,7 @@ import { Link, useRouteError } from "react-router-dom";
 import { endpoint } from "../../utils/endpoints";
 import { logger } from "../../utils/logger";
 import { Screen } from "./Screen";
+import { clsLink } from "./classes";
 
 export function ErrorScreen() {
   document.title = "Oops! 😬 Spill.it";
@@ -18,13 +19,7 @@ export function ErrorScreen() {
           This tea may have been cleaned up the fun police.
         </span>
         <br />
-        <Link
-          to={endpoint("/")}
-          className={clsx(
-            "underline underline-offset-4",
-            ...["transition", "hover:text-fuchsia-500"],
-          )}
-        >
+        <Link to={endpoint("/")} className={clsx(clsLink)}>
           Go back
         </Link>{" "}
         before they see you 🚨

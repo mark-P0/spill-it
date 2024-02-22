@@ -9,6 +9,7 @@ import { getFromStorage } from "../../utils/storage";
 import { LoadingCursorAbsoluteOverlay } from "../_app/Loading";
 import { Screen } from "../_app/Screen";
 import { useUserContext } from "../_app/UserContext";
+import { clsBtn, clsLinkBlock } from "../_app/classes";
 import { useToastContext } from "../_app/toast/ToastContext";
 import { Feed } from "./feed/Feed";
 import { FeedProvider, useFeedContext } from "./feed/FeedContext";
@@ -24,9 +25,10 @@ function ProfileButtonLink() {
       to={endpointWithParam("/:username", { username })}
       className={clsx(
         "overflow-clip",
-        "w-9 aspect-square rounded-full",
         "border-2 border-white/50",
-        ...["transition", "hover:brightness-90 active:scale-95"],
+        clsLinkBlock,
+        "w-9 aspect-square rounded-full", // Based on styles for icon buttons
+        ...["transition", "active:scale-90 hover:brightness-90"],
       )}
     >
       <img
@@ -83,8 +85,8 @@ function PostForm() {
   }
 
   return (
-    <form onSubmit={submit}>
-      <fieldset disabled={isSubmitting} className="relative grid gap-3">
+    <form onSubmit={submit} className="relative">
+      <fieldset disabled={isSubmitting} className="grid gap-3">
         <label>
           <span className="sr-only">Tea 🍵</span>
           <textarea
@@ -98,26 +100,14 @@ function PostForm() {
             )}
           ></textarea>
         </label>
-        <button
-          disabled={content === ""}
-          className={clsx(
-            "ml-auto",
-            "select-none",
-            "rounded-full px-6 py-3",
-            "disabled:opacity-50",
-            "font-bold tracking-wide",
-            ...[
-              "transition",
-              "bg-rose-500 enabled:hover:bg-rose-600",
-              "enabled:active:scale-95",
-            ],
-          )}
-        >
-          {isSubmitting ? <>Spilling...</> : <>Spill! 🍵</>}
-        </button>
-
-        {isSubmitting && <LoadingCursorAbsoluteOverlay />}
+        <div className="ml-auto">
+          <button disabled={content === ""} className={clsx(clsBtn)}>
+            {isSubmitting ? <>Spilling...</> : <>Spill! 🍵</>}
+          </button>
+        </div>
       </fieldset>
+
+      {isSubmitting && <LoadingCursorAbsoluteOverlay />}
     </form>
   );
 }
@@ -128,10 +118,12 @@ export function HomeScreen() {
   return (
     <FeedProvider>
       <Screen className="grid auto-rows-min gap-6 p-6">
-        <header className="flex items-center justify-between gap-3">
+        <header className="flex items-center gap-3">
           <h1 className="text-3xl">Home</h1>
 
-          <ProfileButtonLink />
+          <div className="ml-auto">
+            <ProfileButtonLink />
+          </div>
         </header>
         <PostForm />
 
