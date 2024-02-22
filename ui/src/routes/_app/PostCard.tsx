@@ -11,7 +11,12 @@ import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
 import { LoadingCursorAbsoluteOverlay } from "./Loading";
 import { useUserContext } from "./UserContext";
-import { clsBtnNegative, clsBtnOutline, clsSmallBtnIcon } from "./classes";
+import {
+  clsBtnNegative,
+  clsBtnOutline,
+  clsLink,
+  clsSmallBtnIcon,
+} from "./classes";
 import { ModalContent } from "./modal/Modal";
 import { useModalContext } from "./modal/ModalContext";
 import { useToastContext } from "./toast/ToastContext";
@@ -131,11 +136,7 @@ export function PostCard(props: {
           <h3>
             <Link
               to={endpointWithParam("/:username", { username })}
-              className={clsx(
-                "font-bold",
-                "underline underline-offset-4",
-                ...["transition", "text-white hover:text-fuchsia-500"],
-              )}
+              className={clsx("font-bold", clsLink)}
             >
               {handleName}
             </Link>

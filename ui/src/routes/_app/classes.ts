@@ -102,3 +102,20 @@ const _clsBtn = (options?: {
 export const clsBtn = _clsBtn();
 export const clsLinkBtn = _clsBtn({ withoutDisabled: true });
 export const clsBtnNegative = _clsBtn({ type: "negative" });
+
+const _clsLink = (options?: { visibility?: "opaque" | "translucent" }) => {
+  const { visibility = "opaque" } = options ?? {};
+  return clsx(
+    "underline underline-offset-4",
+    ...[
+      "transition",
+      ...[
+        visibility === "opaque" && "text-white",
+        visibility === "translucent" && "text-white/50",
+        "hover:text-fuchsia-500",
+      ],
+    ],
+  );
+};
+export const clsLink = _clsLink();
+export const clsLinkTranslucent = _clsLink({ visibility: "translucent" });

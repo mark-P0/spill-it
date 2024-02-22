@@ -16,6 +16,7 @@ import {
   clsLinkBtn,
   clsLinkBtnIcon,
   clsLinkBtnOutline,
+  clsLinkTranslucent,
 } from "../_app/classes";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
@@ -116,11 +117,7 @@ function FollowCountsNav() {
     <nav className="flex gap-3">
       <Link
         to={endpointWithParam("/:username/followers", { username })}
-        className={clsx(
-          "text-xs uppercase tracking-wide",
-          "underline underline-offset-4",
-          ...["transition", "text-white/50 hover:text-fuchsia-500"],
-        )}
+        className={clsx("text-xs uppercase tracking-wide", clsLinkTranslucent)}
       >
         <span className="font-bold text-base">
           {followers?.length ?? <>...</>}
@@ -130,11 +127,7 @@ function FollowCountsNav() {
 
       <Link
         to={endpointWithParam("/:username/following", { username })}
-        className={clsx(
-          "text-xs uppercase tracking-wide",
-          "underline underline-offset-4",
-          ...["transition", "text-white/50 hover:text-fuchsia-500"],
-        )}
+        className={clsx("text-xs uppercase tracking-wide", clsLinkTranslucent)}
       >
         <span className="font-bold text-base">
           {followings?.length ?? <>...</>}

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { BsXLg } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
-import { clsBtnIcon } from "../_app/classes";
+import { clsBtnIcon, clsLink } from "../_app/classes";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
 import { useProfileContext } from "./ProfileContext";
@@ -24,11 +24,7 @@ function UserCard(props: { user: UserPublic }) {
         <h3>
           <Link
             to={endpointWithParam("/:username", { username })}
-            className={clsx(
-              "font-bold",
-              "underline underline-offset-4",
-              ...["transition", "text-white hover:text-fuchsia-500"],
-            )}
+            className={clsx("font-bold", clsLink)}
           >
             {handleName}
           </Link>
