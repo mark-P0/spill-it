@@ -11,10 +11,10 @@ import clsx from "clsx";
 export const clsLinkBlock = "block";
 
 const _clsBtnIcon = (options?: {
-  size?: "base" | "small";
   withoutDisabled?: boolean;
+  size?: "base" | "small";
 }) => {
-  const { size = "base", withoutDisabled = false } = options ?? {};
+  const { withoutDisabled = false, size = "base" } = options ?? {};
   return clsx(
     ...[
       //
@@ -73,8 +73,11 @@ export const clsBtnOutline = _clsBtnOutline();
 export const clsLinkBtnOutline = _clsBtnOutline({ withoutDisabled: true });
 
 // TODO Share common classes with other button types?
-const _clsBtn = (options?: { withoutDisabled?: boolean }) => {
-  const { withoutDisabled = false } = options ?? {};
+const _clsBtn = (options?: {
+  withoutDisabled?: boolean;
+  type?: "positive" | "negative"; // TODO Good enough names? Follow log levels, e.g. `info`, `error`?
+}) => {
+  const { withoutDisabled = false, type = "positive" } = options ?? {};
   return clsx(
     "select-none",
     "rounded-full px-6 py-3",
@@ -84,15 +87,18 @@ const _clsBtn = (options?: { withoutDisabled?: boolean }) => {
       !withoutDisabled && [
         "disabled:opacity-50",
         "enabled:active:scale-95",
-        "bg-fuchsia-500 enabled:hover:bg-fuchsia-600",
+        type === "positive" && "bg-fuchsia-500 enabled:hover:bg-fuchsia-600",
+        type === "negative" && "bg-rose-500 enabled:hover:bg-red-700",
       ],
       withoutDisabled && [
         // "disabled:opacity-50",
         "active:scale-95",
-        "bg-fuchsia-500 hover:bg-fuchsia-600",
+        type === "positive" && "bg-fuchsia-500 hover:bg-fuchsia-600",
+        type === "negative" && "bg-rose-500 hover:bg-red-700",
       ],
     ].flat(),
   );
 };
 export const clsBtn = _clsBtn();
 export const clsLinkBtn = _clsBtn({ withoutDisabled: true });
+export const clsBtnNegative = _clsBtn({ type: "negative" });
