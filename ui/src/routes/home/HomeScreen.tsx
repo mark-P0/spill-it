@@ -9,7 +9,7 @@ import { getFromStorage } from "../../utils/storage";
 import { LoadingCursorAbsoluteOverlay } from "../_app/Loading";
 import { Screen } from "../_app/Screen";
 import { useUserContext } from "../_app/UserContext";
-import { clsLinkBlock } from "../_app/classes";
+import { clsBtn, clsLinkBlock } from "../_app/classes";
 import { useToastContext } from "../_app/toast/ToastContext";
 import { Feed } from "./feed/Feed";
 import { FeedProvider, useFeedContext } from "./feed/FeedContext";
@@ -85,8 +85,8 @@ function PostForm() {
   }
 
   return (
-    <form onSubmit={submit}>
-      <fieldset disabled={isSubmitting} className="relative grid gap-3">
+    <form onSubmit={submit} className="relative">
+      <fieldset disabled={isSubmitting} className="grid gap-3">
         <label>
           <span className="sr-only">Tea 🍵</span>
           <textarea
@@ -100,26 +100,14 @@ function PostForm() {
             )}
           ></textarea>
         </label>
-        <button
-          disabled={content === ""}
-          className={clsx(
-            "ml-auto",
-            "select-none",
-            "rounded-full px-6 py-3",
-            "disabled:opacity-50",
-            "font-bold tracking-wide",
-            ...[
-              "transition",
-              "bg-rose-500 enabled:hover:bg-rose-600",
-              "enabled:active:scale-95",
-            ],
-          )}
-        >
-          {isSubmitting ? <>Spilling...</> : <>Spill! 🍵</>}
-        </button>
-
-        {isSubmitting && <LoadingCursorAbsoluteOverlay />}
+        <div className="ml-auto">
+          <button disabled={content === ""} className={clsx(clsBtn)}>
+            {isSubmitting ? <>Spilling...</> : <>Spill! 🍵</>}
+          </button>
+        </div>
       </fieldset>
+
+      {isSubmitting && <LoadingCursorAbsoluteOverlay />}
     </form>
   );
 }

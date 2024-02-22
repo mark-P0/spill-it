@@ -5,6 +5,7 @@ import { logger } from "../../../utils/logger";
 import { Controller, useObserver } from "../../../utils/react";
 import { LoadingIndicator } from "../../_app/Loading";
 import { PostCard } from "../../_app/PostCard";
+import { clsBtn } from "../../_app/classes";
 import { useToastContext } from "../../_app/toast/ToastContext";
 import { usePostsContext } from "./PostsContext";
 
@@ -52,20 +53,7 @@ export function PostsList() {
   if (postsStatus === "error") {
     return (
       <div className="grid place-items-center">
-        <button
-          onClick={reinitializePosts}
-          className={clsx(
-            "select-none",
-            "rounded-full px-6 py-3",
-            "disabled:opacity-50",
-            "font-bold tracking-wide",
-            ...[
-              "transition",
-              "bg-fuchsia-500 hover:bg-fuchsia-600",
-              "active:scale-95",
-            ],
-          )}
-        >
+        <button onClick={reinitializePosts} className={clsx(clsBtn)}>
           Load Posts 🔁
         </button>
       </div>

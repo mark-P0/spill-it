@@ -71,3 +71,28 @@ const _clsBtnOutline = (options?: { withoutDisabled?: boolean }) => {
 };
 export const clsBtnOutline = _clsBtnOutline();
 export const clsLinkBtnOutline = _clsBtnOutline({ withoutDisabled: true });
+
+// TODO Share common classes with other button types?
+const _clsBtn = (options?: { withoutDisabled?: boolean }) => {
+  const { withoutDisabled = false } = options ?? {};
+  return clsx(
+    "select-none",
+    "rounded-full px-6 py-3",
+    "font-bold tracking-wide",
+    ...[
+      "transition",
+      !withoutDisabled && [
+        "disabled:opacity-50",
+        "enabled:active:scale-95",
+        "bg-fuchsia-500 enabled:hover:bg-fuchsia-600",
+      ],
+      withoutDisabled && [
+        // "disabled:opacity-50",
+        "active:scale-95",
+        "bg-fuchsia-500 hover:bg-fuchsia-600",
+      ],
+    ].flat(),
+  );
+};
+export const clsBtn = _clsBtn();
+export const clsLinkBtn = _clsBtn({ withoutDisabled: true });

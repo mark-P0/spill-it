@@ -9,9 +9,11 @@ import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
 import { useUserContext } from "../_app/UserContext";
 import {
+  clsBtn,
   clsBtnIcon,
   clsBtnOutline,
   clsLinkBlock,
+  clsLinkBtn,
   clsLinkBtnIcon,
   clsLinkBtnOutline,
 } from "../_app/classes";
@@ -49,15 +51,8 @@ function LogoutModalContent() {
         <Link
           to={endpoint("/logout")}
           className={clsx(
-            "text-center select-none",
-            "rounded-full px-6 py-3",
-            "disabled:opacity-50",
-            "font-bold tracking-wide",
-            ...[
-              "transition",
-              "bg-fuchsia-500 hover:bg-fuchsia-600",
-              "active:scale-95",
-            ],
+            "text-center", // Link/Anchor texts are not centered by default like in buttons
+            clsLinkBtn,
           )}
         >
           Yes 👋
@@ -282,16 +277,8 @@ function FollowButton() {
       disabled={isProcessing}
       onClick={follow}
       className={clsx(
-        isProcessing && "cursor-wait",
-        "select-none",
-        "rounded-full px-6 py-3",
-        "disabled:opacity-50",
-        "font-bold tracking-wide",
-        ...[
-          "transition",
-          "enabled:active:scale-95",
-          "bg-fuchsia-500 enabled:hover:bg-fuchsia-600",
-        ],
+        isProcessing && "cursor-wait", // TODO Use overlay?
+        clsBtn,
       )}
     >
       Follow
