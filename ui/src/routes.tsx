@@ -3,7 +3,10 @@ import { raise } from "@spill-it/utils/errors";
 import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";
 import { ProfileScreen } from "./routes/[profile2]/ProfileScreen";
-import { loadProfile } from "./routes/[profile2]/profile-loader";
+import {
+  loadProfile,
+  profileRouteId,
+} from "./routes/[profile2]/profile-loader";
 import {
   FollowersModal,
   FollowingModal,
@@ -38,6 +41,7 @@ export const ProfileRoute1: RouteObject = {
   ],
 };
 export const ProfileRoute: RouteObject = {
+  id: profileRouteId,
   path: endpoint("/:username"),
   loader: loadProfile,
   element: <ProfileScreen />,

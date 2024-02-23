@@ -46,7 +46,8 @@ async function fetchFollowings(userId: string) {
   return followings;
 }
 
-export const [loadProfile, useProfileLoader] = createLoader(async (_) => {
+export const profileRouteId = "[profile]";
+const profileLoader = createLoader(profileRouteId, async (_) => {
   const { username } = zodProfileParams.parse(_.params);
 
   logger.debug("Fetching profile...");
@@ -60,3 +61,4 @@ export const [loadProfile, useProfileLoader] = createLoader(async (_) => {
 
   return { profile, followers, followings };
 });
+export const [loadProfile, useProfileLoader] = profileLoader;
