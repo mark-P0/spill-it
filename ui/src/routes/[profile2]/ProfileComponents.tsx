@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { BsBoxArrowLeft, BsHouseFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
-import { endpoint } from "../../utils/endpoints";
+import { endpoint, endpointWithParam } from "../../utils/endpoints";
 import { logger } from "../../utils/logger";
 import { useUserContext } from "../_app/UserContext";
 import {
@@ -102,15 +102,14 @@ export function NavBar() {
 }
 
 function FollowCountsNav() {
-  const { /* profile, */ followers, followings } = useProfileLoader();
+  const { profile, followers, followings } = useProfileLoader();
 
-  // const { username } = profile;
+  const { username } = profile;
 
   return (
     <nav className="flex gap-3">
       <Link
-        // to={endpointWithParam("/:username/followers", { username })}
-        to="#"
+        to={endpointWithParam("/:username/followers", { username })}
         className={clsx("text-xs uppercase tracking-wide", clsLinkTranslucent)}
       >
         <span className="font-bold text-base">{followers.length}</span>{" "}
@@ -118,8 +117,7 @@ function FollowCountsNav() {
       </Link>
 
       <Link
-        // to={endpointWithParam("/:username/following", { username })}
-        to="#"
+        to={endpointWithParam("/:username/following", { username })}
         className={clsx("text-xs uppercase tracking-wide", clsLinkTranslucent)}
       >
         <span className="font-bold text-base">{followings.length}</span>{" "}

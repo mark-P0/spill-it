@@ -1,3 +1,4 @@
+import { Outlet } from "react-router-dom";
 import { Screen } from "../_app/Screen";
 import { NavBar, ProfileCard } from "./ProfileComponents";
 import { useProfileLoader } from "./profile-loader";
@@ -20,6 +21,8 @@ export function ProfileScreen() {
           {JSON.stringify(profile, undefined, 2)}
         </pre>
       </main>
+
+      <Outlet />
     </Screen>
   );
 }

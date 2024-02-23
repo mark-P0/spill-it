@@ -2,15 +2,15 @@ import { buildHeaderAuth } from "@spill-it/auth/headers";
 import { raise } from "@spill-it/utils/errors";
 import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";
+import {
+  FollowersModal,
+  FollowingModal,
+} from "./routes/[profile2]/FollowsModals";
 import { ProfileScreen } from "./routes/[profile2]/ProfileScreen";
 import {
   loadProfile,
   profileRouteId,
 } from "./routes/[profile2]/profile-loader";
-import {
-  FollowersModal,
-  FollowingModal,
-} from "./routes/[profile]/FollowsModals";
 import { EditProfileModal } from "./routes/[profile]/edit-profile/EditProfileModal";
 import { ErrorScreen } from "./routes/_app/ErrorScreen";
 import { HomeScreen } from "./routes/home/HomeScreen";
@@ -45,20 +45,20 @@ export const ProfileRoute: RouteObject = {
   path: endpoint("/:username"),
   loader: loadProfile,
   element: <ProfileScreen />,
-  // children: [
-  //   {
-  //     path: endpoint("/:username/followers"),
-  //     element: <FollowersModal />,
-  //   },
-  //   {
-  //     path: endpoint("/:username/following"),
-  //     element: <FollowingModal />,
-  //   },
-  //   {
-  //     path: endpoint("/:username/edit"),
-  //     element: <EditProfileModal />,
-  //   },
-  // ],
+  children: [
+    {
+      path: endpoint("/:username/followers"),
+      element: <FollowersModal />,
+    },
+    {
+      path: endpoint("/:username/following"),
+      element: <FollowingModal />,
+    },
+    // {
+    //   path: endpoint("/:username/edit"),
+    //   element: <EditProfileModal />,
+    // },
+  ],
 };
 
 export const HomeRoute: RouteObject = {
