@@ -1,5 +1,5 @@
 import { Screen } from "../_app/Screen";
-import { NavBar } from "./ProfileComponents";
+import { NavBar, ProfileCard } from "./ProfileComponents";
 import { useProfileLoader } from "./profile-loader";
 
 export function ProfileScreen() {
@@ -10,8 +10,9 @@ export function ProfileScreen() {
 
   return (
     <Screen className="grid auto-rows-min gap-6 p-6">
-      <header>
+      <header className="grid grid-rows-subgrid row-span-2">
         <NavBar />
+        <ProfileCard />
       </header>
 
       <main>

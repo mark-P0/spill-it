@@ -99,3 +99,27 @@ export function NavBar() {
     </nav>
   );
 }
+
+export function ProfileCard() {
+  const { profile } = useProfileLoader();
+
+  const { handleName, username, portraitUrl } = profile;
+
+  return (
+    <article className="flex gap-6">
+      <header>
+        <h1 className="text-3xl font-bold">{handleName}</h1>
+        <p className="text-lg text-white/50">{username}</p>
+        {/* <FollowCountsNav /> */}
+      </header>
+      <div>{/* <ActionButton /> */}</div>
+      <div className="ml-auto">
+        <img
+          src={portraitUrl}
+          alt={`Portrait of "${handleName}"`}
+          className="w-20 aspect-square rounded-full"
+        />
+      </div>
+    </article>
+  );
+}
