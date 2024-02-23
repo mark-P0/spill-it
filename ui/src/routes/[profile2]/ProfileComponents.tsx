@@ -5,11 +5,13 @@ import { endpoint, endpointWithParam } from "../../utils/endpoints";
 import { logger } from "../../utils/logger";
 import { useUserContext } from "../_app/UserContext";
 import {
+  clsBtn,
   clsBtnIcon,
   clsBtnOutline,
   clsLinkBlock,
   clsLinkBtn,
   clsLinkBtnIcon,
+  clsLinkBtnOutline,
   clsLinkTranslucent,
 } from "../_app/classes";
 import { ModalContent } from "../_app/modal/Modal";
@@ -127,6 +129,160 @@ function FollowCountsNav() {
   );
 }
 
+function EditProfileButtonLink() {
+  const { user } = useUserContext();
+
+  if (user === null) return null;
+  const { username } = user;
+
+  return (
+    <Link
+      to={endpointWithParam("/:username/edit", { username })}
+      className={clsx(
+        "font-bold tracking-wide",
+        clsLinkBlock,
+        clsLinkBtnOutline,
+      )}
+    >
+      Edit Profile
+    </Link>
+  );
+}
+function UnfollowButton() {
+  // const { showOnToast } = useToastContext();
+  // const { profile, reflectFollowers } = useProfileLoader();
+  // const [isProcessing, setIsProcessing] = useState(false);
+
+  //   async function unfollow() {
+  //     setIsProcessing(true);
+  //     try {
+  //       if (profile === null) raise("Profile not available...?");
+  //       const { id, handleName } = profile;
+  //
+  //       logger.debug("Retrieving session info...");
+  //       const headerAuth = getFromStorage("SESS");
+  //
+  //       logger.debug("Requesting unfollow...");
+  //       const result = await fetchAPI("/api/v0/follows", "DELETE", {
+  //         headers: { Authorization: headerAuth },
+  //         query: { followingUserId: id },
+  //       });
+  //       if (!result.success) raise("Failed unfollowing", result.error);
+  //
+  //       logger.debug("Reflecting followers...");
+  //       await reflectFollowers();
+  //
+  //       showOnToast(
+  //         <>
+  //           You have now <span className="font-bold">unfollowed</span>{" "}
+  //           {handleName} 😢
+  //         </>,
+  //         "critical",
+  //       );
+  //     } catch (caughtError) {
+  //       logger.error(ensureError(caughtError));
+  //       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
+  //     }
+  //     setIsProcessing(false);
+  //   }
+
+  return (
+    <button
+      // disabled={isProcessing}
+      // onClick={unfollow}
+      className={clsx(
+        // isProcessing && "cursor-wait", // TODO Use overlay?
+        "font-bold tracking-wide",
+        "select-none",
+        "rounded-full px-6 py-3", // Based on styles for outline buttons
+        ...[
+          "transition",
+          "disabled:opacity-50",
+          "enabled:active:scale-95",
+          ...[
+            "border",
+            "border-white/25 enabled:hover:border-transparent",
+            "text-white enabled:hover:bg-red-700",
+          ],
+        ],
+        "grid *:row-[1] *:col-[1]",
+        "group",
+      )}
+    >
+      <span className="transition opacity-100 group-enabled:group-hover:opacity-0">
+        Following
+      </span>
+      <span className="transition opacity-0 group-enabled:group-hover:opacity-100">
+        Unfollow
+      </span>
+    </button>
+  );
+}
+function FollowButton() {
+  // const { showOnToast } = useToastContext();
+  // const { profile, reflectFollowers } = useProfileLoader();
+  // const [isProcessing, setIsProcessing] = useState(false);
+
+  //   async function follow() {
+  //     setIsProcessing(true);
+  //     try {
+  //       if (profile === null) raise("Profile not available...?");
+  //       const { id, handleName } = profile;
+  //
+  //       logger.debug("Retrieving session info...");
+  //       const headerAuth = getFromStorage("SESS");
+  //
+  //       logger.debug("Requesting follow...");
+  //       const result = await fetchAPI("/api/v0/follows", "POST", {
+  //         headers: { Authorization: headerAuth },
+  //         query: { followingUserId: id },
+  //       });
+  //       if (!result.success) raise("Failed following", result.error);
+  //
+  //       logger.debug("Reflecting followers...");
+  //       await reflectFollowers();
+  //
+  //       showOnToast(
+  //         <>
+  //           You are now <span className="font-bold">following</span> {handleName}!
+  //           💅
+  //         </>,
+  //         "info",
+  //       );
+  //     } catch (caughtError) {
+  //       logger.error(ensureError(caughtError));
+  //       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
+  //     }
+  //     setIsProcessing(false);
+  //   }
+
+  return (
+    <button
+      // disabled={isProcessing}
+      // onClick={follow}
+      className={clsx(
+        // isProcessing && "cursor-wait", // TODO Use overlay?
+        clsBtn,
+      )}
+    >
+      Follow
+    </button>
+  );
+}
+function ActionButton() {
+  const { user } = useUserContext();
+  const { profile, followers } = useProfileLoader();
+
+  if (user === null) return null;
+
+  if (user.id === profile.id) return <EditProfileButtonLink />;
+
+  const isFollowing = followers.some(({ follower }) => follower.id === user.id);
+  if (isFollowing) return <UnfollowButton />;
+
+  return <FollowButton />;
+}
+
 export function ProfileCard() {
   const { profile } = useProfileLoader();
 
@@ -139,7 +295,9 @@ export function ProfileCard() {
         <p className="text-lg text-white/50">{username}</p>
         <FollowCountsNav />
       </header>
-      <div>{/* <ActionButton /> */}</div>
+      <div>
+        <ActionButton />
+      </div>
       <div className="ml-auto">
         <img
           src={portraitUrl}
