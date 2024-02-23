@@ -5,7 +5,7 @@ import { digits, letters } from "@spill-it/utils/strings";
 import clsx from "clsx";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { BsXLg } from "react-icons/bs";
-import { useNavigate } from "react-router-dom";
+import { Form, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { endpointWithParam } from "../../../utils/endpoints";
 import { fetchAPI } from "../../../utils/fetch-api";
@@ -36,6 +36,104 @@ const zodUsername = z
   .max(USERNAME_LEN_MAX)
   .refine(isUsernameCharsValid, "Invalid username characters")
   .optional();
+
+export function EditProfileForm2() {
+  const { closeModal } = useModalContext();
+
+  return (
+    <Form method="POST">
+      <fieldset
+        // disabled={isProcessing}
+        className="grid gap-6"
+      >
+        <header className="flex items-center gap-6">
+          <h2 className="text-3xl font-bold">Edit Profile</h2>
+
+          <div className="ml-auto">
+            <button
+              type="button"
+              onClick={closeModal}
+              className={clsx(clsBtnIcon)}
+            >
+              <BsXLg />
+            </button>
+          </div>
+        </header>
+
+        <div className="grid gap-3">
+          <label className="select-none grid gap-1 group/handle">
+            <span
+              className={clsx(
+                "text-xs uppercase tracking-wide",
+                ...[
+                  "transition",
+                  "text-white/50 group-focus-within/handle:text-white group-has-[:invalid]/handle:text-red-500",
+                ],
+              )}
+            >
+              Handle Name
+            </span>
+            <Input
+              type="text"
+              name="handleName"
+              // value={newHandleName}
+              // onChange={reflectNewHandleName}
+              // validity={newHandleNameValidity}
+              // reportValidity
+              className={clsx(
+                "bg-transparent",
+                "border rounded px-2 py-1",
+                ...[
+                  "transition",
+                  "border-white/25 group-focus-within/handle:border-white group-has-[:invalid]/handle:border-red-500",
+                ],
+              )}
+            />
+          </label>
+
+          <label className="select-none grid gap-1 group/username">
+            <span
+              className={clsx(
+                "text-xs uppercase tracking-wide",
+                ...[
+                  "transition",
+                  "text-white/50 group-focus-within/username:text-white group-has-[:invalid]/username:text-red-500",
+                ],
+              )}
+            >
+              Username
+            </span>
+            <Input
+              type="text"
+              name="username"
+              // value={newUsername}
+              // onChange={reflectNewUsername}
+              // validity={newUsernameValidity}
+              // reportValidity
+              className={clsx(
+                "bg-transparent",
+                "border rounded px-2 py-1",
+                ...[
+                  "transition",
+                  "border-white/25 group-focus-within/username:border-white group-has-[:invalid]/username:border-red-500",
+                ],
+              )}
+            />
+          </label>
+        </div>
+
+        <footer className="flex flex-row-reverse">
+          <button
+            // disabled={!canSave}
+            className={clsx(clsBtn)}
+          >
+            Save
+          </button>
+        </footer>
+      </fieldset>
+    </Form>
+  );
+}
 
 export function EditProfileForm() {
   const navigate = useNavigate();

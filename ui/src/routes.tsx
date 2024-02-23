@@ -12,11 +12,15 @@ import { ErrorScreen } from "./routes/_app/ErrorScreen";
 import { HomeScreen } from "./routes/home/HomeScreen";
 import { WelcomeScreen } from "./routes/welcome/WelcomeScreen";
 import { redirectUri } from "./routes/welcome/redirect-uri";
-import { endpoint } from "./utils/endpoints";
+import { endpoint, endpointWithParam } from "./utils/endpoints";
 import { fetchAPI } from "./utils/fetch-api";
 import { isLoggedIn } from "./utils/is-logged-in";
 import { logger } from "./utils/logger";
-import { deleteFromStorage, setOnStorage } from "./utils/storage";
+import {
+  deleteFromStorage,
+  getFromStorage,
+  setOnStorage,
+} from "./utils/storage";
 
 export const ProfileRoute: RouteObject = {
   path: endpoint("/:username"),
@@ -33,6 +37,43 @@ export const ProfileRoute: RouteObject = {
     {
       path: endpoint("/:username/edit"),
       element: <EditProfileModal />,
+      async action({ params, request }) {
+        console.warn("edit action");
+        console.warn({ params, request });
+
+        // TODO Reuse from profile context
+        const _params = z.object({ username: z.string() }).parse(params);
+
+        const formData = await request.formData();
+        const formDataObj = Object.fromEntries(formData);
+
+        // TODO Reuse from DB package?
+        // TODO Reuse from edit profile form
+        const _formData = z
+          .object({
+            username: z.string().optional(),
+            handleName: z.string().optional(),
+          })
+          .parse(formDataObj);
+
+        let { username, handleName } = _formData;
+        if (username === "") username = undefined;
+        if (handleName === "") handleName = undefined;
+
+        logger.debug("Retrieving session info...");
+        const headerAuth = getFromStorage("SESS");
+
+        const result = await fetchAPI("/api/v0/users/me", "PATCH", {
+          headers: { Authorization: headerAuth },
+          body: { details: { username, handleName } },
+        });
+        if (!result.success)
+          raise("Failed updating profile info", result.error);
+
+        username ??= _params.username;
+        const profileLocation = endpointWithParam("/:username", { username });
+        return redirect(profileLocation);
+      },
     },
   ],
 };
