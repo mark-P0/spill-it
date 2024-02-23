@@ -10,6 +10,7 @@ import {
   clsLinkBlock,
   clsLinkBtn,
   clsLinkBtnIcon,
+  clsLinkTranslucent,
 } from "../_app/classes";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
@@ -100,6 +101,34 @@ export function NavBar() {
   );
 }
 
+function FollowCountsNav() {
+  const { /* profile, */ followers, followings } = useProfileLoader();
+
+  // const { username } = profile;
+
+  return (
+    <nav className="flex gap-3">
+      <Link
+        // to={endpointWithParam("/:username/followers", { username })}
+        to="#"
+        className={clsx("text-xs uppercase tracking-wide", clsLinkTranslucent)}
+      >
+        <span className="font-bold text-base">{followers.length}</span>{" "}
+        {followers.length === 1 ? <>follower</> : <>followers</>}
+      </Link>
+
+      <Link
+        // to={endpointWithParam("/:username/following", { username })}
+        to="#"
+        className={clsx("text-xs uppercase tracking-wide", clsLinkTranslucent)}
+      >
+        <span className="font-bold text-base">{followings.length}</span>{" "}
+        following
+      </Link>
+    </nav>
+  );
+}
+
 export function ProfileCard() {
   const { profile } = useProfileLoader();
 
@@ -110,7 +139,7 @@ export function ProfileCard() {
       <header>
         <h1 className="text-3xl font-bold">{handleName}</h1>
         <p className="text-lg text-white/50">{username}</p>
-        {/* <FollowCountsNav /> */}
+        <FollowCountsNav />
       </header>
       <div>{/* <ActionButton /> */}</div>
       <div className="ml-auto">
