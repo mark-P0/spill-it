@@ -1,4 +1,5 @@
 import { Screen } from "../_app/Screen";
+import { NavBar } from "./ProfileComponents";
 import { useProfileLoader } from "./profile-loader";
 
 export function ProfileScreen() {
@@ -8,8 +9,16 @@ export function ProfileScreen() {
   document.title = `${handleName} (${username}) 👀 Spill.it!`;
 
   return (
-    <Screen>
-      <pre>{JSON.stringify(profile, undefined, 2)}</pre>
+    <Screen className="grid auto-rows-min gap-6 p-6">
+      <header>
+        <NavBar />
+      </header>
+
+      <main>
+        <pre className="bg-red-500 whitespace-normal break-all">
+          {JSON.stringify(profile, undefined, 2)}
+        </pre>
+      </main>
     </Screen>
   );
 }
