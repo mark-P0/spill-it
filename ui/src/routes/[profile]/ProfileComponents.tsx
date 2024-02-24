@@ -7,6 +7,7 @@ import { endpoint, endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
+import { useProfileLoader } from "../[profile]";
 import { useUserContext } from "../_app/UserContext";
 import {
   clsBtn,
@@ -86,9 +87,10 @@ function LogoutButton() {
 
 export function NavBar() {
   const { user } = useUserContext();
-  const { profile } = useProfileContext();
+  const { profile } = useProfileLoader();
 
-  const isProfileOfUser = profile?.id === user?.id;
+  const isProfileOfUser = profile.id === user?.id;
+
   return (
     <nav className="flex items-center">
       {
@@ -108,9 +110,8 @@ export function NavBar() {
 }
 
 function FollowCountsNav() {
-  const { profile, followers, followings } = useProfileContext();
+  const { profile, followers, followings } = useProfileLoader();
 
-  if (profile === null) return;
   const { username } = profile;
 
   return (
@@ -119,19 +120,15 @@ function FollowCountsNav() {
         to={endpointWithParam("/:username/followers", { username })}
         className={clsx("text-xs uppercase tracking-wide", clsLinkTranslucent)}
       >
-        <span className="font-bold text-base">
-          {followers?.length ?? <>...</>}
-        </span>{" "}
-        {followers?.length === 1 ? <>follower</> : <>followers</>}
+        <span className="font-bold text-base">{followers.length}</span>{" "}
+        {followers.length === 1 ? <>follower</> : <>followers</>}
       </Link>
 
       <Link
         to={endpointWithParam("/:username/following", { username })}
         className={clsx("text-xs uppercase tracking-wide", clsLinkTranslucent)}
       >
-        <span className="font-bold text-base">
-          {followings?.length ?? <>...</>}
-        </span>{" "}
+        <span className="font-bold text-base">{followings.length}</span>{" "}
         following
       </Link>
     </nav>
@@ -280,11 +277,9 @@ function FollowButton() {
 }
 function ActionButton() {
   const { user } = useUserContext();
-  const { profile, followers } = useProfileContext();
+  const { profile, followers } = useProfileLoader();
 
   if (user === null) return null;
-  if (profile === null) return null;
-  if (followers === null) return null;
 
   if (user.id === profile.id) return <EditProfileButtonLink />;
 
@@ -295,9 +290,8 @@ function ActionButton() {
 }
 
 export function ProfileCard() {
-  const { profile } = useProfileContext();
+  const { profile } = useProfileLoader();
 
-  if (profile === null) return null;
   const { handleName, username, portraitUrl } = profile;
 
   return (
