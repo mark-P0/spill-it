@@ -191,9 +191,11 @@ function UnfollowButton() {
     setIsProcessing(false);
   }
 
+  const isRevalidating = revalidator.state === "loading";
+
   return (
     <button
-      disabled={isProcessing}
+      disabled={isProcessing || isRevalidating}
       onClick={unfollow}
       className={clsx(
         "disabled:cursor-wait", // TODO Use overlay?
@@ -261,9 +263,11 @@ function FollowButton() {
     setIsProcessing(false);
   }
 
+  const isRevalidating = revalidator.state === "loading";
+
   return (
     <button
-      disabled={isProcessing}
+      disabled={isProcessing || isRevalidating}
       onClick={follow}
       className={clsx(
         "disabled:cursor-wait", // TODO Use overlay?
