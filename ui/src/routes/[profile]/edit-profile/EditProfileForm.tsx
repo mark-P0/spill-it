@@ -37,6 +37,18 @@ const zodUsername = z
   .refine(isUsernameCharsValid, "Invalid username characters")
   .optional();
 
+async function requestUpdate(
+  username: string | undefined,
+  handleName: string | undefined,
+) {
+  const headerAuth = getFromStorage("SESS");
+
+  const result = await fetchAPI("/api/v0/users/me", "PATCH", {
+    headers: { Authorization: headerAuth },
+    body: { details: { username, handleName } },
+  });
+  if (!result.success) raise("Failed updating profile info", result.error);
+}
 export function EditProfileForm() {
   const { user } = useUserContext();
   const { closeModal, makeModalCancellable } = useModalContext();
@@ -87,10 +99,6 @@ export function EditProfileForm() {
     setIsProcessing(true);
     makeModalCancellable(false);
     try {
-      logger.debug("Retrieving session info...");
-      const headerAuth = getFromStorage("SESS");
-
-      logger.debug("Requesting update...");
       let username: string | undefined;
       if (newUsername !== user.username && newUsername !== "") {
         username = newUsername;
@@ -99,11 +107,9 @@ export function EditProfileForm() {
       if (newHandleName !== user.handleName && newHandleName !== "") {
         handleName = newHandleName;
       }
-      const result = await fetchAPI("/api/v0/users/me", "PATCH", {
-        headers: { Authorization: headerAuth },
-        body: { details: { username, handleName } },
-      });
-      if (!result.success) raise("Failed updating profile info", result.error);
+
+      logger.debug("Sending update request...");
+      await requestUpdate(username, handleName)
 
       logger.debug("Redirecting to [new] username...");
       showOnToast(<>Success! ✨ Redirecting...</>, "info");
