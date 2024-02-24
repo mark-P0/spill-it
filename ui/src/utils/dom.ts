@@ -38,13 +38,27 @@ export function EE<T extends HTMLElement>(
   return element;
 }
 
+/**
+ * Redirect programatically via JS. Gives the effect of clicking an `<a>`.
+ *
+ * Might be subject to browser privacy/security rules...
+ *
+ * Alternatives:
+ * - `window.location = url`
+ * - `window.location.href = url`
+ *
+ * https://developer.mozilla.org/en-US/docs/Web/API/Window/location#basic_example
+ */
+export function redirectFull(url: string) {
+  window.location.assign(url);
+}
+
 const bodyClasses =
   document.body.getAttribute("class") ??
   (() => {
     logger.warn("No document body classes...?");
     return "";
   })();
-
 export function removeBodyClasses() {
   document.body.removeAttribute("class");
 }
