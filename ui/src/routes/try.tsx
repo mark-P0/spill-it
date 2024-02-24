@@ -4,6 +4,18 @@ import { logger } from "../utils/logger";
 import { Screen } from "./_app/Screen";
 import { ModalContent } from "./_app/modal/Modal";
 import { useModalContext } from "./_app/modal/ModalContext";
+import { TextArea } from "./try/TextArea";
+
+const textAreaRoute: RouteObject = (() => {
+  return {
+    path: "/textarea",
+    element: (
+      <Screen>
+        <TextArea />
+      </Screen>
+    ),
+  };
+})();
 
 const queryRoute: RouteObject = (() => {
   return {
@@ -87,6 +99,7 @@ const modalRoute: RouteObject = (() => {
 })();
 
 export const tryRoutes: RouteObject[] = [
+  textAreaRoute,
   queryRoute,
   sleepRoute,
   loadRoute,
