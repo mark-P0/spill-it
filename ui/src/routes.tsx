@@ -7,11 +7,11 @@ import {
   FollowingModal,
 } from "./routes/[profile2]/FollowsModals";
 import { ProfileScreen } from "./routes/[profile2]/ProfileScreen";
+import { EditProfileModal } from "./routes/[profile2]/edit-profile/EditProfileModal";
 import {
   loadProfile,
   profileRouteId,
 } from "./routes/[profile2]/profile-loader";
-import { EditProfileModal } from "./routes/[profile]/edit-profile/EditProfileModal";
 import { App } from "./routes/_app/App";
 import { ErrorScreen } from "./routes/_app/ErrorScreen";
 import { HomeScreen } from "./routes/home/HomeScreen";
@@ -55,10 +55,10 @@ export const ProfileRoute: RouteObject = {
       path: endpoint("/:username/following"),
       element: <FollowingModal />,
     },
-    // {
-    //   path: endpoint("/:username/edit"),
-    //   element: <EditProfileModal />,
-    // },
+    {
+      path: endpoint("/:username/edit"),
+      element: <EditProfileModal />,
+    },
   ],
 };
 
