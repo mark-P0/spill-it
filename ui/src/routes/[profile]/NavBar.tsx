@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { endpoint } from "../../utils/endpoints";
 import { logger } from "../../utils/logger";
 import { useProfileLoader } from "../[profile]";
-import { Nothing } from "../_app/Nothing";
 import { useUserContext } from "../_app/UserContext";
 import {
   clsBtnIcon,
@@ -69,9 +68,7 @@ export function NavBar() {
 
   return (
     <nav className="flex items-center">
-      {
-        isProfileOfUser ? <LogoutButton /> : <Nothing /> // Use placeholder to not affect layout
-      }
+      {isProfileOfUser && <LogoutButton />}
 
       <div className="ml-auto">
         <Link
