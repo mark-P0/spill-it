@@ -5,8 +5,8 @@ import { digits, letters } from "@spill-it/utils/strings";
 import clsx from "clsx";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { BsXLg } from "react-icons/bs";
-import { useNavigate } from "react-router-dom";
 import { z } from "zod";
+import { redirectFull } from "../../../utils/dom";
 import { endpointWithParam } from "../../../utils/endpoints";
 import { fetchAPI } from "../../../utils/fetch-api";
 import { logger } from "../../../utils/logger";
@@ -38,8 +38,7 @@ const zodUsername = z
   .optional();
 
 export function EditProfileForm() {
-  const navigate = useNavigate();
-  const { user, reflectUser } = useUserContext();
+  const { user } = useUserContext();
   const { closeModal, makeModalCancellable } = useModalContext();
   const { showOnToast } = useToastContext();
 
@@ -109,8 +108,8 @@ export function EditProfileForm() {
       logger.debug("Redirecting to [new] username...");
       showOnToast(<>Success! ✨ Redirecting...</>, "info");
       await sleep(1); // Give time for user to digest toast // TODO Is this time enough?
-      navigate(endpointWithParam("/:username", { username: newUsername }));
-      reflectUser(); // TODO Is this a good enough "time" to update stored user info?
+      redirectFull(endpointWithParam("/:username", { username: newUsername }));
+
       return; // Operations after the try-catch block should not matter as the app will redirect anyway
     } catch (caughtError) {
       logger.error(ensureError(caughtError));
