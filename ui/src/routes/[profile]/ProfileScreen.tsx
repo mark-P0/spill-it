@@ -1,8 +1,8 @@
 import { Outlet } from "react-router-dom";
 import { useProfileLoader } from "../[profile]";
 import { Screen } from "../_app/Screen";
+import { NavBar } from "./NavBar";
 import { ProfileCard } from "./ProfileCard";
-import { NavBar } from "./ProfileComponents";
 import { PostsProvider } from "./posts/PostsContext";
 import { PostsList } from "./posts/PostsList";
 
