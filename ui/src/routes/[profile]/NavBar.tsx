@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { endpoint } from "../../utils/endpoints";
 import { logger } from "../../utils/logger";
 import { useProfileLoader } from "../[profile]";
+import { Nothing } from "../_app/Nothing";
 import { useUserContext } from "../_app/UserContext";
 import {
   clsBtnIcon,
@@ -14,22 +15,6 @@ import {
 } from "../_app/classes";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
-
-/**
- * Can be used to place an "element" (it is a text node) where desired but not necessarily "visible"
- *
- * Alternative entities include:
- * - `&nbsp;`
- * - `&#8203;` Zero-width space
- *
- * ---
- *
- * - https://github.com/typora/typora-issues/issues/4136
- * - https://levelup.gitconnected.com/the-zero-width-space-77543a28c984
- */
-function Nothing() {
-  return <>&zwj;</>;
-}
 
 function LogoutModalContent() {
   const { closeModal } = useModalContext();
