@@ -6,6 +6,7 @@ import { endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
+import { TextArea } from "../_app/Input";
 import { LoadingCursorAbsoluteOverlay } from "../_app/Loading";
 import { Screen } from "../_app/Screen";
 import { useUserContext } from "../_app/UserContext";
@@ -89,7 +90,7 @@ function PostForm() {
       <fieldset disabled={isSubmitting} className="grid gap-3">
         <label>
           <span className="sr-only">Tea 🍵</span>
-          <textarea
+          <TextArea
             value={content}
             onChange={(event) => setContent(event.currentTarget.value)}
             placeholder="What's the tea sis?!"
@@ -98,7 +99,7 @@ function PostForm() {
               "w-full rounded p-3",
               "bg-white/10 disabled:opacity-50",
             )}
-          ></textarea>
+          />
         </label>
         <div className="ml-auto">
           <button disabled={content === ""} className={clsx(clsBtn)}>
