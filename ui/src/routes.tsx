@@ -1,3 +1,11 @@
+/**
+ * The route objects in this file are exported to "silence" ESLint
+ * as it seems to see them as React components.
+ *
+ * They have component-like properties and indeed React Router has a
+ * `<Route>` "component" that can be used to the define the routes.
+ */
+
 import { buildHeaderAuth } from "@spill-it/auth/headers";
 import { raise } from "@spill-it/utils/errors";
 import { RouteObject, redirect } from "react-router-dom";
