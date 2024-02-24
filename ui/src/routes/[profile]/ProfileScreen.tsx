@@ -2,7 +2,6 @@ import { Outlet } from "react-router-dom";
 import { useProfileLoader } from "../[profile]";
 import { Screen } from "../_app/Screen";
 import { NavBar, ProfileCard } from "./ProfileComponents";
-import { ProfileProvider } from "./ProfileContext";
 import { PostsProvider } from "./posts/PostsContext";
 import { PostsList } from "./posts/PostsList";
 
@@ -31,10 +30,8 @@ function _ProfileScreen() {
 }
 export function ProfileScreen() {
   return (
-    <ProfileProvider>
-      <PostsProvider>
-        <_ProfileScreen />
-      </PostsProvider>
-    </ProfileProvider>
+    <PostsProvider>
+      <_ProfileScreen />
+    </PostsProvider>
   );
 }
