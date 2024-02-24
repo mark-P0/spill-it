@@ -12,6 +12,7 @@ import {
   profileRouteId,
 } from "./routes/[profile2]/profile-loader";
 import { EditProfileModal } from "./routes/[profile]/edit-profile/EditProfileModal";
+import { App } from "./routes/_app/App";
 import { ErrorScreen } from "./routes/_app/ErrorScreen";
 import { HomeScreen } from "./routes/home/HomeScreen";
 import { WelcomeScreen } from "./routes/welcome/WelcomeScreen";
@@ -150,6 +151,7 @@ export const RootRoute: RouteObject = {
 };
 export const AppRoute: RouteObject = {
   errorElement: <ErrorScreen />,
+  element: <App />,
   children: [
     RootRoute,
     WelcomeRoute,
