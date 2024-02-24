@@ -20,6 +20,7 @@ import {
 } from "../_app/classes";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
+import { useToastContext } from "../_app/toast/ToastContext";
 import { useProfileLoader } from "./profile-loader";
 
 /**
@@ -164,6 +165,7 @@ async function requestUnfollow(followingUserId: string) {
 }
 function UnfollowButton() {
   const revalidator = useRevalidator();
+  const { showOnToast } = useToastContext();
   const { profile } = useProfileLoader();
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -172,10 +174,18 @@ function UnfollowButton() {
     try {
       logger.debug("Requesting unfollow...");
       await requestUnfollow(profile.id);
+      showOnToast(
+        <>
+          You have now <span className="font-bold">unfollowed</span>{" "}
+          {profile.handleName} 😢
+        </>,
+        "critical",
+      );
 
       revalidator.revalidate();
     } catch (caughtError) {
       logger.error(ensureError(caughtError));
+      showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
     }
     setIsProcessing(false);
   }
@@ -226,6 +236,7 @@ async function requestFollow(followingUserId: string) {
 }
 function FollowButton() {
   const revalidator = useRevalidator();
+  const { showOnToast } = useToastContext();
   const { profile } = useProfileLoader();
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -234,10 +245,18 @@ function FollowButton() {
     try {
       logger.debug("Requesting follow...");
       await requestFollow(profile.id);
+      showOnToast(
+        <>
+          You are now <span className="font-bold">following</span>{" "}
+          {profile.handleName}! 💅
+        </>,
+        "info",
+      );
 
       revalidator.revalidate();
     } catch (caughtError) {
       logger.error(ensureError(caughtError));
+      showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
     }
     setIsProcessing(false);
   }
