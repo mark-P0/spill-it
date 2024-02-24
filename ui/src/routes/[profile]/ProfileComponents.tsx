@@ -2,7 +2,7 @@ import { ensureError, raise } from "@spill-it/utils/errors";
 import clsx from "clsx";
 import { useState } from "react";
 import { BsBoxArrowLeft, BsHouseFill } from "react-icons/bs";
-import { Link } from "react-router-dom";
+import { Link, useRevalidator } from "react-router-dom";
 import { endpoint, endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
@@ -22,7 +22,6 @@ import {
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
 import { useToastContext } from "../_app/toast/ToastContext";
-import { useProfileContext } from "./ProfileContext";
 
 /**
  * Can be used to place an "element" (it is a text node) where desired but not necessarily "visible"
@@ -154,37 +153,37 @@ function EditProfileButtonLink() {
     </Link>
   );
 }
+
+async function requestUnfollow(followingUserId: string) {
+  const headerAuth = getFromStorage("SESS");
+
+  const result = await fetchAPI("/api/v0/follows", "DELETE", {
+    headers: { Authorization: headerAuth },
+    query: { followingUserId },
+  });
+  if (!result.success) raise("Failed unfollowing", result.error);
+}
 function UnfollowButton() {
+  const revalidator = useRevalidator();
   const { showOnToast } = useToastContext();
-  const { profile, reflectFollowers } = useProfileContext();
+  const { profile } = useProfileLoader();
   const [isProcessing, setIsProcessing] = useState(false);
 
   async function unfollow() {
     setIsProcessing(true);
     try {
-      if (profile === null) raise("Profile not available...?");
-      const { id, handleName } = profile;
-
-      logger.debug("Retrieving session info...");
-      const headerAuth = getFromStorage("SESS");
-
-      logger.debug("Requesting unfollow...");
-      const result = await fetchAPI("/api/v0/follows", "DELETE", {
-        headers: { Authorization: headerAuth },
-        query: { followingUserId: id },
-      });
-      if (!result.success) raise("Failed unfollowing", result.error);
-
-      logger.debug("Reflecting followers...");
-      await reflectFollowers();
-
+      logger.debug("Sending unfollow request...");
+      await requestUnfollow(profile.id);
       showOnToast(
         <>
           You have now <span className="font-bold">unfollowed</span>{" "}
-          {handleName} 😢
+          {profile.handleName} 😢
         </>,
         "critical",
       );
+
+      logger.debug("Revalidating profile...");
+      revalidator.revalidate();
     } catch (caughtError) {
       logger.error(ensureError(caughtError));
       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
@@ -224,37 +223,37 @@ function UnfollowButton() {
     </button>
   );
 }
+
+async function requestFollow(followingUserId: string) {
+  const headerAuth = getFromStorage("SESS");
+
+  const result = await fetchAPI("/api/v0/follows", "POST", {
+    headers: { Authorization: headerAuth },
+    query: { followingUserId },
+  });
+  if (!result.success) raise("Failed following", result.error);
+}
 function FollowButton() {
+  const revalidator = useRevalidator();
   const { showOnToast } = useToastContext();
-  const { profile, reflectFollowers } = useProfileContext();
+  const { profile } = useProfileLoader();
   const [isProcessing, setIsProcessing] = useState(false);
 
   async function follow() {
     setIsProcessing(true);
     try {
-      if (profile === null) raise("Profile not available...?");
-      const { id, handleName } = profile;
-
-      logger.debug("Retrieving session info...");
-      const headerAuth = getFromStorage("SESS");
-
-      logger.debug("Requesting follow...");
-      const result = await fetchAPI("/api/v0/follows", "POST", {
-        headers: { Authorization: headerAuth },
-        query: { followingUserId: id },
-      });
-      if (!result.success) raise("Failed following", result.error);
-
-      logger.debug("Reflecting followers...");
-      await reflectFollowers();
-
+      logger.debug("Sending follow request...");
+      await requestFollow(profile.id);
       showOnToast(
         <>
-          You are now <span className="font-bold">following</span> {handleName}!
-          💅
+          You are now <span className="font-bold">following</span>{" "}
+          {profile.handleName}! 💅
         </>,
         "info",
       );
+
+      logger.debug("Revalidating profile...");
+      revalidator.revalidate();
     } catch (caughtError) {
       logger.error(ensureError(caughtError));
       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
@@ -275,6 +274,7 @@ function FollowButton() {
     </button>
   );
 }
+
 function ActionButton() {
   const { user } = useUserContext();
   const { profile, followers } = useProfileLoader();
