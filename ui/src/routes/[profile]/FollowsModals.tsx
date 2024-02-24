@@ -4,10 +4,10 @@ import { useEffect } from "react";
 import { BsXLg } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
+import { useProfileLoader } from "../[profile]";
 import { clsBtnIcon, clsLink } from "../_app/classes";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
-import { useProfileContext } from "./ProfileContext";
 
 function UserCard(props: { user: UserPublic }) {
   const { user } = props;
@@ -36,7 +36,7 @@ function UserCard(props: { user: UserPublic }) {
 }
 
 function FollowersModalContent() {
-  const { profile, followers } = useProfileContext();
+  const { profile, followers } = useProfileLoader();
   const { closeModal } = useModalContext();
 
   if (profile === null) return;
@@ -88,7 +88,7 @@ export function FollowersModal() {
 }
 
 function FollowingModalContent() {
-  const { profile, followings } = useProfileContext();
+  const { profile, followings } = useProfileLoader();
   const { closeModal } = useModalContext();
 
   if (profile === null) return;

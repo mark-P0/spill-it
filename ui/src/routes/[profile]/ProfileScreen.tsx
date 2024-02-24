@@ -1,16 +1,15 @@
 import { Outlet } from "react-router-dom";
+import { useProfileLoader } from "../[profile]";
 import { Screen } from "../_app/Screen";
 import { NavBar, ProfileCard } from "./ProfileComponents";
-import { ProfileProvider, useProfileContext } from "./ProfileContext";
 import { PostsProvider } from "./posts/PostsContext";
 import { PostsList } from "./posts/PostsList";
 
 function _ProfileScreen() {
-  const { profile } = useProfileContext();
-  if (profile !== null) {
-    const { handleName, username } = profile;
-    document.title = `${handleName} (${username}) 👀 Spill.it!`;
-  }
+  const { profile } = useProfileLoader();
+
+  const { handleName, username } = profile;
+  document.title = `${handleName} (${username}) 👀 Spill.it!`;
 
   return (
     <Screen className="grid auto-rows-min gap-6 p-6">
@@ -31,10 +30,8 @@ function _ProfileScreen() {
 }
 export function ProfileScreen() {
   return (
-    <ProfileProvider>
-      <PostsProvider>
-        <_ProfileScreen />
-      </PostsProvider>
-    </ProfileProvider>
+    <PostsProvider>
+      <_ProfileScreen />
+    </PostsProvider>
   );
 }

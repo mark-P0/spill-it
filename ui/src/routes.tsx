@@ -2,6 +2,7 @@ import { buildHeaderAuth } from "@spill-it/auth/headers";
 import { raise } from "@spill-it/utils/errors";
 import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";
+import { loadProfile, profileRouteId } from "./routes/[profile]";
 import {
   FollowersModal,
   FollowingModal,
@@ -20,7 +21,9 @@ import { logger } from "./utils/logger";
 import { deleteFromStorage, setOnStorage } from "./utils/storage";
 
 export const ProfileRoute: RouteObject = {
+  id: profileRouteId,
   path: endpoint("/:username"),
+  loader: loadProfile,
   element: <ProfileScreen />,
   children: [
     {
