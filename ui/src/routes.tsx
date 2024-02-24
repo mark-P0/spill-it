@@ -51,6 +51,7 @@ export const ProfileRoute: RouteObject = {
 
 export const HomeRoute: RouteObject = {
   path: endpoint("/home"),
+  element: <HomeScreen />,
   async loader() {
     logger.debug("Checking if logged in...");
     const canShowHome = await isLoggedIn();
@@ -62,11 +63,11 @@ export const HomeRoute: RouteObject = {
     logger.info("Showing home page...");
     return null;
   },
-  element: <HomeScreen />,
 };
 
 export const LogoutRoute: RouteObject = {
   path: endpoint("/logout"),
+  element: null,
   loader() {
     logger.debug("Deleting session info...");
     deleteFromStorage("SESS");
@@ -74,11 +75,11 @@ export const LogoutRoute: RouteObject = {
     logger.info("Redirecting to site root...");
     return redirect(endpoint("/"));
   },
-  element: null,
 };
 
 export const LoginGoogleRedirectRoute: RouteObject = {
   path: endpoint("/login/google/redirect"),
+  element: null,
   async loader({ request }) {
     logger.debug("Parsing query string...");
     /** https://github.com/remix-run/react-router/issues/9171#issuecomment-1220717197 */
@@ -92,13 +93,9 @@ export const LoginGoogleRedirectRoute: RouteObject = {
         );
 
     logger.debug("Submitting authorization code for session info...");
+    const headerAuth = buildHeaderAuth("SPILLITGOOGLE", { code, redirectUri });
     const result = await fetchAPI("/api/v0/sessions", "GET", {
-      headers: {
-        Authorization: buildHeaderAuth("SPILLITGOOGLE", {
-          code,
-          redirectUri,
-        }),
-      },
+      headers: { Authorization: headerAuth },
     });
     const { Authorization } = result.success
       ? result.value
@@ -110,10 +107,10 @@ export const LoginGoogleRedirectRoute: RouteObject = {
     logger.info("Redirecting to site root...");
     return redirect(endpoint("/"));
   },
-  element: null,
 };
 export const WelcomeRoute: RouteObject = {
   path: endpoint("/welcome"),
+  element: <WelcomeScreen />,
   async loader() {
     logger.debug("Checking if logged in...");
     const canShowHome = await isLoggedIn();
@@ -125,16 +122,15 @@ export const WelcomeRoute: RouteObject = {
     logger.info("Showing welcome page...");
     return null;
   },
-  element: <WelcomeScreen />,
 };
 
 export const RootRoute: RouteObject = {
   path: endpoint("/"),
+  element: null,
   loader() {
     logger.info("Redirecting to home page...");
     return redirect(endpoint("/home"));
   },
-  element: null,
 };
 export const AppRoute: RouteObject = {
   element: <App />,
