@@ -8,7 +8,11 @@ import {
   useRef,
   useState,
 } from "react";
-import { LoaderFunction, useLoaderData } from "react-router-dom";
+import {
+  LoaderFunction,
+  useLoaderData,
+  useRouteLoaderData,
+} from "react-router-dom";
 import { logger } from "./logger";
 
 /**
@@ -90,9 +94,12 @@ export function useTypedLoaderData<TLoader extends LoaderFunction>() {
   return useLoaderData() as LoaderData<TLoader>;
 }
 
-export function createLoader<T extends LoaderFunction>(loader: T) {
+export function createLoader<T extends LoaderFunction>(
+  routeId: string,
+  loader: T,
+) {
   function useLoader() {
-    return useLoaderData() as LoaderData<T>;
+    return useRouteLoaderData(routeId) as LoaderData<T>;
   }
 
   return [loader, useLoader] as const;
