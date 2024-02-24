@@ -196,7 +196,7 @@ function UnfollowButton() {
       disabled={isProcessing}
       onClick={unfollow}
       className={clsx(
-        isProcessing && "cursor-wait", // TODO Use overlay?
+        "disabled:cursor-wait", // TODO Use overlay?
         "font-bold tracking-wide",
         "select-none",
         "rounded-full px-6 py-3", // Based on styles for outline buttons
@@ -266,7 +266,7 @@ function FollowButton() {
       disabled={isProcessing}
       onClick={follow}
       className={clsx(
-        isProcessing && "cursor-wait", // TODO Use overlay?
+        "disabled:cursor-wait", // TODO Use overlay?
         clsBtn,
       )}
     >
