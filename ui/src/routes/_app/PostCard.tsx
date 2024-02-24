@@ -151,7 +151,7 @@ export function PostCard(props: {
           </p>
         </header>
 
-        <p>{content}</p>
+        <p className="whitespace-pre-wrap">{content}</p>
       </div>
 
       <div>
