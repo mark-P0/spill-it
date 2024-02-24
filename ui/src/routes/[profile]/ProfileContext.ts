@@ -43,13 +43,13 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
       setError(ensureError(caughtError));
     }
   }, [params]);
-  useEffect(() => {
-    const hasParamsChanged = profile?.username !== params.username;
-    if (!hasParamsChanged) return;
-
-    logger.debug("Reflecting profile on state...");
-    reflectProfile();
-  }, [params, profile, reflectProfile]);
+  //   useEffect(() => {
+  //     const hasParamsChanged = profile?.username !== params.username;
+  //     if (!hasParamsChanged) return;
+  //
+  //     logger.debug("Reflecting profile on state...");
+  //     reflectProfile();
+  //   }, [params, profile, reflectProfile]);
 
   const [followers, setFollowers] = useState<Follower[] | null>(null);
   const reflectFollowers = useCallback(async () => {
@@ -67,11 +67,11 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
       logger.error(ensureError(caughtError));
     }
   }, [profile]);
-  useEffect(() => {
-    logger.debug("Reflecting followers on state...");
-    setFollowers(null);
-    reflectFollowers();
-  }, [reflectFollowers]);
+  // useEffect(() => {
+  //   logger.debug("Reflecting followers on state...");
+  //   setFollowers(null);
+  //   reflectFollowers();
+  // }, [reflectFollowers]);
 
   const [followings, setFollowings] = useState<Following[] | null>(null);
   const reflectFollowings = useCallback(async () => {
@@ -89,11 +89,11 @@ export const [useProfileContext, ProfileProvider] = createNewContext(() => {
       logger.error(ensureError(caughtError));
     }
   }, [profile]);
-  useEffect(() => {
-    logger.debug("Reflecting followings on state...");
-    setFollowings(null);
-    reflectFollowings();
-  }, [reflectFollowings]);
+  // useEffect(() => {
+  //   logger.debug("Reflecting followings on state...");
+  //   setFollowings(null);
+  //   reflectFollowings();
+  // }, [reflectFollowings]);
 
   return {
     ...{ profile, reflectProfile },
