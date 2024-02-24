@@ -8,6 +8,7 @@ import {
 } from "./routes/[profile]/FollowsModals";
 import { ProfileScreen } from "./routes/[profile]/ProfileScreen";
 import { EditProfileModal } from "./routes/[profile]/edit-profile/EditProfileModal";
+import { App } from "./routes/_app/App";
 import { ErrorScreen } from "./routes/_app/ErrorScreen";
 import { HomeScreen } from "./routes/home/HomeScreen";
 import { WelcomeScreen } from "./routes/welcome/WelcomeScreen";
@@ -125,13 +126,18 @@ export const RootRoute: RouteObject = {
   element: null,
 };
 export const AppRoute: RouteObject = {
-  errorElement: <ErrorScreen />,
+  element: <App />,
   children: [
-    RootRoute,
-    WelcomeRoute,
-    LoginGoogleRedirectRoute,
-    LogoutRoute,
-    HomeRoute,
-    ProfileRoute,
+    {
+      errorElement: <ErrorScreen />,
+      children: [
+        RootRoute,
+        WelcomeRoute,
+        LoginGoogleRedirectRoute,
+        LogoutRoute,
+        HomeRoute,
+        ProfileRoute,
+      ],
+    },
   ],
 };
