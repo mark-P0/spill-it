@@ -10,6 +10,7 @@ import { redirectFull } from "../../../utils/dom";
 import { endpointWithParam } from "../../../utils/endpoints";
 import { fetchAPI } from "../../../utils/fetch-api";
 import { logger } from "../../../utils/logger";
+import { createNewContext } from "../../../utils/react";
 import { getFromStorage } from "../../../utils/storage";
 import { Input } from "../../_app/Input";
 import { LoadingCursorAbsoluteOverlay } from "../../_app/Loading";
@@ -49,7 +50,9 @@ async function requestUpdate(
   });
   if (!result.success) raise("Failed updating profile info", result.error);
 }
-export function EditProfileForm() {
+const [, EditProfileProvider] = createNewContext(() => {});
+
+function _EditProfileForm() {
   const { user } = useUserContext();
   const { closeModal, makeModalCancellable } = useModalContext();
   const { showOnToast } = useToastContext();
@@ -227,5 +230,12 @@ export function EditProfileForm() {
 
       {isProcessing && <LoadingCursorAbsoluteOverlay />}
     </form>
+  );
+}
+export function EditProfileForm() {
+  return (
+    <EditProfileProvider>
+      <_EditProfileForm />
+    </EditProfileProvider>
   );
 }
