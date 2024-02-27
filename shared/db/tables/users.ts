@@ -116,20 +116,15 @@ async function _buildUsernameFromHandle(
 ): Promise<string> {
   const base = buildUsernameBase(handleName);
 
-  let retryCt = 0;
   let username = base;
-  for (;;) {
-    if (retryCt === maxRetries) raise("Built username too many times");
-    retryCt++;
-
+  for (let _ = 0; _ < maxRetries; _++) {
     const existingUser = await _readUserViaUsername(tx, username);
-    if (existingUser === null) break;
+    if (existingUser === null) return username;
 
     if (username.length === USERNAME_LEN_MAX) username = base; // Restart the process when max length has been reached and username still is not unique
     username += randomChoice(digits);
   }
-
-  return username;
+  raise("Built username too many times");
 }
 
 export async function createUserFromGoogle(
