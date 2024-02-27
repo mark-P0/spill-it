@@ -3,7 +3,13 @@ import { ensureError, raise } from "@spill-it/utils/errors";
 import { sleep } from "@spill-it/utils/sleep";
 import { digits, letters } from "@spill-it/utils/strings";
 import clsx from "clsx";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { BsXLg } from "react-icons/bs";
 import { z } from "zod";
 import { redirectFull } from "../../../utils/dom";
@@ -18,6 +24,22 @@ import { useUserContext } from "../../_app/UserContext";
 import { clsBtn, clsBtnIcon } from "../../_app/classes";
 import { useModalContext } from "../../_app/modal/ModalContext";
 import { useToastContext } from "../../_app/toast/ToastContext";
+
+/** `validator` must be wrapped in a `useCallback()` hook */
+function useFieldState<T, U>(defaultValue: T, validator: (newValue: T) => U) {
+  const [value, setValue] = useState(defaultValue);
+  const [validity, setValidity] = useState(validator(defaultValue));
+
+  const updateValue = useCallback(
+    (newValue: T) => {
+      setValue(newValue);
+      setValidity(validator(newValue));
+    },
+    [validator],
+  );
+
+  return [value, validity, updateValue] as const;
+}
 
 // TODO Reuse these from DB package?
 const charset = new Set([...letters, ...digits]);
@@ -55,39 +77,40 @@ const [useEditProfileContext, EditProfileProvider] = createNewContext(() => {
   const { makeModalCancellable } = useModalContext();
   const { showOnToast } = useToastContext();
 
-  const [newHandleName, setNewHandleName] = useState("");
-  const [newHandleNameValidity, setNewHandleNameValidity] = useState("");
+  const newHandleNameDefault: string = "";
+  const [newHandleName, newHandleNameValidity, updateNewHandleName] =
+    useFieldState(
+      newHandleNameDefault,
+      useCallback((incoming) => {
+        const parsing = zodHandle.safeParse(incoming);
+        if (!parsing.success) {
+          return parsing.error.issues[0]?.message ?? "Invalid handle name";
+        }
+
+        return "";
+      }, []),
+    );
   useEffect(() => {
     if (user === null) return;
-    setNewHandleName(user.handleName);
-  }, [user]);
-  function reflectNewHandleName(event: ChangeEvent<HTMLInputElement>) {
-    const input = event.target;
-    setNewHandleName(input.value);
+    updateNewHandleName(user.handleName);
+  }, [user, updateNewHandleName]);
 
-    const parsing = zodHandle.safeParse(input.value);
-    const validity = parsing.success
-      ? ""
-      : parsing.error.issues[0]?.message ?? "Invalid handle name";
-    setNewHandleNameValidity(validity);
-  }
+  const newUsernameDefault: string = "";
+  const [newUsername, newUsernameValidity, updateNewUsername] = useFieldState(
+    newUsernameDefault,
+    useCallback((incoming) => {
+      const parsing = zodUsername.safeParse(incoming);
+      if (!parsing.success) {
+        return parsing.error.issues[0]?.message ?? "Invalid handle name";
+      }
 
-  const [newUsername, setNewUsername] = useState("");
-  const [newUsernameValidity, setNewUsernameValidity] = useState("");
+      return "";
+    }, []),
+  );
   useEffect(() => {
     if (user === null) return;
-    setNewUsername(user.username);
-  }, [user]);
-  function reflectNewUsername(event: ChangeEvent<HTMLInputElement>) {
-    const input = event.target;
-    setNewUsername(input.value);
-
-    const parsing = zodUsername.safeParse(input.value);
-    const validity = parsing.success
-      ? ""
-      : parsing.error.issues[0]?.message ?? "Invalid username";
-    setNewUsernameValidity(validity);
-  }
+    updateNewUsername(user.username);
+  }, [user, updateNewUsername]);
 
   const [isProcessing, setIsProcessing] = useState(false);
   async function save(event: FormEvent<HTMLFormElement>) {
@@ -139,16 +162,21 @@ const [useEditProfileContext, EditProfileProvider] = createNewContext(() => {
     areConstraintsSatisfied;
 
   return {
-    ...{ newHandleName, newHandleNameValidity, reflectNewHandleName },
-    ...{ newUsername, newUsernameValidity, reflectNewUsername },
+    ...{ newHandleName, newHandleNameValidity, updateNewHandleName },
+    ...{ newUsername, newUsernameValidity, updateNewUsername },
     ...{ isProcessing, save },
     canSave,
   };
 });
 
 function HandleNameField() {
-  const { newHandleName, newHandleNameValidity, reflectNewHandleName } =
+  const { newHandleName, newHandleNameValidity, updateNewHandleName } =
     useEditProfileContext();
+
+  function reflect(event: ChangeEvent<HTMLInputElement>) {
+    const input = event.target;
+    updateNewHandleName(input.value);
+  }
 
   return (
     <label className="select-none grid gap-1 group/handle">
@@ -167,7 +195,7 @@ function HandleNameField() {
         type="text"
         name="handleName"
         value={newHandleName}
-        onChange={reflectNewHandleName}
+        onChange={reflect}
         validity={newHandleNameValidity}
         reportValidity
         className={clsx(
@@ -183,8 +211,13 @@ function HandleNameField() {
   );
 }
 function UsernameField() {
-  const { newUsername, newUsernameValidity, reflectNewUsername } =
+  const { newUsername, newUsernameValidity, updateNewUsername } =
     useEditProfileContext();
+
+  function reflect(event: ChangeEvent<HTMLInputElement>) {
+    const input = event.target;
+    updateNewUsername(input.value);
+  }
 
   return (
     <label className="select-none grid gap-1 group/username">
@@ -203,7 +236,7 @@ function UsernameField() {
         type="text"
         name="username"
         value={newUsername}
-        onChange={reflectNewUsername}
+        onChange={reflect}
         validity={newUsernameValidity}
         reportValidity
         className={clsx(
