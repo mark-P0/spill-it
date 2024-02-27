@@ -67,7 +67,7 @@ export function EditProfileForm() {
     const parsing = zodHandle.safeParse(input.value);
     const validity = parsing.success
       ? ""
-      : parsing.error.issues[0]?.message ?? "Inalid handle name";
+      : parsing.error.issues[0]?.message ?? "Invalid handle name";
     setNewHandleNameValidity(validity);
   }
 
@@ -84,7 +84,7 @@ export function EditProfileForm() {
     const parsing = zodUsername.safeParse(input.value);
     const validity = parsing.success
       ? ""
-      : parsing.error.issues[0]?.message ?? "Inalid username";
+      : parsing.error.issues[0]?.message ?? "Invalid username";
     setNewUsernameValidity(validity);
   }
 
@@ -109,7 +109,7 @@ export function EditProfileForm() {
       }
 
       logger.debug("Sending update request...");
-      await requestUpdate(username, handleName)
+      await requestUpdate(username, handleName);
 
       logger.debug("Redirecting to [new] username...");
       showOnToast(<>Success! ✨ Redirecting...</>, "info");
