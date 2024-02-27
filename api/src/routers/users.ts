@@ -4,6 +4,8 @@ import {
   updateUser,
 } from "@spill-it/db/tables/users";
 import {
+  BIO_LEN_MAX,
+  BIO_LEN_MIN,
   HANDLE_LEN_MAX,
   HANDLE_LEN_MIN,
   USERNAME_LEN_MAX,
@@ -182,6 +184,19 @@ export const UsersRouter = Router();
       handleName satisfies z.infer<typeof schema>;
 
       const parsing = schema.safeParse(handleName);
+      if (!parsing.success) {
+        logger.error(formatError(parsing.error));
+        return res.sendStatus(StatusCodes.BAD_REQUEST);
+      }
+    }
+    {
+      logger.info("Checking bio...");
+      const { bio } = details;
+
+      const schema = z.string().min(BIO_LEN_MIN).max(BIO_LEN_MAX).optional();
+      bio satisfies z.infer<typeof schema>;
+
+      const parsing = schema.safeParse(bio);
       if (!parsing.success) {
         logger.error(formatError(parsing.error));
         return res.sendStatus(StatusCodes.BAD_REQUEST);
