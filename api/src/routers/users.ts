@@ -103,10 +103,12 @@ export const UsersRouter = Router();
 
     logger.info("Converting header authorization to user info...");
     const { headers } = input;
-    const userResult = await convertHeaderAuthToUser(headers.Authorization);
+    const userResult = await convertHeaderAuthToUser(
+      res,
+      headers.Authorization,
+    );
     if (!userResult.success) {
-      logger.error(formatError(userResult.error));
-      return res.sendStatus(userResult.error.statusCode);
+      return userResult.error.res;
     }
     const user = userResult.value;
 
@@ -188,10 +190,12 @@ export const UsersRouter = Router();
 
     logger.info("Converting header authorization to user info...");
     const { headers } = input;
-    const userResult = await convertHeaderAuthToUser(headers.Authorization);
+    const userResult = await convertHeaderAuthToUser(
+      res,
+      headers.Authorization,
+    );
     if (!userResult.success) {
-      logger.error(formatError(userResult.error));
-      return res.sendStatus(userResult.error.statusCode);
+      return userResult.error.res;
     }
     const user = userResult.value;
 
