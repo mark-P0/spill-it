@@ -146,12 +146,82 @@ const [useEditProfileContext, EditProfileProvider] = createNewContext(() => {
   };
 });
 
+function HandleNameField() {
+  const { newHandleName, newHandleNameValidity, reflectNewHandleName } =
+    useEditProfileContext();
+
+  return (
+    <label className="select-none grid gap-1 group/handle">
+      <span
+        className={clsx(
+          "text-xs uppercase tracking-wide",
+          ...[
+            "transition",
+            "text-white/50 group-focus-within/handle:text-white group-has-[:invalid]/handle:text-red-500",
+          ],
+        )}
+      >
+        Handle Name
+      </span>
+      <Input
+        type="text"
+        name="handleName"
+        value={newHandleName}
+        onChange={reflectNewHandleName}
+        validity={newHandleNameValidity}
+        reportValidity
+        className={clsx(
+          "bg-transparent",
+          "border rounded px-2 py-1",
+          ...[
+            "transition",
+            "border-white/25 group-focus-within/handle:border-white group-has-[:invalid]/handle:border-red-500",
+          ],
+        )}
+      />
+    </label>
+  );
+}
+function UsernameField() {
+  const { newUsername, newUsernameValidity, reflectNewUsername } =
+    useEditProfileContext();
+
+  return (
+    <label className="select-none grid gap-1 group/username">
+      <span
+        className={clsx(
+          "text-xs uppercase tracking-wide",
+          ...[
+            "transition",
+            "text-white/50 group-focus-within/username:text-white group-has-[:invalid]/username:text-red-500",
+          ],
+        )}
+      >
+        Username
+      </span>
+      <Input
+        type="text"
+        name="username"
+        value={newUsername}
+        onChange={reflectNewUsername}
+        validity={newUsernameValidity}
+        reportValidity
+        className={clsx(
+          "bg-transparent",
+          "border rounded px-2 py-1",
+          ...[
+            "transition",
+            "border-white/25 group-focus-within/username:border-white group-has-[:invalid]/username:border-red-500",
+          ],
+        )}
+      />
+    </label>
+  );
+}
+
 function _EditProfileForm() {
   const { closeModal } = useModalContext();
   const attributes = useEditProfileContext();
-  const { newHandleName, newHandleNameValidity, reflectNewHandleName } =
-    attributes;
-  const { newUsername, newUsernameValidity, reflectNewUsername } = attributes;
   const { isProcessing, save } = attributes;
   const { canSave } = attributes;
 
@@ -173,65 +243,8 @@ function _EditProfileForm() {
         </header>
 
         <div className="grid gap-3">
-          <label className="select-none grid gap-1 group/handle">
-            <span
-              className={clsx(
-                "text-xs uppercase tracking-wide",
-                ...[
-                  "transition",
-                  "text-white/50 group-focus-within/handle:text-white group-has-[:invalid]/handle:text-red-500",
-                ],
-              )}
-            >
-              Handle Name
-            </span>
-            <Input
-              type="text"
-              name="handleName"
-              value={newHandleName}
-              onChange={reflectNewHandleName}
-              validity={newHandleNameValidity}
-              reportValidity
-              className={clsx(
-                "bg-transparent",
-                "border rounded px-2 py-1",
-                ...[
-                  "transition",
-                  "border-white/25 group-focus-within/handle:border-white group-has-[:invalid]/handle:border-red-500",
-                ],
-              )}
-            />
-          </label>
-
-          <label className="select-none grid gap-1 group/username">
-            <span
-              className={clsx(
-                "text-xs uppercase tracking-wide",
-                ...[
-                  "transition",
-                  "text-white/50 group-focus-within/username:text-white group-has-[:invalid]/username:text-red-500",
-                ],
-              )}
-            >
-              Username
-            </span>
-            <Input
-              type="text"
-              name="username"
-              value={newUsername}
-              onChange={reflectNewUsername}
-              validity={newUsernameValidity}
-              reportValidity
-              className={clsx(
-                "bg-transparent",
-                "border rounded px-2 py-1",
-                ...[
-                  "transition",
-                  "border-white/25 group-focus-within/username:border-white group-has-[:invalid]/username:border-red-500",
-                ],
-              )}
-            />
-          </label>
+          <HandleNameField />
+          <UsernameField />
         </div>
 
         <footer className="flex flex-row-reverse">
