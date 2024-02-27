@@ -24,6 +24,7 @@ export const zodSample: DrizzleZodSample = z.object({
 
 export const zodUser: DrizzleZodUser = z.object({
   id: z.string().uuid(),
+  registrationDate: z.date(),
   username: z.string(),
   handleName: z.string(),
   portraitUrl: z.string().url(),
@@ -32,6 +33,7 @@ export const zodUser: DrizzleZodUser = z.object({
 });
 export const zodUserPublic: DrizzleZodUserPublic = zodUser.pick({
   id: true,
+  registrationDate: true,
   username: true,
   handleName: true,
   portraitUrl: true,
@@ -41,6 +43,7 @@ export const zodUserPublic: DrizzleZodUserPublic = zodUser.pick({
 export const zodUserPublicDetails: DrizzleZodUserPublicDetails = zodUser
   .pick({
     // id: true,
+    // registrationDate: true,
     username: true,
     handleName: true,
     portraitUrl: true,
