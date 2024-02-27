@@ -50,11 +50,9 @@ async function requestUpdate(
   });
   if (!result.success) raise("Failed updating profile info", result.error);
 }
-const [, EditProfileProvider] = createNewContext(() => {});
-
-function _EditProfileForm() {
+const [useEditProfileContext, EditProfileProvider] = createNewContext(() => {
   const { user } = useUserContext();
-  const { closeModal, makeModalCancellable } = useModalContext();
+  const { makeModalCancellable } = useModalContext();
   const { showOnToast } = useToastContext();
 
   const [newHandleName, setNewHandleName] = useState("");
@@ -128,11 +126,9 @@ function _EditProfileForm() {
     makeModalCancellable(true);
   }
 
-  if (user === null) return null;
-
   // TODO Set these as constraints?
   const isFormUnedited =
-    newUsername === user.username && newHandleName === user.handleName;
+    newUsername === user?.username && newHandleName === user?.handleName;
   const isFormEmpty = newUsername === "" && newHandleName === "";
   const areConstraintsSatisfied =
     newUsernameValidity === "" && newHandleNameValidity === "";
@@ -141,6 +137,23 @@ function _EditProfileForm() {
     !isFormUnedited &&
     !isFormEmpty && // Possibly redundant with constraints
     areConstraintsSatisfied;
+
+  return {
+    ...{ newHandleName, newHandleNameValidity, reflectNewHandleName },
+    ...{ newUsername, newUsernameValidity, reflectNewUsername },
+    ...{ isProcessing, save },
+    canSave,
+  };
+});
+
+function _EditProfileForm() {
+  const { closeModal } = useModalContext();
+  const attributes = useEditProfileContext();
+  const { newHandleName, newHandleNameValidity, reflectNewHandleName } =
+    attributes;
+  const { newUsername, newUsernameValidity, reflectNewUsername } = attributes;
+  const { isProcessing, save } = attributes;
+  const { canSave } = attributes;
 
   return (
     <form onSubmit={save} className="relative">
