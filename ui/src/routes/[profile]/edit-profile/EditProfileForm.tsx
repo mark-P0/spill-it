@@ -44,6 +44,7 @@ function HandleNameField() {
           "border rounded px-2 py-1",
           ...[
             "transition",
+            "disabled:opacity-50",
             "border-white/25 group-focus-within/handle:border-white group-has-[:invalid]/handle:border-red-500",
           ],
         )}
@@ -85,6 +86,7 @@ function UsernameField() {
           "border rounded px-2 py-1",
           ...[
             "transition",
+            "disabled:opacity-50",
             "border-white/25 group-focus-within/username:border-white group-has-[:invalid]/username:border-red-500",
           ],
         )}
