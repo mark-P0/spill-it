@@ -57,6 +57,7 @@ export const UsersTable = pgTable("users", {
   username: text("username").notNull().unique(),
   handleName: text("handleName").notNull(),
   portraitUrl: text("portraitUrl").notNull(),
+  bio: text("bio").notNull().default(""),
   googleId: text("googleId"),
   loginCt: integer("loginCt").notNull(),
 });
@@ -71,6 +72,7 @@ const drizzleZodUserPublic = drizzleZodUser.pick({
   username: true,
   handleName: true,
   portraitUrl: true,
+  bio: true,
   // googleId: true,
   loginCt: true,
 });
@@ -84,6 +86,7 @@ const drizzleZodUserPublicDetails = drizzleZodUser
     username: true,
     handleName: true,
     portraitUrl: true,
+    bio: true,
     // googleId: true,
     // loginCt: true,
   })

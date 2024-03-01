@@ -134,6 +134,13 @@
       "when": 1709064255048,
       "tag": "0018_yellow_sauron",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1709065640842,
+      "tag": "0019_tan_swordsman",
+      "breakpoints": true
     }
   ]
 }
