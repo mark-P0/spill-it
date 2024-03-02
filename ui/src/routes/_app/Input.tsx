@@ -36,17 +36,19 @@ export function Input(
  * - Very similar to the bold-normal font weight transition trick (overlap and opacity)
  */
 export function TextArea(props: ComponentPropsWithoutRef<"textarea">) {
+  const { ...attributes } = props;
+
   return (
     <div className="grid *:row-[1] *:col-[1]">
-      <textarea {...props}></textarea>
+      <textarea {...attributes}></textarea>
       <div
         className={clsx(
           "invisible", // Visually hidden!
           "whitespace-pre-wrap", // Innate to `<textarea>`
-          props.className, // Styles applied to `<textarea>`
+          attributes.className, // Styles applied to `<textarea>`
         )}
       >
-        {props.value}
+        {attributes.value}
         {
           /**
            * Used to prevent "jumpy" behavior
