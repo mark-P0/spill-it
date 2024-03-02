@@ -11,8 +11,10 @@ import {
 } from "./EditProfileContext";
 
 function HandleNameField() {
+  const attributes = useEditProfileContext();
   const { newHandleName, newHandleNameValidity, updateNewHandleName } =
-    useEditProfileContext();
+    attributes;
+  const { areFieldsInitialized } = attributes;
 
   function reflect(event: ChangeEvent<HTMLInputElement>) {
     const input = event.target;
@@ -38,7 +40,7 @@ function HandleNameField() {
         value={newHandleName}
         onChange={reflect}
         validity={newHandleNameValidity}
-        reportValidity
+        reportValidity={areFieldsInitialized}
         className={clsx(
           "bg-transparent",
           "border rounded px-2 py-1",
@@ -54,8 +56,9 @@ function HandleNameField() {
 }
 
 function UsernameField() {
-  const { newUsername, newUsernameValidity, updateNewUsername } =
-    useEditProfileContext();
+  const attributes = useEditProfileContext();
+  const { newUsername, newUsernameValidity, updateNewUsername } = attributes;
+  const { areFieldsInitialized } = attributes;
 
   function reflect(event: ChangeEvent<HTMLInputElement>) {
     const input = event.target;
@@ -81,7 +84,7 @@ function UsernameField() {
         value={newUsername}
         onChange={reflect}
         validity={newUsernameValidity}
-        reportValidity
+        reportValidity={areFieldsInitialized}
         className={clsx(
           "bg-transparent",
           "border rounded px-2 py-1",
@@ -97,7 +100,9 @@ function UsernameField() {
 }
 
 function BioField() {
-  const { newBio, newBioValidity, updateNewBio } = useEditProfileContext();
+  const attributes = useEditProfileContext();
+  const { newBio, newBioValidity, updateNewBio } = attributes;
+  const { areFieldsInitialized } = attributes;
 
   function reflect(event: ChangeEvent<HTMLTextAreaElement>) {
     const input = event.target;
@@ -122,7 +127,7 @@ function BioField() {
         value={newBio}
         onChange={reflect}
         validity={newBioValidity}
-        reportValidity
+        reportValidity={areFieldsInitialized}
         className={clsx(
           "resize-none",
           clsBreakAnywhere,
