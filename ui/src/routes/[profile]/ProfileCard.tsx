@@ -207,16 +207,23 @@ export function ProfileCard() {
   const { handleName, username, portraitUrl } = profile;
 
   return (
-    <article className="flex gap-6">
-      <header>
-        <h1 className="text-3xl font-bold">{handleName}</h1>
-        <p className="text-lg text-white/50">{username}</p>
-        <FollowCountsNav />
-      </header>
+    <article className="grid grid-cols-[auto_1fr_auto] gap-x-6">
       <div>
+        <header>
+          <h1 className="text-3xl font-bold">{handleName}</h1>
+          <p className="text-lg text-white/50">{username}</p>
+        </header>
+      </div>
+
+      <div className="col-span-2">
+        <FollowCountsNav />
+      </div>
+
+      <div className="col-start-2 row-start-1 place-self-start">
         <ActionButton />
       </div>
-      <div className="ml-auto">
+
+      <div className="col-start-3 row-start-1 row-span-3">
         <img
           src={portraitUrl}
           alt={`Portrait of "${handleName}"`}
