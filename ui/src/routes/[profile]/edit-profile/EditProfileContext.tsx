@@ -49,6 +49,10 @@ const zodUsername = z
   .refine(isUsernameCharsValid, "Invalid username characters")
   .optional();
 
+const BIO_LEN_MIN = 0;
+const BIO_LEN_MAX = 128;
+const zodBio = z.string().min(BIO_LEN_MIN).max(BIO_LEN_MAX).optional();
+
 async function requestUpdate(
   username: string | undefined,
   handleName: string | undefined,
@@ -92,7 +96,7 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
       useCallback((incoming) => {
         const parsing = zodUsername.safeParse(incoming);
         if (!parsing.success) {
-          return parsing.error.issues[0]?.message ?? "Invalid handle name";
+          return parsing.error.issues[0]?.message ?? "Invalid username";
         }
 
         return "";
@@ -106,7 +110,12 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
     const newBioDefault: string = "";
     const [newBio, newBioValidity, updateNewBio] = useFieldState(
       newBioDefault,
-      useCallback(() => {
+      useCallback((incoming) => {
+        const parsing = zodBio.safeParse(incoming);
+        if (!parsing.success) {
+          return parsing.error.issues[0]?.message ?? "Invalid bio";
+        }
+
         return "";
       }, []),
     );
@@ -156,10 +165,15 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
 
     // TODO Set these as constraints?
     const isFormUnedited =
-      newUsername === user?.username && newHandleName === user?.handleName;
-    const isFormEmpty = newUsername === "" && newHandleName === "";
+      newUsername === user?.username &&
+      newHandleName === user?.handleName &&
+      newBio === user?.bio;
+    const isFormEmpty =
+      newUsername === "" && newHandleName === "" && newBio === "";
     const areConstraintsSatisfied =
-      newUsernameValidity === "" && newHandleNameValidity === "";
+      newUsernameValidity === "" &&
+      newHandleNameValidity === "" &&
+      newBioValidity === "";
     const canSave =
       !isProcessing && // Should be redundant
       !isFormUnedited &&
