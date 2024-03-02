@@ -103,6 +103,18 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
       updateNewUsername(user.username);
     }, [user, updateNewUsername]);
 
+    const newBioDefault: string = "";
+    const [newBio, newBioValidity, updateNewBio] = useFieldState(
+      newBioDefault,
+      useCallback(() => {
+        return "";
+      }, []),
+    );
+    useEffect(() => {
+      if (user === null) return;
+      updateNewBio(user.bio);
+    }, [user, updateNewBio]);
+
     const [isProcessing, setIsProcessing] = useState(false);
     async function save(event: FormEvent<HTMLFormElement>) {
       event.preventDefault();
@@ -157,6 +169,7 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
     return {
       ...{ newHandleName, newHandleNameValidity, updateNewHandleName },
       ...{ newUsername, newUsernameValidity, updateNewUsername },
+      ...{ newBio, newBioValidity, updateNewBio },
       ...{ isProcessing, save },
       canSave,
     };
