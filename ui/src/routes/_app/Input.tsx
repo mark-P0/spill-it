@@ -35,12 +35,26 @@ export function Input(
  *   - Purely visual styles, e.g. background color shouldn't matter, but also shouldn't hurt to reapply
  * - Very similar to the bold-normal font weight transition trick (overlap and opacity)
  */
-export function TextArea(props: ComponentPropsWithoutRef<"textarea">) {
-  const { ...attributes } = props;
+export function TextArea(
+  props: ComponentPropsWithoutRef<"textarea"> & {
+    validity?: string;
+    reportValidity?: boolean;
+  },
+) {
+  const { validity, reportValidity, ...attributes } = props;
+
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea === null) return;
+
+    textarea.setCustomValidity(validity ?? "");
+    if (reportValidity) textarea.reportValidity();
+  }, [validity, reportValidity]);
 
   return (
     <div className="grid *:row-[1] *:col-[1]">
-      <textarea {...attributes}></textarea>
+      <textarea {...attributes} ref={textareaRef}></textarea>
       <div
         className={clsx(
           "invisible", // Visually hidden!
