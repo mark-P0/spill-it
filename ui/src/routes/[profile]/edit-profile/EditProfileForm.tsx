@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { ChangeEvent } from "react";
 import { BsXLg } from "react-icons/bs";
-import { Input } from "../../_app/Input";
+import { Input, TextArea } from "../../_app/Input";
 import { LoadingCursorAbsoluteOverlay } from "../../_app/Loading";
 import { clsBtn, clsBtnIcon } from "../../_app/classes";
 import { useModalContext } from "../../_app/modal/ModalContext";
@@ -52,6 +52,7 @@ function HandleNameField() {
     </label>
   );
 }
+
 function UsernameField() {
   const { newUsername, newUsernameValidity, updateNewUsername } =
     useEditProfileContext();
@@ -95,6 +96,54 @@ function UsernameField() {
   );
 }
 
+function BioField() {
+  return (
+    <label className="select-none grid gap-1 group/field">
+      <span
+        className={clsx(
+          "text-xs uppercase tracking-wide",
+          ...[
+            "transition",
+            "text-white/50 group-focus-within/field:text-white group-has-[:invalid]/field:text-red-500",
+          ],
+        )}
+      >
+        Bio
+      </span>
+      <TextArea
+        name="bio"
+        className={clsx(
+          "resize-none",
+          "bg-transparent",
+          "border rounded px-2 py-1",
+          ...[
+            "transition",
+            "disabled:opacity-50",
+            "border-white/25 group-focus-within/field:border-white group-has-[:invalid]/field:border-red-500",
+          ],
+        )}
+      />
+      {/* <Input
+        type="text"
+        name="username"
+        value={newUsername}
+        onChange={reflect}
+        validity={newUsernameValidity}
+        reportValidity
+        className={clsx(
+          "bg-transparent",
+          "border rounded px-2 py-1",
+          ...[
+            "transition",
+            "disabled:opacity-50",
+            "border-white/25 group-focus-within/field:border-white group-has-[:invalid]/field:border-red-500",
+          ],
+        )}
+      /> */}
+    </label>
+  );
+}
+
 function _EditProfileForm() {
   const { closeModal } = useModalContext();
   const attributes = useEditProfileContext();
@@ -102,7 +151,7 @@ function _EditProfileForm() {
   const { canSave } = attributes;
 
   return (
-    <form onSubmit={save} className="relative">
+    <form onSubmit={save} className="relative max-w-sm ">
       <fieldset disabled={isProcessing} className="grid gap-6">
         <header className="flex items-center gap-6">
           <h2 className="text-3xl font-bold">Edit Profile</h2>
@@ -121,6 +170,7 @@ function _EditProfileForm() {
         <div className="grid gap-3">
           <HandleNameField />
           <UsernameField />
+          <BioField />
         </div>
 
         <footer className="flex flex-row-reverse">
