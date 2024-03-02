@@ -34,7 +34,14 @@ export function Screen(props: ComponentPropsWithoutRef<"div">) {
             ],
           )}
         >
-          <div className={clsx(className)}>{children}</div>
+          <div
+            className={clsx(
+              "mx-auto max-w-screen-sm", // Centered, narrow
+              className,
+            )}
+          >
+            {children}
+          </div>
         </div>
       </div>
     </>
