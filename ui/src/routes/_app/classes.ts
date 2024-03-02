@@ -119,3 +119,9 @@ const _clsLink = (options?: { visibility?: "opaque" | "translucent" }) => {
 };
 export const clsLink = _clsLink();
 export const clsLinkTranslucent = _clsLink({ visibility: "translucent" });
+
+/**
+ * - https://github.com/tailwindlabs/tailwindcss/discussions/12127
+ * - https://tailwindcss.com/docs/adding-custom-styles#arbitrary-properties
+ */
+export const clsBreakAnywhere = "[overflow-wrap:anywhere]";

@@ -3,7 +3,7 @@ import { ChangeEvent } from "react";
 import { BsXLg } from "react-icons/bs";
 import { Input, TextArea } from "../../_app/Input";
 import { LoadingCursorAbsoluteOverlay } from "../../_app/Loading";
-import { clsBtn, clsBtnIcon } from "../../_app/classes";
+import { clsBreakAnywhere, clsBtn, clsBtnIcon } from "../../_app/classes";
 import { useModalContext } from "../../_app/modal/ModalContext";
 import {
   EditProfileProvider,
@@ -125,6 +125,7 @@ function BioField() {
         reportValidity
         className={clsx(
           "resize-none",
+          clsBreakAnywhere,
           "bg-transparent",
           "border rounded px-2 py-1",
           ...[
