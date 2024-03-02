@@ -1,7 +1,7 @@
 import { raise } from "@spill-it/utils/errors";
 import clsx from "clsx";
 import {
-  ComponentProps,
+  ComponentPropsWithoutRef,
   PropsWithChildren,
   SyntheticEvent,
   TransitionEvent,
@@ -15,7 +15,7 @@ import { useModalContext } from "./ModalContext";
  * but is [currently] not a strict requirement.
  */
 export function ModalContent(
-  props: PropsWithChildren<ComponentProps<"article">>,
+  props: PropsWithChildren<ComponentPropsWithoutRef<"article">>,
 ) {
   const { children, className, ...attributes } = props;
 

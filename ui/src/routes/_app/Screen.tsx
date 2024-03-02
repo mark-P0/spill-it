@@ -1,8 +1,8 @@
 import clsx from "clsx";
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentPropsWithoutRef, useEffect, useState } from "react";
 import { removeBodyClasses, restoreBodyClasses } from "../../utils/dom";
 
-export function Screen(props: ComponentProps<"div">) {
+export function Screen(props: ComponentPropsWithoutRef<"div">) {
   const [isRendered, setIsRendered] = useState(false);
   useEffect(() => {
     setIsRendered(true);
