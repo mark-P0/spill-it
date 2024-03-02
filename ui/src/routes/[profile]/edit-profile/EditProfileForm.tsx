@@ -20,13 +20,13 @@ function HandleNameField() {
   }
 
   return (
-    <label className="select-none grid gap-1 group/handle">
+    <label className="select-none grid gap-1 group/field">
       <span
         className={clsx(
           "text-xs uppercase tracking-wide",
           ...[
             "transition",
-            "text-white/50 group-focus-within/handle:text-white group-has-[:invalid]/handle:text-red-500",
+            "text-white/50 group-focus-within/field:text-white group-has-[:invalid]/field:text-red-500",
           ],
         )}
       >
@@ -45,7 +45,7 @@ function HandleNameField() {
           ...[
             "transition",
             "disabled:opacity-50",
-            "border-white/25 group-focus-within/handle:border-white group-has-[:invalid]/handle:border-red-500",
+            "border-white/25 group-focus-within/field:border-white group-has-[:invalid]/field:border-red-500",
           ],
         )}
       />
@@ -62,13 +62,13 @@ function UsernameField() {
   }
 
   return (
-    <label className="select-none grid gap-1 group/username">
+    <label className="select-none grid gap-1 group/field">
       <span
         className={clsx(
           "text-xs uppercase tracking-wide",
           ...[
             "transition",
-            "text-white/50 group-focus-within/username:text-white group-has-[:invalid]/username:text-red-500",
+            "text-white/50 group-focus-within/field:text-white group-has-[:invalid]/field:text-red-500",
           ],
         )}
       >
@@ -87,7 +87,7 @@ function UsernameField() {
           ...[
             "transition",
             "disabled:opacity-50",
-            "border-white/25 group-focus-within/username:border-white group-has-[:invalid]/username:border-red-500",
+            "border-white/25 group-focus-within/field:border-white group-has-[:invalid]/field:border-red-500",
           ],
         )}
       />
