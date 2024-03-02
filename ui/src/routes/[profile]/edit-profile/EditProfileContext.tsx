@@ -86,11 +86,6 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
           return "";
         }, []),
       );
-    useEffect(() => {
-      if (user === null) return;
-      updateNewHandleName(user.handleName);
-    }, [user, updateNewHandleName]);
-
     const newUsernameDefault: string = "";
     const [newUsername, newUsernameValidity, updateNewUsername] = useFieldState(
       newUsernameDefault,
@@ -103,11 +98,6 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
         return "";
       }, []),
     );
-    useEffect(() => {
-      if (user === null) return;
-      updateNewUsername(user.username);
-    }, [user, updateNewUsername]);
-
     const newBioDefault: string = "";
     const [newBio, newBioValidity, updateNewBio] = useFieldState(
       newBioDefault,
@@ -120,10 +110,16 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
         return "";
       }, []),
     );
+
+    const [areFieldsInitialized, setAreFieldsInitialized] = useState(false);
     useEffect(() => {
       if (user === null) return;
+      updateNewHandleName(user.handleName);
+      updateNewUsername(user.username);
       updateNewBio(user.bio);
-    }, [user, updateNewBio]);
+
+      setAreFieldsInitialized(true);
+    }, [user, updateNewHandleName, updateNewUsername, updateNewBio]);
 
     const [isProcessing, setIsProcessing] = useState(false);
     async function save(event: FormEvent<HTMLFormElement>) {
@@ -189,6 +185,7 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
       ...{ newHandleName, newHandleNameValidity, updateNewHandleName },
       ...{ newUsername, newUsernameValidity, updateNewUsername },
       ...{ newBio, newBioValidity, updateNewBio },
+      areFieldsInitialized,
       ...{ isProcessing, save },
       canSave,
     };
