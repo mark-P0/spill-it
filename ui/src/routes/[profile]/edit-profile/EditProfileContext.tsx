@@ -56,12 +56,13 @@ const zodBio = z.string().min(BIO_LEN_MIN).max(BIO_LEN_MAX).optional();
 async function requestUpdate(
   username: string | undefined,
   handleName: string | undefined,
+  bio: string | undefined,
 ) {
   const headerAuth = getFromStorage("SESS");
 
   const result = await fetchAPI("/api/v0/users/me", "PATCH", {
     headers: { Authorization: headerAuth },
-    body: { details: { username, handleName } },
+    body: { details: { username, handleName, bio } },
   });
   if (!result.success) raise("Failed updating profile info", result.error);
 }
@@ -143,9 +144,13 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
         if (newHandleName !== user.handleName && newHandleName !== "") {
           handleName = newHandleName;
         }
+        let bio: string | undefined;
+        if (newBio !== user.bio && newBio !== "") {
+          bio = newBio;
+        }
 
         logger.debug("Sending update request...");
-        await requestUpdate(username, handleName);
+        await requestUpdate(username, handleName, bio);
 
         logger.debug("Redirecting to [new] username...");
         showOnToast(<>Success! ✨ Redirecting...</>, "info");
