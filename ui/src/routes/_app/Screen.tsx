@@ -18,23 +18,26 @@ export function Screen(props: ComponentPropsWithoutRef<"div">) {
 
   const { children, className, ...attributes } = props;
   return (
-    <div
-      // "Container" for hiding overflow of actual screen
-      className="overflow-clip"
-    >
-      {/** Actual screen */}
-      <div
-        {...attributes}
-        onTransitionEnd={() => setHasTransitioned(true)}
-        className={clsx(
-          "min-h-screen",
-          "bg-fuchsia-950 text-white",
-          ...["transition duration-700", !isRendered && "opacity-0 scale-105"],
-          className,
-        )}
-      >
-        {children}
+    <>
+      {/** "Container" for hiding overflow of actual screen */}
+      <div className="overflow-clip">
+        {/** Actual screen */}
+        <div
+          {...attributes}
+          onTransitionEnd={() => setHasTransitioned(true)}
+          className={clsx(
+            "min-h-screen",
+            "bg-fuchsia-950 text-white",
+            ...[
+              "transition duration-700",
+              !isRendered && "opacity-0 scale-105",
+            ],
+            className,
+          )}
+        >
+          {children}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
