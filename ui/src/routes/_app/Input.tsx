@@ -1,10 +1,9 @@
 import clsx from "clsx";
-import { ComponentProps, useEffect, useRef } from "react";
+import { ComponentPropsWithoutRef, useEffect, useRef } from "react";
 
-// TODO Allow providing refs?
 /** Allow specifying custom validity(ies) as props */
 export function Input(
-  props: Omit<ComponentProps<"input">, "ref"> & {
+  props: ComponentPropsWithoutRef<"input"> & {
     validity?: string;
     reportValidity?: boolean;
   },
@@ -36,7 +35,7 @@ export function Input(
  *   - Purely visual styles, e.g. background color shouldn't matter, but also shouldn't hurt to reapply
  * - Very similar to the bold-normal font weight transition trick (overlap and opacity)
  */
-export function TextArea(props: ComponentProps<"textarea">) {
+export function TextArea(props: ComponentPropsWithoutRef<"textarea">) {
   return (
     <div className="grid *:row-[1] *:col-[1]">
       <textarea {...props}></textarea>
