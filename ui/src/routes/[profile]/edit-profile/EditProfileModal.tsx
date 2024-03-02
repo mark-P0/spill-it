@@ -8,7 +8,7 @@ import { EditProfileForm } from "./EditProfileForm";
 
 function EditProfileModalContent() {
   return (
-    <ModalContent>
+    <ModalContent className="max-w-screen-sm w-[75vw]">
       {
         // TODO Create local toast for ALL modals? i.e. in the Modal component
         /** Localize toast in modal content so that it maybe shown on [top] of the "top layer" */
