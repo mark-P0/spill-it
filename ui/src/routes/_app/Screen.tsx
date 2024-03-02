@@ -32,10 +32,9 @@ export function Screen(props: ComponentPropsWithoutRef<"div">) {
               "transition duration-700",
               !isRendered && "opacity-0 scale-105",
             ],
-            className,
           )}
         >
-          {children}
+          <div className={clsx(className)}>{children}</div>
         </div>
       </div>
     </>
