@@ -204,7 +204,7 @@ function ActionButton() {
 export function ProfileCard() {
   const { profile } = useProfileLoader();
 
-  const { handleName, username, portraitUrl } = profile;
+  const { handleName, username, bio, portraitUrl } = profile;
 
   return (
     <article className="grid grid-cols-[auto_1fr_auto] gap-x-6">
@@ -213,6 +213,10 @@ export function ProfileCard() {
           <h1 className="text-3xl font-bold">{handleName}</h1>
           <p className="text-lg text-white/50">{username}</p>
         </header>
+      </div>
+
+      <div className="col-span-2">
+        {bio !== "" && <p className="my-1">{bio}</p>}
       </div>
 
       <div className="col-span-2">

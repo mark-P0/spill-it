@@ -49,15 +49,20 @@ const zodUsername = z
   .refine(isUsernameCharsValid, "Invalid username characters")
   .optional();
 
+const BIO_LEN_MIN = 0;
+const BIO_LEN_MAX = 128;
+const zodBio = z.string().min(BIO_LEN_MIN).max(BIO_LEN_MAX).optional();
+
 async function requestUpdate(
   username: string | undefined,
   handleName: string | undefined,
+  bio: string | undefined,
 ) {
   const headerAuth = getFromStorage("SESS");
 
   const result = await fetchAPI("/api/v0/users/me", "PATCH", {
     headers: { Authorization: headerAuth },
-    body: { details: { username, handleName } },
+    body: { details: { username, handleName, bio } },
   });
   if (!result.success) raise("Failed updating profile info", result.error);
 }
@@ -92,7 +97,7 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
       useCallback((incoming) => {
         const parsing = zodUsername.safeParse(incoming);
         if (!parsing.success) {
-          return parsing.error.issues[0]?.message ?? "Invalid handle name";
+          return parsing.error.issues[0]?.message ?? "Invalid username";
         }
 
         return "";
@@ -102,6 +107,23 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
       if (user === null) return;
       updateNewUsername(user.username);
     }, [user, updateNewUsername]);
+
+    const newBioDefault: string = "";
+    const [newBio, newBioValidity, updateNewBio] = useFieldState(
+      newBioDefault,
+      useCallback((incoming) => {
+        const parsing = zodBio.safeParse(incoming);
+        if (!parsing.success) {
+          return parsing.error.issues[0]?.message ?? "Invalid bio";
+        }
+
+        return "";
+      }, []),
+    );
+    useEffect(() => {
+      if (user === null) return;
+      updateNewBio(user.bio);
+    }, [user, updateNewBio]);
 
     const [isProcessing, setIsProcessing] = useState(false);
     async function save(event: FormEvent<HTMLFormElement>) {
@@ -122,9 +144,13 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
         if (newHandleName !== user.handleName && newHandleName !== "") {
           handleName = newHandleName;
         }
+        let bio: string | undefined;
+        if (newBio !== user.bio && newBio !== "") {
+          bio = newBio;
+        }
 
         logger.debug("Sending update request...");
-        await requestUpdate(username, handleName);
+        await requestUpdate(username, handleName, bio);
 
         logger.debug("Redirecting to [new] username...");
         showOnToast(<>Success! ✨ Redirecting...</>, "info");
@@ -144,10 +170,15 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
 
     // TODO Set these as constraints?
     const isFormUnedited =
-      newUsername === user?.username && newHandleName === user?.handleName;
-    const isFormEmpty = newUsername === "" && newHandleName === "";
+      newUsername === user?.username &&
+      newHandleName === user?.handleName &&
+      newBio === user?.bio;
+    const isFormEmpty =
+      newUsername === "" && newHandleName === "" && newBio === "";
     const areConstraintsSatisfied =
-      newUsernameValidity === "" && newHandleNameValidity === "";
+      newUsernameValidity === "" &&
+      newHandleNameValidity === "" &&
+      newBioValidity === "";
     const canSave =
       !isProcessing && // Should be redundant
       !isFormUnedited &&
@@ -157,6 +188,7 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
     return {
       ...{ newHandleName, newHandleNameValidity, updateNewHandleName },
       ...{ newUsername, newUsernameValidity, updateNewUsername },
+      ...{ newBio, newBioValidity, updateNewBio },
       ...{ isProcessing, save },
       canSave,
     };
