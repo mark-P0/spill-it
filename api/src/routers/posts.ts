@@ -1,4 +1,5 @@
 import { UserPublic } from "@spill-it/db/schema/drizzle";
+import { readFollowBetweenUsers } from "@spill-it/db/tables/follows";
 import {
   createPost,
   deletePost,
@@ -6,6 +7,7 @@ import {
   readPostsFeedWithAuthorViaUserBeforeTimestamp,
   readPostsWithAuthorViaUserBeforeTimestamp,
 } from "@spill-it/db/tables/posts";
+import { readUser } from "@spill-it/db/tables/users";
 import { POST_CT_CAP } from "@spill-it/db/utils/constants";
 import { endpointDetails } from "@spill-it/endpoints";
 import { today } from "@spill-it/utils/dates";
@@ -231,11 +233,35 @@ export const PostsRouter = Router();
     logger.info("Determining user whose posts to fetch...");
     let userId: UserPublic["id"] | undefined;
     if (query.userId !== undefined) {
-      // TODO Check if queried user has a public profile
-      // TODO Check if current user follows the queried user
+      logger.info("Checking if posts of user can be fetched...");
+
+      const requestedUser = await readUser(query.userId);
+      if (requestedUser === null) {
+        logger.error("User whose posts are requested does not exist");
+        return res.sendStatus(StatusCodes.BAD_REQUEST);
+      }
+
+      if (requestedUser.isPrivate) {
+        if (user === undefined) {
+          logger.error(
+            "Requested posts of private user without authentication",
+          );
+          return res.sendStatus(StatusCodes.UNAUTHORIZED);
+        }
+
+        const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
+        if (follow === null) {
+          logger.error("Requested posts of private user that is not followed");
+          return res.sendStatus(StatusCodes.FORBIDDEN);
+        }
+      }
+
       // TODO Check other authorization criteria?
+
+      logger.info("Will fetch posts of another user");
       userId = query.userId;
     } else if (user !== undefined) {
+      logger.info("Will fetch own posts");
       userId = user.id;
     }
     if (userId === undefined) {
