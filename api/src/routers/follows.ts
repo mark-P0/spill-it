@@ -36,9 +36,12 @@ export const FollowsRouter = Router();
 
     logger.info("Converting header authorization to user info...");
     const { headers } = input;
-    const userResult = await convertHeaderAuthToUser(res, headers.Authorization);
+    const userResult = await convertHeaderAuthToUser(
+      res,
+      headers.Authorization,
+    );
     if (!userResult.success) {
-      return userResult.error.res
+      return userResult.error.res;
     }
     const user = userResult.value;
 
@@ -128,9 +131,12 @@ export const FollowsRouter = Router();
 
     logger.info("Converting header authorization to user info...");
     const { headers } = input;
-    const userResult = await convertHeaderAuthToUser(res, headers.Authorization);
+    const userResult = await convertHeaderAuthToUser(
+      res,
+      headers.Authorization,
+    );
     if (!userResult.success) {
-      return userResult.error.res
+      return userResult.error.res;
     }
     const user = userResult.value;
 
@@ -252,21 +258,21 @@ export const FollowsRouter = Router();
     }
     const input = inputParsing.data;
 
-    logger.info("Fetching followers...");
+    logger.info("Fetching followings...");
     const { query } = input;
     const followerUserId = query.userId;
-    const followersResult = await safeAsync(() =>
+    const followingsResult = await safeAsync(() =>
       readFollowings(followerUserId),
     );
-    if (!followersResult.success) {
-      logger.error(formatError(followersResult.error));
+    if (!followingsResult.success) {
+      logger.error(formatError(followingsResult.error));
       return res.sendStatus(StatusCodes.BAD_GATEWAY);
     }
-    const followers = followersResult.value;
+    const followings = followingsResult.value;
 
     logger.info("Parsing output...");
     const outputParsing = signature.output.safeParse({
-      data: followers,
+      data: followings,
     } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
