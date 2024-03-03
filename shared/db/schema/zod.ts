@@ -29,6 +29,7 @@ export const zodUser: DrizzleZodUser = z.object({
   handleName: z.string(),
   portraitUrl: z.string().url(),
   bio: z.string(),
+  isPrivate: z.boolean(),
   googleId: z.string().nullable(),
   loginCt: z.number(),
 });
@@ -39,6 +40,7 @@ export const zodUserPublic: DrizzleZodUserPublic = zodUser.pick({
   handleName: true,
   portraitUrl: true,
   bio: true,
+  isPrivate: true,
   // googleId: true,
   loginCt: true,
 });
@@ -50,6 +52,7 @@ export const zodUserPublicDetails: DrizzleZodUserPublicDetails = zodUser
     handleName: true,
     portraitUrl: true,
     bio: true,
+    isPrivate: true,
     // googleId: true,
     // loginCt: true,
   })

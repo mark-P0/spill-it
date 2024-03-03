@@ -29,6 +29,7 @@
 
 import { relations } from "drizzle-orm";
 import {
+  boolean,
   integer,
   pgTable,
   text,
@@ -58,6 +59,7 @@ export const UsersTable = pgTable("users", {
   handleName: text("handleName").notNull(),
   portraitUrl: text("portraitUrl").notNull(),
   bio: text("bio").notNull().default(""),
+  isPrivate: boolean("isPrivate").notNull().default(false),
   googleId: text("googleId"),
   loginCt: integer("loginCt").notNull(),
 });
@@ -73,6 +75,7 @@ const drizzleZodUserPublic = drizzleZodUser.pick({
   handleName: true,
   portraitUrl: true,
   bio: true,
+  isPrivate: true,
   // googleId: true,
   loginCt: true,
 });
@@ -87,6 +90,7 @@ const drizzleZodUserPublicDetails = drizzleZodUser
     handleName: true,
     portraitUrl: true,
     bio: true,
+    isPrivate: true,
     // googleId: true,
     // loginCt: true,
   })
