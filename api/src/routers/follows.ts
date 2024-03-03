@@ -1,3 +1,4 @@
+import { UserPublic } from "@spill-it/db/schema/drizzle";
 import {
   createFollow,
   deleteFollowBetweenUsers,
@@ -209,8 +210,45 @@ export const FollowsRouter = Router();
     }
     const input = inputParsing.data;
 
-    logger.info("Fetching followers...");
+    const { headers } = input;
+    let user: UserPublic | undefined;
+    if (headers.Authorization !== undefined) {
+      logger.info("Converting header authorization to user info...");
+      const userResult = await convertHeaderAuthToUser(
+        res,
+        headers.Authorization,
+      );
+      if (!userResult.success) {
+        return userResult.error.res;
+      }
+      user = userResult.value;
+    }
+
+    logger.info("Checking if followers can be fetched...");
     const { query } = input;
+    const requestedUser = await readUser(query.userId);
+    if (requestedUser === null) {
+      logger.error("User whose followers are requested does not exist");
+      return res.sendStatus(StatusCodes.BAD_REQUEST);
+    }
+    if (requestedUser.isPrivate) {
+      if (user === undefined) {
+        logger.error(
+          "Requested followers of private user without authentication",
+        );
+        return res.sendStatus(StatusCodes.UNAUTHORIZED);
+      }
+
+      const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
+      if (follow === null) {
+        logger.error(
+          "Requested followers of private user that is not followed",
+        );
+        return res.sendStatus(StatusCodes.FORBIDDEN);
+      }
+    }
+
+    logger.info("Fetching followers...");
     const followingUserId = query.userId;
     const followersResult = await safeAsync(() =>
       readFollowers(followingUserId),
@@ -258,8 +296,45 @@ export const FollowsRouter = Router();
     }
     const input = inputParsing.data;
 
-    logger.info("Fetching followings...");
+    const { headers } = input;
+    let user: UserPublic | undefined;
+    if (headers.Authorization !== undefined) {
+      logger.info("Converting header authorization to user info...");
+      const userResult = await convertHeaderAuthToUser(
+        res,
+        headers.Authorization,
+      );
+      if (!userResult.success) {
+        return userResult.error.res;
+      }
+      user = userResult.value;
+    }
+
+    logger.info("Checking if followings can be fetched...");
     const { query } = input;
+    const requestedUser = await readUser(query.userId);
+    if (requestedUser === null) {
+      logger.error("User whose followings are requested does not exist");
+      return res.sendStatus(StatusCodes.BAD_REQUEST);
+    }
+    if (requestedUser.isPrivate) {
+      if (user === undefined) {
+        logger.error(
+          "Requested followings of private user without authentication",
+        );
+        return res.sendStatus(StatusCodes.UNAUTHORIZED);
+      }
+
+      const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
+      if (follow === null) {
+        logger.error(
+          "Requested followings of private user that is not followed",
+        );
+        return res.sendStatus(StatusCodes.FORBIDDEN);
+      }
+    }
+
+    logger.info("Fetching followings...");
     const followerUserId = query.userId;
     const followingsResult = await safeAsync(() =>
       readFollowings(followerUserId),
