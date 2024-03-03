@@ -141,7 +141,7 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
           handleName = newHandleName;
         }
         let bio: string | undefined;
-        if (newBio !== user.bio && newBio !== "") {
+        if (newBio !== user.bio) {
           bio = newBio;
         }
 
