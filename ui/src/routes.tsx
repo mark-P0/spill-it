@@ -10,7 +10,7 @@ import { buildHeaderAuth } from "@spill-it/auth/headers";
 import { raise } from "@spill-it/utils/errors";
 import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";
-import { loadProfile, profileRouteId } from "./routes/[profile]";
+import { profileRouteId } from "./routes/[profile]";
 import {
   FollowersModal,
   FollowingModal,
@@ -19,6 +19,7 @@ import { ProfileScreen } from "./routes/[profile]/ProfileScreen";
 import { EditProfileModal } from "./routes/[profile]/edit-profile/EditProfileModal";
 import { App } from "./routes/_app/App";
 import { ErrorScreen } from "./routes/_app/ErrorScreen";
+import { RPCRoutes } from "./routes/_rpc";
 import { HomeScreen } from "./routes/home/HomeScreen";
 import { WelcomeScreen } from "./routes/welcome/WelcomeScreen";
 import { redirectUri } from "./routes/welcome/redirect-uri";
@@ -31,7 +32,7 @@ import { deleteFromStorage, setOnStorage } from "./utils/storage";
 export const ProfileRoute: RouteObject = {
   id: profileRouteId,
   path: endpoint("/:username"),
-  loader: loadProfile,
+  // loader: loadProfile,
   element: <ProfileScreen />,
   children: [
     {
@@ -144,6 +145,7 @@ export const AppRoute: RouteObject = {
         LogoutRoute,
         HomeRoute,
         ProfileRoute,
+        ...RPCRoutes,
       ],
     },
   ],
