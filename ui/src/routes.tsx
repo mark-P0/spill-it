@@ -19,6 +19,7 @@ import { ProfileScreen } from "./routes/[profile]/ProfileScreen";
 import { EditProfileModal } from "./routes/[profile]/edit-profile/EditProfileModal";
 import { App } from "./routes/_app/App";
 import { ErrorScreen } from "./routes/_app/ErrorScreen";
+import { RPCRoutes } from "./routes/_rpc";
 import { HomeScreen } from "./routes/home/HomeScreen";
 import { WelcomeScreen } from "./routes/welcome/WelcomeScreen";
 import { redirectUri } from "./routes/welcome/redirect-uri";
@@ -144,6 +145,7 @@ export const AppRoute: RouteObject = {
         LogoutRoute,
         HomeRoute,
         ProfileRoute,
+        ...RPCRoutes,
       ],
     },
   ],
