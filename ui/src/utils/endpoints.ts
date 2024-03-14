@@ -13,6 +13,7 @@ const endpoints = [
     "/:username/following",
     "/:username/edit",
   ],
+  ...["/users"],
 ] as const;
 type Endpoint = (typeof endpoints)[number];
 
