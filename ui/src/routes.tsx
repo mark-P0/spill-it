@@ -29,7 +29,7 @@ import { isLoggedIn } from "./utils/is-logged-in";
 import { logger } from "./utils/logger";
 import { deleteFromStorage, setOnStorage } from "./utils/storage";
 
-export const ProfileRoute: RouteObject = {
+export const ProfileRoute1: RouteObject = {
   id: profileRouteId,
   path: endpoint("/:username"),
   loader: loadProfile,
@@ -48,6 +48,10 @@ export const ProfileRoute: RouteObject = {
       element: <EditProfileModal />,
     },
   ],
+};
+export const ProfileRoute: RouteObject = {
+  path: endpoint("/:username"),
+  element: <ProfileScreen />,
 };
 
 export const HomeRoute: RouteObject = {
