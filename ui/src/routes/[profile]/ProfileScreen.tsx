@@ -22,7 +22,9 @@ function _ProfileScreen() {
       <main>
         <h2 className="sr-only">Spills 🍵</h2>
 
-        <PostsList />
+        <PostsProvider>
+          <PostsList />
+        </PostsProvider>
       </main>
 
       <Outlet />
@@ -30,9 +32,5 @@ function _ProfileScreen() {
   );
 }
 export function ProfileScreen() {
-  return (
-    <PostsProvider>
-      <_ProfileScreen />
-    </PostsProvider>
-  );
+  return <_ProfileScreen />;
 }
