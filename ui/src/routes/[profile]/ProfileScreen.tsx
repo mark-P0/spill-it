@@ -17,7 +17,21 @@ function PostsSection() {
   const canShowPosts = isProfilePublic || isFollowing;
 
   if (!canShowPosts) {
-    return null; // TODO Render informational card
+    return (
+      <section className="w-fit mx-auto">
+        <h2 className="text-xl text-white/75">
+          ❌ <span className="font-bold">{profile.handleName}</span> chooses
+          their friends
+        </h2>
+
+        <p className="text-white/50">
+          Only a privileged few can see their mess.
+          <br />
+          Ask for permission by sending a{" "}
+          <span className="font-bold">follow request</span>.
+        </p>
+      </section>
+    );
   }
 
   return (
