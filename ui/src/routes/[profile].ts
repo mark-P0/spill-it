@@ -5,6 +5,7 @@ import { EndpointParams } from "../utils/endpoints";
 import { fetchAPI } from "../utils/fetch-api";
 import { logger } from "../utils/logger";
 import { createLoader } from "../utils/react";
+import { getFromStorage } from "../utils/storage";
 
 const zodProfileParams = zodOfType<EndpointParams<"/:username">>()(
   z.object({
@@ -26,7 +27,15 @@ async function fetchProfile(username: string) {
   return profile;
 }
 async function fetchFollowers(userId: string) {
+  const headers: { Authorization?: string } = {};
+  try {
+    headers.Authorization = getFromStorage("SESS");
+  } catch {
+    logger.warn("Fetching followers without authentication");
+  }
+
   const followersResult = await fetchAPI("/api/v0/followers", "GET", {
+    headers,
     query: { userId },
   });
   const followers = followersResult.success
@@ -36,7 +45,15 @@ async function fetchFollowers(userId: string) {
   return followers;
 }
 async function fetchFollowings(userId: string) {
+  const headers: { Authorization?: string } = {};
+  try {
+    headers.Authorization = getFromStorage("SESS");
+  } catch {
+    logger.warn("Fetching followings without authentication");
+  }
+
   const followingsResult = await fetchAPI("/api/v0/followings", "GET", {
+    headers,
     query: { userId },
   });
   const followings = followingsResult.success
