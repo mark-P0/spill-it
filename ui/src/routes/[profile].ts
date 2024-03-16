@@ -38,9 +38,7 @@ async function fetchFollowers(userId: string) {
     headers,
     query: { userId },
   });
-  const followers = followersResult.success
-    ? followersResult.value.data
-    : raise("Failed fetching followers", followersResult.error);
+  const followers = followersResult.success ? followersResult.value.data : null;
 
   return followers;
 }
@@ -58,7 +56,7 @@ async function fetchFollowings(userId: string) {
   });
   const followings = followingsResult.success
     ? followingsResult.value.data
-    : raise("Failed fetching followings", followingsResult.error);
+    : null;
 
   return followings;
 }
