@@ -6,7 +6,7 @@ import { ProfileCard } from "./ProfileCard";
 import { PostsProvider } from "./posts/PostsContext";
 import { PostsList } from "./posts/PostsList";
 
-function _ProfileScreen() {
+export function ProfileScreen() {
   const { profile } = useProfileLoader();
 
   const { handleName, username } = profile;
@@ -30,7 +30,4 @@ function _ProfileScreen() {
       <Outlet />
     </Screen>
   );
-}
-export function ProfileScreen() {
-  return <_ProfileScreen />;
 }
