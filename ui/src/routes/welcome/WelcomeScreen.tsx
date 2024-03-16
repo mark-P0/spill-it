@@ -1,6 +1,7 @@
 import { buildAuthUrl } from "@spill-it/auth/google";
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
+import { useFetcher, useRevalidator } from "react-router-dom";
 import { E, EE } from "../../utils/dom";
 import { env } from "../../utils/env";
 import { logger } from "../../utils/logger";
@@ -100,9 +101,28 @@ function LoginWithGoogle() {
 export function WelcomeScreen() {
   document.title = "Welcome! ✨ Spill.it!";
 
+  const fetcher = useFetcher();
+  function loadData() {
+    console.warn("fetcher.load");
+    fetcher.load("/deleteme");
+  }
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  console.warn(fetcher.state, fetcher.data, fetcher.formAction);
+
   return (
     <Screen className="grid place-items-center">
-      <LoginWithGoogle />
+      <button
+        onClick={() => {
+          loadData();
+        }}
+      >
+        reload
+      </button>
+
+      {/* <LoginWithGoogle /> */}
     </Screen>
   );
 }

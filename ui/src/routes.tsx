@@ -8,6 +8,7 @@
 
 import { buildHeaderAuth } from "@spill-it/auth/headers";
 import { raise } from "@spill-it/utils/errors";
+import { sleep } from "@spill-it/utils/sleep";
 import { RouteObject, redirect } from "react-router-dom";
 import { z } from "zod";
 import { loadProfile, profileRouteId } from "./routes/[profile]";
@@ -144,6 +145,16 @@ export const AppRoute: RouteObject = {
         LogoutRoute,
         HomeRoute,
         ProfileRoute,
+
+        {
+          path: "/deleteme",
+          element: <ErrorScreen />,
+          async loader() {
+            console.warn("/deleteme");
+            await sleep(3);
+            return Date.now();
+          },
+        },
       ],
     },
   ],
