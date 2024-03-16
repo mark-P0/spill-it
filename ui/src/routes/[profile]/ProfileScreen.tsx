@@ -52,7 +52,15 @@ const zodProfileParams = zodOfType<EndpointParams<"/:username">>()(
 function _ProfileScreen() {
   const { profile } = useProfileContext();
 
-  return <Screen>{JSON.stringify(profile)}</Screen>;
+  return (
+    <Screen className="grid auto-rows-min gap-6 p-6">
+      <header className="grid grid-rows-subgrid row-span-2">
+        <NavBar />
+      </header>
+
+      <div className="break-all">{JSON.stringify(profile)}</div>
+    </Screen>
+  );
 }
 export function ProfileScreen() {
   const rawParams = useParams();

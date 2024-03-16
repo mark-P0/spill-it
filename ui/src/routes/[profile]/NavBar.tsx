@@ -3,7 +3,6 @@ import { BsBoxArrowLeft, BsHouseFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { endpoint } from "../../utils/endpoints";
 import { logger } from "../../utils/logger";
-import { useProfileLoader } from "../[profile]";
 import { useUserContext } from "../_app/UserContext";
 import {
   clsBtnIcon,
@@ -14,6 +13,7 @@ import {
 } from "../_app/classes";
 import { ModalContent } from "../_app/modal/Modal";
 import { useModalContext } from "../_app/modal/ModalContext";
+import { useProfileContext } from "./ProfileContext";
 
 function LogoutModalContent() {
   const { closeModal } = useModalContext();
@@ -62,7 +62,7 @@ function LogoutButton() {
 
 export function NavBar() {
   const { user } = useUserContext();
-  const { profile } = useProfileLoader();
+  const { profile } = useProfileContext();
 
   const isProfileOfUser = profile.id === user?.id;
 
