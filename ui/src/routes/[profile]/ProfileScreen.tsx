@@ -1,4 +1,3 @@
-import { UserPublic } from "@spill-it/db/schema/drizzle";
 import { zodOfType } from "@spill-it/utils/zod";
 import { useEffect } from "react";
 import { Outlet, useFetcher, useParams } from "react-router-dom";
@@ -9,6 +8,7 @@ import { Screen } from "../_app/Screen";
 import { zodRPCUsers } from "../_rpc";
 import { NavBar } from "./NavBar";
 import { ProfileCard } from "./ProfileCard";
+import { ProfileContext, useProfileContext } from "./ProfileContext";
 import { PostsProvider } from "./posts/PostsContext";
 import { PostsList } from "./posts/PostsList";
 
@@ -49,8 +49,8 @@ const zodProfileParams = zodOfType<EndpointParams<"/:username">>()(
   }),
 );
 
-function _ProfileScreen(props: { profile: UserPublic }) {
-  const { profile } = props;
+function _ProfileScreen() {
+  const { profile } = useProfileContext();
 
   return <Screen>{JSON.stringify(profile)}</Screen>;
 }
@@ -73,12 +73,17 @@ export function ProfileScreen() {
   }, [params.username]);
 
   const userResult = zodRPCUsers.parse(fetcher.data);
-
   if (userResult === undefined || fetcher.state !== "idle") {
     return null; // Show nothing; allow the body animations to be seen
   }
   if (!userResult.success) {
     throw userResult.error;
   }
-  return <_ProfileScreen profile={userResult.value} />;
+
+  const profile = userResult.value;
+  return (
+    <ProfileContext.Provider value={{ profile }}>
+      <_ProfileScreen />
+    </ProfileContext.Provider>
+  );
 }
