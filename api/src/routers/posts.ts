@@ -249,10 +249,17 @@ export const PostsRouter = Router();
           return res.sendStatus(StatusCodes.UNAUTHORIZED);
         }
 
-        const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
-        if (follow === null) {
-          logger.error("Requested posts of private user that is not followed");
-          return res.sendStatus(StatusCodes.FORBIDDEN);
+        if (user.id !== requestedUser.id) {
+          const follow = await readFollowBetweenUsers(
+            user.id,
+            requestedUser.id,
+          );
+          if (follow === null) {
+            logger.error(
+              "Requested posts of private user that is not followed",
+            );
+            return res.sendStatus(StatusCodes.FORBIDDEN);
+          }
         }
       }
 

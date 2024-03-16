@@ -18,8 +18,9 @@ import { useToastContext } from "../_app/toast/ToastContext";
 
 function FollowCountsNav() {
   const { profile, followers, followings } = useProfileLoader();
-
   const { username } = profile;
+
+  if (followers === null || followings === null) return null;
 
   return (
     <nav className="flex gap-3">
@@ -195,7 +196,8 @@ function ActionButton() {
 
   if (user.id === profile.id) return <EditProfileButtonLink />;
 
-  const isFollowing = followers.some(({ follower }) => follower.id === user.id);
+  const isFollowing =
+    followers?.some(({ follower }) => follower.id === user.id) ?? false;
   if (isFollowing) return <UnfollowButton />;
 
   return <FollowButton />;

@@ -239,12 +239,14 @@ export const FollowsRouter = Router();
         return res.sendStatus(StatusCodes.UNAUTHORIZED);
       }
 
-      const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
-      if (follow === null) {
-        logger.error(
-          "Requested followers of private user that is not followed",
-        );
-        return res.sendStatus(StatusCodes.FORBIDDEN);
+      if (user.id !== requestedUser.id) {
+        const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
+        if (follow === null) {
+          logger.error(
+            "Requested followers of private user that is not followed",
+          );
+          return res.sendStatus(StatusCodes.FORBIDDEN);
+        }
       }
     }
 
@@ -325,12 +327,14 @@ export const FollowsRouter = Router();
         return res.sendStatus(StatusCodes.UNAUTHORIZED);
       }
 
-      const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
-      if (follow === null) {
-        logger.error(
-          "Requested followings of private user that is not followed",
-        );
-        return res.sendStatus(StatusCodes.FORBIDDEN);
+      if (user.id !== requestedUser.id) {
+        const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
+        if (follow === null) {
+          logger.error(
+            "Requested followings of private user that is not followed",
+          );
+          return res.sendStatus(StatusCodes.FORBIDDEN);
+        }
       }
     }
 
