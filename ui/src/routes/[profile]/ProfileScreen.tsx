@@ -6,6 +6,18 @@ import { ProfileCard } from "./ProfileCard";
 import { PostsProvider } from "./posts/PostsContext";
 import { PostsList } from "./posts/PostsList";
 
+function PostsSection() {
+  return (
+    <section>
+      <h2 className="sr-only">Spills 🍵</h2>
+
+      <PostsProvider>
+        <PostsList />
+      </PostsProvider>
+    </section>
+  );
+}
+
 export function ProfileScreen() {
   const { profile } = useProfileLoader();
 
@@ -20,11 +32,7 @@ export function ProfileScreen() {
       </header>
 
       <main>
-        <h2 className="sr-only">Spills 🍵</h2>
-
-        <PostsProvider>
-          <PostsList />
-        </PostsProvider>
+        <PostsSection />
       </main>
 
       <Outlet />
