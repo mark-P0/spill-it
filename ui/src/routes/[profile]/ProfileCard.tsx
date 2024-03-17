@@ -1,6 +1,7 @@
 import { ensureError, raise } from "@spill-it/utils/errors";
 import clsx from "clsx";
 import { useState } from "react";
+import { BsLockFill } from "react-icons/bs";
 import { Link, useRevalidator } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
@@ -206,13 +207,16 @@ function ActionButton() {
 export function ProfileCard() {
   const { profile } = useProfileLoader();
 
-  const { handleName, username, bio, portraitUrl } = profile;
+  const { handleName, username, bio, portraitUrl, isPrivate } = profile;
 
   return (
     <article className="grid grid-cols-[auto_1fr_auto] gap-x-6">
       <div>
         <header>
-          <h1 className="text-3xl font-bold">{handleName}</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold">{handleName}</h1>
+            {isPrivate && <BsLockFill className="h-6 w-6 text-emerald-500" />}
+          </div>
           <p className="text-lg text-white/50">{username}</p>
         </header>
       </div>
