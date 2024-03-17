@@ -144,6 +144,27 @@ function BioField() {
   );
 }
 
+function IsPrivateField() {
+  const { isPrivate, setIsPrivate } = useEditProfileContext();
+
+  function reflect(event: ChangeEvent<HTMLInputElement>) {
+    const input = event.target;
+    setIsPrivate(input.checked);
+  }
+
+  return (
+    <label className="select-none flex gap-2">
+      <input
+        type="checkbox"
+        name="isPrivate"
+        checked={isPrivate}
+        onChange={reflect}
+      />
+      Private
+    </label>
+  );
+}
+
 function _EditProfileForm() {
   const { closeModal } = useModalContext();
   const attributes = useEditProfileContext();
@@ -171,6 +192,7 @@ function _EditProfileForm() {
           <HandleNameField />
           <UsernameField />
           <BioField />
+          <IsPrivateField />
         </div>
 
         <footer className="flex flex-row-reverse">
