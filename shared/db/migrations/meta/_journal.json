@@ -141,6 +141,13 @@
       "when": 1709065640842,
       "tag": "0019_tan_swordsman",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1709500397777,
+      "tag": "0020_fast_eternals",
+      "breakpoints": true
     }
   ]
 }

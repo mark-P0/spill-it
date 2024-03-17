@@ -95,7 +95,9 @@ export const endpointMap = {
   "/api/v0/followers": {
     GET: {
       input: z.object({
-        // TODO Restrict access to user data?
+        headers: z.object({
+          Authorization: z.string().optional(),
+        }),
         query: z.object({
           userId: zodUserPublic.shape.id, // Requesting the users that follow `userId`
         }),
@@ -108,7 +110,9 @@ export const endpointMap = {
   "/api/v0/followings": {
     GET: {
       input: z.object({
-        // TODO Restrict access to user data?
+        headers: z.object({
+          Authorization: z.string().optional(),
+        }),
         query: z.object({
           userId: zodUserPublic.shape.id, // Requesting the users that `userId` follow
         }),
