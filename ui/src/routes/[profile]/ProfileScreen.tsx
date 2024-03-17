@@ -11,10 +11,11 @@ function PostsSection() {
   const { user } = useUserContext();
   const { profile, followers } = useProfileLoader();
 
+  const isOwnProfile = profile.id === user?.id;
   const isProfilePublic = !profile.isPrivate;
   const isFollowing =
     followers?.some(({ follower }) => follower.id === user?.id) ?? false;
-  const canShowPosts = isProfilePublic || isFollowing;
+  const canShowPosts = isOwnProfile || isProfilePublic || isFollowing;
 
   if (!canShowPosts) {
     return (
