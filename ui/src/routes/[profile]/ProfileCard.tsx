@@ -20,10 +20,7 @@ function FollowCountsNav() {
   const { profile, followers, followings } = useProfileLoader();
   const { username } = profile;
 
-  if (followers === null || followings === null) {
-    logger.warn("Rendering follow counts without info; ignoring...");
-    return null;
-  }
+  if (followers === null || followings === null) return null;
 
   return (
     <nav className="flex gap-3">
