@@ -57,12 +57,13 @@ async function requestUpdate(
   username: string | undefined,
   handleName: string | undefined,
   bio: string | undefined,
+  isPrivate: boolean,
 ) {
   const headerAuth = getFromStorage("SESS");
 
   const result = await fetchAPI("/api/v0/users/me", "PATCH", {
     headers: { Authorization: headerAuth },
-    body: { details: { username, handleName, bio } },
+    body: { details: { username, handleName, bio, isPrivate } },
   });
   if (!result.success) raise("Failed updating profile info", result.error);
 }
@@ -110,6 +111,7 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
         return "";
       }, []),
     );
+    const [isPrivate, setIsPrivate] = useState(false);
 
     const [areFieldsInitialized, setAreFieldsInitialized] = useState(false);
     useEffect(() => {
@@ -117,6 +119,7 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
       updateNewHandleName(user.handleName);
       updateNewUsername(user.username);
       updateNewBio(user.bio);
+      setIsPrivate(user.isPrivate);
 
       setAreFieldsInitialized(true);
     }, [user, updateNewHandleName, updateNewUsername, updateNewBio]);
@@ -146,7 +149,7 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
         }
 
         logger.debug("Sending update request...");
-        await requestUpdate(username, handleName, bio);
+        await requestUpdate(username, handleName, bio, isPrivate);
 
         logger.debug("Redirecting to [new] username...");
         showOnToast(<>Success! ✨ Redirecting...</>, "info");
@@ -168,7 +171,8 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
     const isFormUnedited =
       newUsername === user?.username &&
       newHandleName === user?.handleName &&
-      newBio === user?.bio;
+      newBio === user?.bio &&
+      isPrivate === user?.isPrivate;
     const isFormEmpty =
       newUsername === "" && newHandleName === "" && newBio === "";
     const areConstraintsSatisfied =
@@ -182,6 +186,7 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
       areConstraintsSatisfied;
 
     return {
+      ...{ isPrivate, setIsPrivate },
       ...{ newHandleName, newHandleNameValidity, updateNewHandleName },
       ...{ newUsername, newUsernameValidity, updateNewUsername },
       ...{ newBio, newBioValidity, updateNewBio },
