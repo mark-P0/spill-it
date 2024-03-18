@@ -83,8 +83,9 @@ export const FollowsRouter = Router();
     }
 
     logger.info("Creating follow entry...");
+    const isAccepted = !userToFollow.isPrivate; // Follows are accepted by default if the user to follow is public
     const followResult = await safeAsync(() =>
-      createFollow({ followerUserId, followingUserId }),
+      createFollow({ followerUserId, followingUserId, isAccepted }),
     );
     if (!followResult.success) {
       logger.error(formatError(followResult.error));
