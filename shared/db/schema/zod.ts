@@ -69,12 +69,18 @@ export const zodFollowWithUsers: DrizzleZodFollowWithUsers = zodFollow.extend({
   following: zodUserPublic,
 });
 export const zodFollowers = zodFollowWithUsers.pick({
+  // id: true,
   date: true,
+  // followerUserId: true,
+  // followingUserId: true,
   follower: true,
 });
 export type Follower = z.infer<typeof zodFollowers>;
 export const zodFollowings = zodFollowWithUsers.pick({
+  // id: true,
   date: true,
+  // followerUserId: true,
+  // followingUserId: true,
   following: true,
 });
 export type Following = z.infer<typeof zodFollowings>;
