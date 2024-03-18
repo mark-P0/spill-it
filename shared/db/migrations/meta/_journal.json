@@ -155,6 +155,13 @@
       "when": 1710722323055,
       "tag": "0021_odd_grim_reaper",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "5",
+      "when": 1710722753908,
+      "tag": "0022_bitter_colonel_america",
+      "breakpoints": true
     }
   ]
 }

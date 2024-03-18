@@ -108,7 +108,7 @@ export const FollowsTable = pgTable("follows", {
   date: timestamp("date").notNull().defaultNow(),
   followerUserId: uuid("followerUserId").notNull(),
   followingUserId: uuid("followingUserId").notNull(),
-  isAccepted: boolean("isAccepted").notNull().default(true), // TODO Remove default `true` immediately after migration; only used here to add values to existing DB entries
+  isAccepted: boolean("isAccepted").notNull(),
 });
 const drizzleZodFollow = createSelectSchema(FollowsTable);
 export type DrizzleZodFollow = typeof drizzleZodFollow;
