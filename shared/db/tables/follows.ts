@@ -35,7 +35,7 @@ export async function readFollowers(
 ): Promise<Follower[]> {
   const followers = await db.query.FollowsTable.findMany({
     where: eq(FollowsTable.followingUserId, followingUserId),
-    columns: { date: true },
+    columns: { date: true, isAccepted: true },
     with: { follower: true },
   });
 
@@ -46,7 +46,7 @@ export async function readFollowings(
 ): Promise<Following[]> {
   const followings = await db.query.FollowsTable.findMany({
     where: eq(FollowsTable.followerUserId, followerUserId),
-    columns: { date: true },
+    columns: { date: true, isAccepted: true },
     with: { following: true },
   });
 

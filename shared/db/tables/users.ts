@@ -74,11 +74,11 @@ export async function readUserWithFollowsViaUsername(
     where: eq(UsersTable.username, username),
     with: {
       followers: {
-        columns: { date: true },
+        columns: { date: true, isAccepted: true },
         with: { follower: true },
       },
       followings: {
-        columns: { date: true },
+        columns: { date: true, isAccepted: true },
         with: { following: true },
       },
     },

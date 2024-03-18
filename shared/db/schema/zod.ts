@@ -74,7 +74,7 @@ export const zodFollowers = zodFollowWithUsers.pick({
   date: true,
   // followerUserId: true,
   // followingUserId: true,
-  // isAccepted: true,
+  isAccepted: true,
   follower: true,
 });
 export type Follower = z.infer<typeof zodFollowers>;
@@ -83,7 +83,7 @@ export const zodFollowings = zodFollowWithUsers.pick({
   date: true,
   // followerUserId: true,
   // followingUserId: true,
-  // isAccepted: true,
+  isAccepted: true,
   following: true,
 });
 export type Following = z.infer<typeof zodFollowings>;
