@@ -26,7 +26,7 @@ async function fetchProfile(username: string) {
 
   return profile;
 }
-async function fetchFollowers(userId: string) {
+async function fetchRawFollowers(userId: string) {
   const headers: { Authorization?: string } = {};
   try {
     headers.Authorization = getFromStorage("SESS");
@@ -42,7 +42,7 @@ async function fetchFollowers(userId: string) {
 
   return followers;
 }
-async function fetchFollowings(userId: string) {
+async function fetchRawFollowings(userId: string) {
   const headers: { Authorization?: string } = {};
   try {
     headers.Authorization = getFromStorage("SESS");
@@ -71,10 +71,13 @@ export const [loadProfile, useProfileLoader] = createLoader(
     const profile = await fetchProfile(username);
 
     logger.debug("Fetching profile follows...");
-    const [followers, followings] = await Promise.all([
-      fetchFollowers(profile.id),
-      fetchFollowings(profile.id),
+    const [rawFollowers, rawFollowings] = await Promise.all([
+      fetchRawFollowers(profile.id),
+      fetchRawFollowings(profile.id),
     ]);
+
+    const followers = rawFollowers;
+    const followings = rawFollowings;
 
     return { profile, followers, followings };
   },
