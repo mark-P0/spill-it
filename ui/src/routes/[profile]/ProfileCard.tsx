@@ -64,7 +64,7 @@ function EditProfileButtonLink() {
   );
 }
 
-async function requestUnfollow(followingUserId: string) {
+async function sendUnfollow(followingUserId: string) {
   const headerAuth = getFromStorage("SESS");
 
   const result = await fetchAPI("/api/v0/follows", "DELETE", {
@@ -83,7 +83,7 @@ function UnfollowButton() {
     setIsProcessing(true);
     try {
       logger.debug("Sending unfollow request...");
-      await requestUnfollow(profile.id);
+      await sendUnfollow(profile.id);
       showOnToast(
         <>
           You have now <span className="font-bold">unfollowed</span>{" "}
@@ -136,7 +136,7 @@ function UnfollowButton() {
   );
 }
 
-async function requestFollow(followingUserId: string) {
+async function sendFollow(followingUserId: string) {
   const headerAuth = getFromStorage("SESS");
 
   const result = await fetchAPI("/api/v0/follows", "POST", {
@@ -155,7 +155,7 @@ function FollowButton() {
     setIsProcessing(true);
     try {
       logger.debug("Sending follow request...");
-      await requestFollow(profile.id);
+      await sendFollow(profile.id);
       showOnToast(
         <>
           You are now <span className="font-bold">following</span>{" "}
