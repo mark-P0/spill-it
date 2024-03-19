@@ -64,6 +64,38 @@ function EditProfileButtonLink() {
   );
 }
 
+function CancelFollowButton() {
+  return (
+    <button
+      className={clsx(
+        "disabled:cursor-wait", // TODO Use overlay?
+        "font-bold tracking-wide",
+        "select-none",
+        "rounded-full px-6 py-3", // Based on styles for outline buttons
+        ...[
+          "transition",
+          "disabled:opacity-50",
+          "enabled:active:scale-95",
+          ...[
+            "border",
+            "border-white/25 enabled:hover:border-transparent",
+            "text-white enabled:hover:bg-red-700",
+          ],
+        ],
+        "grid *:row-[1] *:col-[1]",
+        "group",
+      )}
+    >
+      <span className="transition opacity-100 group-enabled:group-hover:opacity-0">
+        Requested
+      </span>
+      <span className="transition opacity-0 group-enabled:group-hover:opacity-100">
+        Cancel
+      </span>
+    </button>
+  );
+}
+
 async function sendUnfollow(followingUserId: string) {
   const headerAuth = getFromStorage("SESS");
 
@@ -191,12 +223,16 @@ function FollowButton() {
 
 function ActionButton() {
   const { user } = useUserContext();
-  const { profile, followers } = useProfileLoader();
+  const { profile, followers, followerRequests } = useProfileLoader();
 
   if (user === null) return null;
 
   const isOwnProfile = user.id === profile.id;
   if (isOwnProfile) return <EditProfileButtonLink />;
+
+  const isRequestor =
+    followerRequests?.some(({ follower }) => follower.id === user.id) ?? false;
+  if (isRequestor) return <CancelFollowButton />;
 
   const isFollowing =
     followers?.some(({ follower }) => follower.id === user.id) ?? false;
