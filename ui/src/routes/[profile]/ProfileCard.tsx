@@ -228,13 +228,24 @@ function FollowButton() {
     try {
       logger.debug("Sending follow request...");
       await sendFollow(profile.id);
-      showOnToast(
-        <>
-          You are now <span className="font-bold">following</span>{" "}
-          {profile.handleName}! 💅
-        </>,
-        "info",
-      );
+
+      if (profile.isPrivate) {
+        showOnToast(
+          <>
+            You have sent a <span className="font-bold">request</span> to follow{" "}
+            {profile.handleName} 🙏
+          </>,
+          "info",
+        );
+      } else {
+        showOnToast(
+          <>
+            You are now <span className="font-bold">following</span>{" "}
+            {profile.handleName}! 💅
+          </>,
+          "info",
+        );
+      }
 
       logger.debug("Revalidating profile...");
       revalidator.revalidate();
