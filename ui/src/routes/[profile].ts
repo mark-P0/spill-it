@@ -76,9 +76,22 @@ export const [loadProfile, useProfileLoader] = createLoader(
       fetchRawFollowings(profile.id),
     ]);
 
-    const followers = rawFollowers;
-    const followings = rawFollowings;
+    const followers =
+      rawFollowers?.filter(({ isAccepted }) => isAccepted) ?? null;
+    const followerRequests =
+      rawFollowers?.filter(({ isAccepted }) => !isAccepted) ?? null;
 
-    return { profile, followers, followings };
+    const followings =
+      rawFollowings?.filter(({ isAccepted }) => isAccepted) ?? null;
+    const followingRequests =
+      rawFollowings?.filter(({ isAccepted }) => !isAccepted) ?? null;
+
+    return {
+      profile,
+      followers,
+      followerRequests,
+      followings,
+      followingRequests,
+    };
   },
 );
