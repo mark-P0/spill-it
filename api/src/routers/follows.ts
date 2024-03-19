@@ -248,6 +248,12 @@ export const FollowsRouter = Router();
           );
           return res.sendStatus(StatusCodes.FORBIDDEN);
         }
+        if (!follow.isAccepted) {
+          logger.error(
+            "Requested followers of private user with follow request that is not yet accepted",
+          );
+          return res.sendStatus(StatusCodes.FORBIDDEN);
+        }
       }
     }
 
@@ -333,6 +339,12 @@ export const FollowsRouter = Router();
         if (follow === null) {
           logger.error(
             "Requested followings of private user that is not followed",
+          );
+          return res.sendStatus(StatusCodes.FORBIDDEN);
+        }
+        if (!follow.isAccepted) {
+          logger.error(
+            "Requested followings of private user with follow request that is not yet accepted",
           );
           return res.sendStatus(StatusCodes.FORBIDDEN);
         }

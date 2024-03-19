@@ -260,6 +260,12 @@ export const PostsRouter = Router();
             );
             return res.sendStatus(StatusCodes.FORBIDDEN);
           }
+          if (!follow.isAccepted) {
+            logger.error(
+              "Requested posts of private user with follow request that is not yet accepted",
+            );
+            return res.sendStatus(StatusCodes.FORBIDDEN);
+          }
         }
       }
 
