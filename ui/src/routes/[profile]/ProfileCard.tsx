@@ -195,7 +195,8 @@ function ActionButton() {
 
   if (user === null) return null;
 
-  if (user.id === profile.id) return <EditProfileButtonLink />;
+  const isOwnProfile = user.id === profile.id;
+  if (isOwnProfile) return <EditProfileButtonLink />;
 
   const isFollowing =
     followers?.some(({ follower }) => follower.id === user.id) ?? false;
