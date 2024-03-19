@@ -53,7 +53,7 @@ const BIO_LEN_MIN = 0;
 const BIO_LEN_MAX = 128;
 const zodBio = z.string().min(BIO_LEN_MIN).max(BIO_LEN_MAX).optional();
 
-async function requestUpdate(
+async function sendUpdate(
   username: string | undefined,
   handleName: string | undefined,
   bio: string | undefined,
@@ -149,7 +149,7 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
         }
 
         logger.debug("Sending update request...");
-        await requestUpdate(username, handleName, bio, isPrivate);
+        await sendUpdate(username, handleName, bio, isPrivate);
 
         logger.debug("Redirecting to [new] username...");
         showOnToast(<>Success! ✨ Redirecting...</>, "info");
