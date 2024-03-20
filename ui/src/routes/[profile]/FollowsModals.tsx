@@ -43,6 +43,16 @@ function UserCard(props: { user: UserPublic }) {
   );
 }
 
+/** Functionally the same as "unfollowing" */
+async function sendDeclineFollowRequest(followerUserId: string) {
+  const headerAuth = getFromStorage("SESS");
+
+  const result = await fetchAPI("/api/v0/follows", "DELETE", {
+    headers: { Authorization: headerAuth },
+    query: { followerUserId },
+  });
+  if (!result.success) raise("Failed declining follow request", result.error);
+}
 async function sendAcceptFollowRequest(followerUserId: string) {
   const headerAuth = getFromStorage("SESS");
 
@@ -60,6 +70,27 @@ function RequestingUserCard(props: { user: UserPublic }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const { user } = props;
 
+  async function decline() {
+    setIsProcessing(true);
+    try {
+      logger.debug("Sending decline follow request...");
+      await sendDeclineFollowRequest(user.id);
+      showOnToast(
+        <>
+          You have rejected the request of{" "}
+          <span className="font-bold">{user.handleName}</span> 👋
+        </>,
+        "critical",
+      );
+
+      logger.debug("Revalidating profile...");
+      revalidator.revalidate();
+    } catch (caughtError) {
+      logger.error(ensureError(caughtError));
+      showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
+    }
+    setIsProcessing(false);
+  }
   async function accept() {
     setIsProcessing(true);
     try {
@@ -112,6 +143,7 @@ function RequestingUserCard(props: { user: UserPublic }) {
           >
             <button
               type="button"
+              onClick={decline}
               className={clsx(clsBtnIcon, "enabled:hover:!bg-red-700")}
             >
               <BsX className="w-full h-full" />
