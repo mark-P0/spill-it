@@ -38,7 +38,11 @@ async function fetchRawFollowers(userId: string) {
     headers,
     query: { userId },
   });
-  const followers = followersResult.success ? followersResult.value.data : null;
+  if (!followersResult.success) {
+    logger.warn("Failed fetching followers; defaulting to null...");
+    return null;
+  }
+  const followers = followersResult.value.data;
 
   return followers;
 }
@@ -54,9 +58,11 @@ async function fetchRawFollowings(userId: string) {
     headers,
     query: { userId },
   });
-  const followings = followingsResult.success
-    ? followingsResult.value.data
-    : null;
+  if (!followingsResult.success) {
+    logger.warn("Failed fetching followings; defaulting to null...");
+    return null;
+  }
+  const followings = followingsResult.value.data;
 
   return followings;
 }
