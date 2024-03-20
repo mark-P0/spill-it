@@ -43,6 +43,16 @@ function UserCard(props: { user: UserPublic }) {
   );
 }
 
+/** Functionally the same as "unfollowing" */
+async function sendDeclineFollowRequest(followerUserId: string) {
+  const headerAuth = getFromStorage("SESS");
+
+  const result = await fetchAPI("/api/v0/follows", "DELETE", {
+    headers: { Authorization: headerAuth },
+    query: { followerUserId },
+  });
+  if (!result.success) raise("Failed declining follow request", result.error);
+}
 async function sendAcceptFollowRequest(followerUserId: string) {
   const headerAuth = getFromStorage("SESS");
 
