@@ -67,6 +67,19 @@ export const endpointMap = {
     },
   },
   "/api/v0/follows": {
+    GET: {
+      input: z.object({
+        headers: z.object({
+          Authorization: z.string(),
+        }),
+        query: z.object({
+          followingUserId: zodFollow.shape.followingUserId,
+        }),
+      }),
+      output: z.object({
+        data: zodFollow,
+      }),
+    },
     POST: {
       input: z.object({
         headers: z.object({
