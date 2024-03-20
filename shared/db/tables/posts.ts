@@ -86,7 +86,12 @@ export async function readPostsFeedWithAuthorViaUserBeforeTimestamp(
     const sqFollowingUserIds = tx
       .select({ _: FollowsTable.followingUserId }) // Keep only a single column
       .from(FollowsTable)
-      .where(eq(FollowsTable.followerUserId, userId)); // Relationships where `userId` is the follower
+      .where(
+        and(
+          eq(FollowsTable.followerUserId, userId), // Relationships where `userId` is the follower
+          eq(FollowsTable.isAccepted, true), // Only consider accepted (i.e. actual) follows
+        ),
+      );
 
     const posts = await tx.query.PostsTable.findMany({
       where: and(
