@@ -191,15 +191,14 @@ function FollowButton() {
 
 function ActionButton() {
   const { user } = useUserContext();
-  const { profile, followers } = useProfileLoader();
+  const { profile, follow } = useProfileLoader();
 
   if (user === null) return null;
 
   const isOwnProfile = user.id === profile.id;
   if (isOwnProfile) return <EditProfileButtonLink />;
 
-  const isFollowing =
-    followers?.some(({ follower }) => follower.id === user.id) ?? false;
+  const isFollowing = follow?.isAccepted ?? false;
   if (isFollowing) return <UnfollowButton />;
 
   return <FollowButton />;
