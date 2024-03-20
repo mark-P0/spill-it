@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   DrizzleZodFollow,
+  DrizzleZodFollowPublicDetails,
   DrizzleZodFollowWithUsers,
   DrizzleZodPost,
   DrizzleZodPostWithAuthor,
@@ -65,6 +66,16 @@ export const zodFollow: DrizzleZodFollow = z.object({
   followingUserId: zodUserPublic.shape.id,
   isAccepted: z.boolean(),
 });
+export const zodFollowPublicDetails: DrizzleZodFollowPublicDetails = zodFollow
+  .pick({
+    // id: true,
+    // date: true,
+    // followerUserId: true,
+    // followingUserId: true,
+    isAccepted: true,
+  })
+  .partial();
+
 export const zodFollowWithUsers: DrizzleZodFollowWithUsers = zodFollow.extend({
   follower: zodUserPublic,
   following: zodUserPublic,

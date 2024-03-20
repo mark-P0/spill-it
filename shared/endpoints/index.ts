@@ -1,5 +1,6 @@
 import {
   zodFollow,
+  zodFollowPublicDetails,
   zodFollowWithUsers,
   zodFollowers,
   zodFollowings,
@@ -74,6 +75,22 @@ export const endpointMap = {
         }),
         query: z.object({
           followingUserId: zodFollow.shape.followingUserId,
+        }),
+      }),
+      output: z.object({
+        data: zodFollow,
+      }),
+    },
+    PATCH: {
+      input: z.object({
+        headers: z.object({
+          Authorization: z.string(),
+        }),
+        query: z.object({
+          followerUserId: zodFollow.shape.followerUserId,
+        }),
+        body: z.object({
+          details: zodFollowPublicDetails,
         }),
       }),
       output: z.object({

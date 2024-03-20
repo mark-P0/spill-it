@@ -115,6 +115,19 @@ export type DrizzleZodFollow = typeof drizzleZodFollow;
 export type Follow = typeof FollowsTable.$inferSelect;
 export type FollowDetails = typeof FollowsTable.$inferInsert;
 
+export const drizzleZodFollowPublicDetails = drizzleZodFollow
+  .pick({
+    // id: true,
+    // date: true,
+    // followerUserId: true,
+    // followingUserId: true,
+    isAccepted: true,
+  })
+  .partial();
+export type DrizzleZodFollowPublicDetails =
+  typeof drizzleZodFollowPublicDetails;
+export type FollowPublicDetails = z.infer<DrizzleZodFollowPublicDetails>;
+
 export const FollowsRelations = relations(FollowsTable, ({ one }) => ({
   follower: one(UsersTable, {
     relationName: "follower",
