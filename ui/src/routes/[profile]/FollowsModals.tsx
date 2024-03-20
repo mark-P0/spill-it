@@ -5,6 +5,7 @@ import { BsPersonPlusFill, BsXLg } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
 import { useProfileLoader } from "../[profile]";
+import { useUserContext } from "../_app/UserContext";
 import { clsBtnIcon, clsLink } from "../_app/classes";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
@@ -114,6 +115,7 @@ function FollowingRequestsModalContent() {
   );
 }
 function FollowingModalContent() {
+  const { user } = useUserContext();
   const { profile, followings } = useProfileLoader();
   const { closeModal, showOnModal } = useModalContext();
 
@@ -125,6 +127,8 @@ function FollowingModalContent() {
   if (followings === null) return;
 
   const { handleName } = profile;
+  const isOwnProfile = user?.id === profile.id;
+
   return (
     <ModalContent>
       <header className="flex items-center gap-6">
@@ -136,9 +140,14 @@ function FollowingModalContent() {
           <button onClick={closeModal} className={clsx(clsBtnIcon)}>
             <BsXLg className="w-full h-full" />
           </button>
-          <button onClick={showFollowingRequests} className={clsx(clsBtnIcon)}>
-            <BsPersonPlusFill className="w-full h-full" />
-          </button>
+          {isOwnProfile && (
+            <button
+              onClick={showFollowingRequests}
+              className={clsx(clsBtnIcon)}
+            >
+              <BsPersonPlusFill className="w-full h-full" />
+            </button>
+          )}
         </div>
       </header>
 
