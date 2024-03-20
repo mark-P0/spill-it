@@ -9,12 +9,11 @@ import { PostsList } from "./posts/PostsList";
 
 function PostsSection() {
   const { user } = useUserContext();
-  const { profile, followers } = useProfileLoader();
+  const { profile, follow } = useProfileLoader();
 
   const isOwnProfile = profile.id === user?.id;
   const isProfilePublic = !profile.isPrivate;
-  const isFollowing =
-    followers?.some(({ follower }) => follower.id === user?.id) ?? false;
+  const isFollowing = follow?.isAccepted ?? false;
   const canShowPosts = isOwnProfile || isProfilePublic || isFollowing;
 
   if (!canShowPosts) {
