@@ -64,9 +64,50 @@ function EditProfileButtonLink() {
   );
 }
 
+/** Functionally the same as "unfollowing" */
+async function sendCancelFollowRequest(followingUserId: string) {
+  const headerAuth = getFromStorage("SESS");
+
+  const result = await fetchAPI("/api/v0/follows", "DELETE", {
+    headers: { Authorization: headerAuth },
+    query: { followingUserId },
+  });
+  if (!result.success) raise("Failed cancelling follow request", result.error);
+}
 function CancelRequestButton() {
+  const revalidator = useRevalidator();
+  const { showOnToast } = useToastContext();
+  const { profile } = useProfileLoader();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  async function cancel() {
+    setIsProcessing(true);
+    try {
+      logger.debug("Sending cancel follow request...");
+      await sendCancelFollowRequest(profile.id);
+      showOnToast(
+        <>
+          Your request to follow {profile.handleName} is now{" "}
+          <span className="font-bold">cancelled</span> 💨
+        </>,
+        "critical",
+      );
+
+      logger.debug("Revalidating profile...");
+      revalidator.revalidate();
+    } catch (caughtError) {
+      logger.error(ensureError(caughtError));
+      showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
+    }
+    setIsProcessing(false);
+  }
+
+  const isRevalidating = revalidator.state === "loading";
+
   return (
     <button
+      disabled={isProcessing || isRevalidating}
+      onClick={cancel}
       className={clsx(
         "disabled:cursor-wait", // TODO Use overlay?
         "font-bold tracking-wide",
