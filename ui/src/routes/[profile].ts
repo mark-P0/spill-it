@@ -26,6 +26,26 @@ async function fetchProfile(username: string) {
 
   return profile;
 }
+async function fetchFollow(followingUserId: string) {
+  let Authorization: string;
+  try {
+    Authorization = getFromStorage("SESS");
+  } catch {
+    return null;
+  }
+
+  const followResult = await fetchAPI("/api/v0/follows", "GET", {
+    headers: { Authorization },
+    query: { followingUserId },
+  });
+  if (!followResult.success) {
+    logger.warn("Failed fetching follow entry; defaulting to null...");
+    return null;
+  }
+  const follow = followResult.value.data;
+
+  return follow;
+}
 async function fetchRawFollowers(userId: string) {
   const headers: { Authorization?: string } = {};
   try {
@@ -77,7 +97,8 @@ export const [loadProfile, useProfileLoader] = createLoader(
     const profile = await fetchProfile(username);
 
     logger.debug("Fetching profile follows...");
-    const [rawFollowers, rawFollowings] = await Promise.all([
+    const [follow, rawFollowers, rawFollowings] = await Promise.all([
+      fetchFollow(profile.id),
       fetchRawFollowers(profile.id),
       fetchRawFollowings(profile.id),
     ]);
@@ -94,6 +115,7 @@ export const [loadProfile, useProfileLoader] = createLoader(
 
     return {
       profile,
+      follow,
       followers,
       followerRequests,
       followings,
