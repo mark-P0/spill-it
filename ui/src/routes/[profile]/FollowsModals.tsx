@@ -36,14 +36,48 @@ function UserCard(props: { user: UserPublic }) {
   );
 }
 
-function FollowersModalContent() {
-  const { profile, followers } = useProfileLoader();
+function FollowerRequestsModalContent() {
+  const { followerRequests } = useProfileLoader();
   const { closeModal } = useModalContext();
+
+  return (
+    <ModalContent>
+      <header className="flex items-center gap-6">
+        <h2 className="text-xl font-bold tracking-wide">
+          People requesting to follow you
+        </h2>
+
+        <div className="ml-auto flex flex-row-reverse">
+          <button onClick={closeModal} className={clsx(clsBtnIcon)}>
+            <BsXLg className="w-full h-full" />
+          </button>
+        </div>
+      </header>
+
+      <ol className="mt-3 grid gap-1">
+        {followerRequests?.map(({ follower }) => (
+          // TODO Add controls for accepting/rejecting requests
+          <UserCard key={follower.id} user={follower} />
+        ))}
+      </ol>
+    </ModalContent>
+  );
+}
+function FollowersModalContent() {
+  const { user } = useUserContext();
+  const { profile, followers } = useProfileLoader();
+  const { closeModal, showOnModal } = useModalContext();
+
+  function showFollowerRequests() {
+    showOnModal(<FollowerRequestsModalContent />);
+  }
 
   if (profile === null) return;
   if (followers === null) return;
 
   const { handleName } = profile;
+  const isOwnProfile = user?.id === profile.id;
+
   return (
     <ModalContent>
       <header className="flex items-center gap-6">
@@ -51,10 +85,15 @@ function FollowersModalContent() {
           People who follow <span className="font-bold">{handleName}</span>
         </h2>
 
-        <div className="ml-auto">
+        <div className="ml-auto flex flex-row-reverse">
           <button onClick={closeModal} className={clsx(clsBtnIcon)}>
             <BsXLg />
           </button>
+          {isOwnProfile && (
+            <button onClick={showFollowerRequests} className={clsx(clsBtnIcon)}>
+              <BsPersonPlusFill className="w-full h-full" />
+            </button>
+          )}
         </div>
       </header>
 
