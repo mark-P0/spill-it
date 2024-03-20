@@ -26,7 +26,27 @@ async function fetchProfile(username: string) {
 
   return profile;
 }
-async function fetchFollowers(userId: string) {
+async function fetchFollow(followingUserId: string) {
+  let Authorization: string;
+  try {
+    Authorization = getFromStorage("SESS");
+  } catch {
+    return null;
+  }
+
+  const followResult = await fetchAPI("/api/v0/follows", "GET", {
+    headers: { Authorization },
+    query: { followingUserId },
+  });
+  if (!followResult.success) {
+    logger.warn("Failed fetching follow entry; defaulting to null...");
+    return null;
+  }
+  const follow = followResult.value.data;
+
+  return follow;
+}
+async function fetchRawFollowers(userId: string) {
   const headers: { Authorization?: string } = {};
   try {
     headers.Authorization = getFromStorage("SESS");
@@ -38,11 +58,15 @@ async function fetchFollowers(userId: string) {
     headers,
     query: { userId },
   });
-  const followers = followersResult.success ? followersResult.value.data : null;
+  if (!followersResult.success) {
+    logger.warn("Failed fetching followers; defaulting to null...");
+    return null;
+  }
+  const followers = followersResult.value.data;
 
   return followers;
 }
-async function fetchFollowings(userId: string) {
+async function fetchRawFollowings(userId: string) {
   const headers: { Authorization?: string } = {};
   try {
     headers.Authorization = getFromStorage("SESS");
@@ -54,9 +78,11 @@ async function fetchFollowings(userId: string) {
     headers,
     query: { userId },
   });
-  const followings = followingsResult.success
-    ? followingsResult.value.data
-    : null;
+  if (!followingsResult.success) {
+    logger.warn("Failed fetching followings; defaulting to null...");
+    return null;
+  }
+  const followings = followingsResult.value.data;
 
   return followings;
 }
@@ -67,15 +93,34 @@ export const [loadProfile, useProfileLoader] = createLoader(
   async ({ params }) => {
     const { username } = zodProfileParams.parse(params);
 
+    // TODO Fetch these all at once?
     logger.debug("Fetching profile...");
     const profile = await fetchProfile(username);
 
     logger.debug("Fetching profile follows...");
-    const [followers, followings] = await Promise.all([
-      fetchFollowers(profile.id),
-      fetchFollowings(profile.id),
+    const [follow, rawFollowers, rawFollowings] = await Promise.all([
+      fetchFollow(profile.id),
+      fetchRawFollowers(profile.id),
+      fetchRawFollowings(profile.id),
     ]);
 
-    return { profile, followers, followings };
+    const followers =
+      rawFollowers?.filter(({ isAccepted }) => isAccepted) ?? null;
+    const followerRequests =
+      rawFollowers?.filter(({ isAccepted }) => !isAccepted) ?? null;
+
+    const followings =
+      rawFollowings?.filter(({ isAccepted }) => isAccepted) ?? null;
+    const followingRequests =
+      rawFollowings?.filter(({ isAccepted }) => !isAccepted) ?? null;
+
+    return {
+      profile,
+      follow,
+      followers,
+      followerRequests,
+      followings,
+      followingRequests,
+    };
   },
 );

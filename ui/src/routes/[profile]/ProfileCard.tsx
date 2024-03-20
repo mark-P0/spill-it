@@ -64,7 +64,80 @@ function EditProfileButtonLink() {
   );
 }
 
-async function requestUnfollow(followingUserId: string) {
+/** Functionally the same as "unfollowing" */
+async function sendCancelFollowRequest(followingUserId: string) {
+  const headerAuth = getFromStorage("SESS");
+
+  const result = await fetchAPI("/api/v0/follows", "DELETE", {
+    headers: { Authorization: headerAuth },
+    query: { followingUserId },
+  });
+  if (!result.success) raise("Failed cancelling follow request", result.error);
+}
+function CancelRequestButton() {
+  const revalidator = useRevalidator();
+  const { showOnToast } = useToastContext();
+  const { profile } = useProfileLoader();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  async function cancel() {
+    setIsProcessing(true);
+    try {
+      logger.debug("Sending cancel follow request...");
+      await sendCancelFollowRequest(profile.id);
+      showOnToast(
+        <>
+          Your request to follow {profile.handleName} is now{" "}
+          <span className="font-bold">cancelled</span> 💨
+        </>,
+        "critical",
+      );
+
+      logger.debug("Revalidating profile...");
+      revalidator.revalidate();
+    } catch (caughtError) {
+      logger.error(ensureError(caughtError));
+      showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
+    }
+    setIsProcessing(false);
+  }
+
+  const isRevalidating = revalidator.state === "loading";
+
+  return (
+    <button
+      disabled={isProcessing || isRevalidating}
+      onClick={cancel}
+      className={clsx(
+        "disabled:cursor-wait", // TODO Use overlay?
+        "font-bold tracking-wide",
+        "select-none",
+        "rounded-full px-6 py-3", // Based on styles for outline buttons
+        ...[
+          "transition",
+          "disabled:opacity-50",
+          "enabled:active:scale-95",
+          ...[
+            "border",
+            "border-white/25 enabled:hover:border-transparent",
+            "text-white enabled:hover:bg-red-700",
+          ],
+        ],
+        "grid *:row-[1] *:col-[1]",
+        "group",
+      )}
+    >
+      <span className="transition opacity-100 group-enabled:group-hover:opacity-0">
+        Requested
+      </span>
+      <span className="transition opacity-0 group-enabled:group-hover:opacity-100">
+        Cancel
+      </span>
+    </button>
+  );
+}
+
+async function sendUnfollow(followingUserId: string) {
   const headerAuth = getFromStorage("SESS");
 
   const result = await fetchAPI("/api/v0/follows", "DELETE", {
@@ -83,10 +156,10 @@ function UnfollowButton() {
     setIsProcessing(true);
     try {
       logger.debug("Sending unfollow request...");
-      await requestUnfollow(profile.id);
+      await sendUnfollow(profile.id);
       showOnToast(
         <>
-          You have now <span className="font-bold">unfollowed</span>{" "}
+          You <span className="font-bold">no longer follow</span>{" "}
           {profile.handleName} 😢
         </>,
         "critical",
@@ -136,7 +209,7 @@ function UnfollowButton() {
   );
 }
 
-async function requestFollow(followingUserId: string) {
+async function sendFollow(followingUserId: string) {
   const headerAuth = getFromStorage("SESS");
 
   const result = await fetchAPI("/api/v0/follows", "POST", {
@@ -155,14 +228,25 @@ function FollowButton() {
     setIsProcessing(true);
     try {
       logger.debug("Sending follow request...");
-      await requestFollow(profile.id);
-      showOnToast(
-        <>
-          You are now <span className="font-bold">following</span>{" "}
-          {profile.handleName}! 💅
-        </>,
-        "info",
-      );
+      await sendFollow(profile.id);
+
+      if (profile.isPrivate) {
+        showOnToast(
+          <>
+            You have sent a <span className="font-bold">request</span> to follow{" "}
+            {profile.handleName} 🙏
+          </>,
+          "info",
+        );
+      } else {
+        showOnToast(
+          <>
+            You are now <span className="font-bold">following</span>{" "}
+            {profile.handleName}! 💅
+          </>,
+          "info",
+        );
+      }
 
       logger.debug("Revalidating profile...");
       revalidator.revalidate();
@@ -191,14 +275,17 @@ function FollowButton() {
 
 function ActionButton() {
   const { user } = useUserContext();
-  const { profile, followers } = useProfileLoader();
+  const { profile, follow } = useProfileLoader();
 
   if (user === null) return null;
 
-  if (user.id === profile.id) return <EditProfileButtonLink />;
+  const isOwnProfile = user.id === profile.id;
+  if (isOwnProfile) return <EditProfileButtonLink />;
 
-  const isFollowing =
-    followers?.some(({ follower }) => follower.id === user.id) ?? false;
+  const isFollowRequested = follow !== null ? !follow.isAccepted : false;
+  if (isFollowRequested) return <CancelRequestButton />;
+
+  const isFollowing = follow?.isAccepted ?? false;
   if (isFollowing) return <UnfollowButton />;
 
   return <FollowButton />;
