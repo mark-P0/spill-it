@@ -1,7 +1,7 @@
 import { UserPublic } from "@spill-it/db/schema/drizzle";
 import clsx from "clsx";
 import { useEffect } from "react";
-import { BsXLg } from "react-icons/bs";
+import { BsPersonPlusFill, BsXLg } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
 import { useProfileLoader } from "../[profile]";
@@ -87,9 +87,39 @@ export function FollowersModal() {
   );
 }
 
+function FollowingRequestsModalContent() {
+  const { followingRequests } = useProfileLoader();
+  const { closeModal } = useModalContext();
+
+  return (
+    <ModalContent>
+      <header className="flex items-center gap-6">
+        <h2 className="text-xl font-bold tracking-wide">
+          People you requested to follow
+        </h2>
+
+        <div className="ml-auto flex flex-row-reverse">
+          <button onClick={closeModal} className={clsx(clsBtnIcon)}>
+            <BsXLg className="w-full h-full" />
+          </button>
+        </div>
+      </header>
+
+      <ol className="mt-3 grid gap-1">
+        {followingRequests?.map(({ following }) => (
+          <UserCard key={following.id} user={following} />
+        ))}
+      </ol>
+    </ModalContent>
+  );
+}
 function FollowingModalContent() {
   const { profile, followings } = useProfileLoader();
-  const { closeModal } = useModalContext();
+  const { closeModal, showOnModal } = useModalContext();
+
+  function showFollowingRequests() {
+    showOnModal(<FollowingRequestsModalContent />);
+  }
 
   if (profile === null) return;
   if (followings === null) return;
@@ -102,9 +132,12 @@ function FollowingModalContent() {
           People followed by <span className="font-bold">{handleName}</span>
         </h2>
 
-        <div className="ml-auto">
+        <div className="ml-auto flex flex-row-reverse">
           <button onClick={closeModal} className={clsx(clsBtnIcon)}>
             <BsXLg className="w-full h-full" />
+          </button>
+          <button onClick={showFollowingRequests} className={clsx(clsBtnIcon)}>
+            <BsPersonPlusFill className="w-full h-full" />
           </button>
         </div>
       </header>
