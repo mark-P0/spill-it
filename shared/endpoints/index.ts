@@ -116,7 +116,8 @@ export const endpointMap = {
           Authorization: z.string(),
         }),
         query: z.object({
-          followingUserId: zodFollow.shape.followingUserId,
+          followerUserId: zodFollow.shape.followerUserId.optional(),
+          followingUserId: zodFollow.shape.followingUserId.optional(),
         }),
       }),
       output: z.object({}),

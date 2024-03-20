@@ -11,11 +11,14 @@ import { readUser } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
-import { safe, safeAsync } from "@spill-it/utils/safe";
-import { Router } from "express";
+import { Result, safe, safeAsync } from "@spill-it/utils/safe";
+import { Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { convertHeaderAuthToUser } from "../middlewares/header-auth-user";
+import {
+  ResponseAsError,
+  convertHeaderAuthToUser,
+} from "../middlewares/header-auth-user";
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(__filename);
@@ -281,13 +284,19 @@ export const FollowsRouter = Router();
     }
     const user = userResult.value;
 
+    logger.info("Determining user IDs...");
+    const { query } = input;
+    const userIdsResult = determineUserIds(res, query, user);
+    if (!userIdsResult.success) {
+      return userIdsResult.error.res;
+    }
+    const { followerUserId, followingUserId } = userIdsResult.value;
+
     logger.info("Checking if follow entry is possible...");
-    const { followingUserId } = input.query;
-    const followerUserId = user.id;
     {
       if (followerUserId === followingUserId) {
-        logger.error("Cannot follow self");
-        return res.sendStatus(StatusCodes.BAD_REQUEST);
+        logger.error("Self-following should not be possible...");
+        return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
       }
     }
     {
@@ -333,6 +342,59 @@ export const FollowsRouter = Router();
     logger.info("Sending output...");
     return res.send(rawOutput);
   });
+
+  type FollowUserIds = {
+    followerUserId: string;
+    followingUserId: string;
+  };
+  function determineUserIds<T extends Response>(
+    res: T,
+    query: Input["query"],
+    user: UserPublic,
+  ): Result<FollowUserIds, ResponseAsError<T>> {
+    const { followerUserId, followingUserId } = query;
+
+    if (followerUserId !== undefined && followingUserId === undefined) {
+      return {
+        success: true,
+        value: {
+          followerUserId: followerUserId,
+          followingUserId: user.id,
+        },
+      };
+    }
+    if (followerUserId === undefined && followingUserId !== undefined) {
+      return {
+        success: true,
+        value: {
+          followerUserId: user.id,
+          followingUserId: followingUserId,
+        },
+      };
+    }
+
+    if (followerUserId === undefined || followingUserId === undefined) {
+      logger.error("At least one (1) user ID must be provided");
+      const error = new ResponseAsError(
+        res.sendStatus(StatusCodes.BAD_REQUEST),
+      );
+      return { success: false, error };
+    }
+    /* At this point, both user IDs are provided */
+
+    /* Providing both IDs is only valid if at least one of them is of the requesting user */
+    if (followerUserId === user.id || followingUserId === user.id) {
+      return {
+        success: true,
+        value: { followerUserId, followingUserId },
+      };
+    }
+
+    /* Neither of the provided IDs are of the requesting user */
+    logger.error("Cannot perform actions on follow entry of other users");
+    const error = new ResponseAsError(res.sendStatus(StatusCodes.FORBIDDEN));
+    return { success: false, error };
+  }
 }
 
 {

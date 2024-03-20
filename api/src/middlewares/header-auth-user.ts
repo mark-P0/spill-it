@@ -14,7 +14,7 @@ import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(__filename);
 
-class ResponseAsError<T extends Response> extends Error {
+export class ResponseAsError<T extends Response> extends Error {
   constructor(public res: T) {
     super("Express response packaged as an error");
   }
