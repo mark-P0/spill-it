@@ -93,6 +93,7 @@ export const [loadProfile, useProfileLoader] = createLoader(
   async ({ params }) => {
     const { username } = zodProfileParams.parse(params);
 
+    // TODO Fetch these all at once?
     logger.debug("Fetching profile...");
     const profile = await fetchProfile(username);
 
