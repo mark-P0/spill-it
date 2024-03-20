@@ -11,6 +11,25 @@ function PostsSection() {
   const { user } = useUserContext();
   const { profile, follow } = useProfileLoader();
 
+  const isFollowRequested = follow !== null ? !follow.isAccepted : false;
+  if (isFollowRequested) {
+    return (
+      <section className="w-fit mx-auto">
+        <h2 className="text-xl text-white/75">
+          ⚖ <span className="font-bold">{profile.handleName}</span> is judging
+          you
+        </h2>
+
+        <p className="text-white/50">
+          Your worth as a friend is being evaluated.
+          <br />
+          You may <span className="font-bold">cancel your request</span> at any
+          time.
+        </p>
+      </section>
+    );
+  }
+
   const isOwnProfile = profile.id === user?.id;
   const isProfilePublic = !profile.isPrivate;
   const isFollowing = follow?.isAccepted ?? false;
