@@ -53,6 +53,25 @@ export async function readFollowings(
   return followings;
 }
 
+export async function updateFollow(
+  id: Follow["id"],
+  details: Partial<Omit<FollowDetails, "id">>,
+): Promise<Follow> {
+  return await db.transaction(async (tx) => {
+    const follows = await tx
+      .update(FollowsTable)
+      .set(details)
+      .where(eq(FollowsTable.id, id))
+      .returning();
+
+    if (follows.length > 1) raise("Multiple follow entries updated...?");
+    const follow =
+      follows[0] ?? raise("Updated follow entry does not exist...?");
+
+    return follow;
+  });
+}
+
 /**
  * Transactions are automatically rolled back upon errors (think try-catch)
  * - https://github.com/drizzle-team/drizzle-orm/issues/1450
