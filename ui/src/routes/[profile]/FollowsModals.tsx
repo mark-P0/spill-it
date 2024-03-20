@@ -1,14 +1,21 @@
 import { UserPublic } from "@spill-it/db/schema/drizzle";
+import { ensureError, raise } from "@spill-it/utils/errors";
 import clsx from "clsx";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BsCheck, BsPersonPlusFill, BsX, BsXLg } from "react-icons/bs";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useRevalidator } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
+import { fetchAPI } from "../../utils/fetch-api";
+import { logger } from "../../utils/logger";
+import { getFromStorage } from "../../utils/storage";
 import { useProfileLoader } from "../[profile]";
+import { LoadingCursorAbsoluteOverlay } from "../_app/Loading";
 import { useUserContext } from "../_app/UserContext";
 import { clsBtnIcon, clsLink } from "../_app/classes";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
+import { Toast } from "../_app/toast/Toast";
+import { ToastProvider, useToastContext } from "../_app/toast/ToastContext";
 
 function UserCard(props: { user: UserPublic }) {
   const { user } = props;
@@ -36,11 +43,48 @@ function UserCard(props: { user: UserPublic }) {
   );
 }
 
+async function sendAcceptFollowRequest(followerUserId: string) {
+  const headerAuth = getFromStorage("SESS");
+
+  const result = await fetchAPI("/api/v0/follows", "PATCH", {
+    headers: { Authorization: headerAuth },
+    query: { followerUserId },
+    body: { details: { isAccepted: true } },
+  });
+  if (!result.success) raise("Failed accepting follow request", result.error);
+}
 // TODO Reuse existing user card?
 function RequestingUserCard(props: { user: UserPublic }) {
+  const revalidator = useRevalidator();
+  const { showOnToast } = useToastContext();
+  const [isProcessing, setIsProcessing] = useState(false);
   const { user } = props;
 
+  async function accept() {
+    setIsProcessing(true);
+    try {
+      logger.debug("Sending accept follow request...");
+      await sendAcceptFollowRequest(user.id);
+      showOnToast(
+        <>
+          <span className="font-bold">{user.handleName}</span> is now following
+          you! 🎊
+        </>,
+        "info",
+      );
+
+      logger.debug("Revalidating profile...");
+      revalidator.revalidate();
+    } catch (caughtError) {
+      logger.error(ensureError(caughtError));
+      showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
+    }
+    setIsProcessing(false);
+  }
+
   const { handleName, username, portraitUrl } = user;
+  const isLoading = isProcessing || revalidator.state === "loading";
+
   return (
     <article className="flex items-center gap-3 rounded p-3 bg-white/10">
       <img
@@ -60,13 +104,29 @@ function RequestingUserCard(props: { user: UserPublic }) {
         <p className="text-white/50 text-sm">{username}</p>
       </header>
 
-      <div className="ml-auto flex flex-row-reverse items-center">
-        <button className={clsx(clsBtnIcon, "enabled:hover:!bg-red-700")}>
-          <BsX className="w-full h-full" />
-        </button>
-        <button className={clsx(clsBtnIcon, "enabled:hover:!bg-fuchsia-600")}>
-          <BsCheck className="w-full h-full" />
-        </button>
+      <div className="ml-auto">
+        <form>
+          <fieldset
+            disabled={isLoading}
+            className="flex flex-row-reverse items-center"
+          >
+            <button
+              type="button"
+              className={clsx(clsBtnIcon, "enabled:hover:!bg-red-700")}
+            >
+              <BsX className="w-full h-full" />
+            </button>
+            <button
+              type="button"
+              onClick={accept}
+              className={clsx(clsBtnIcon, "enabled:hover:!bg-fuchsia-600")}
+            >
+              <BsCheck type="button" className="w-full h-full" />
+            </button>
+          </fieldset>
+
+          {isLoading && <LoadingCursorAbsoluteOverlay />}
+        </form>
       </div>
     </article>
   );
@@ -78,23 +138,27 @@ function FollowerRequestsModalContent() {
 
   return (
     <ModalContent>
-      <header className="flex items-center gap-6">
-        <h2 className="text-xl font-bold tracking-wide">
-          People requesting to follow you
-        </h2>
+      <ToastProvider>
+        <header className="flex items-center gap-6">
+          <h2 className="text-xl font-bold tracking-wide">
+            People requesting to follow you
+          </h2>
 
-        <div className="ml-auto flex flex-row-reverse">
-          <button onClick={closeModal} className={clsx(clsBtnIcon)}>
-            <BsXLg className="w-full h-full" />
-          </button>
-        </div>
-      </header>
+          <div className="ml-auto flex flex-row-reverse">
+            <button onClick={closeModal} className={clsx(clsBtnIcon)}>
+              <BsXLg className="w-full h-full" />
+            </button>
+          </div>
+        </header>
 
-      <ol className="mt-3 grid gap-1">
-        {followerRequests?.map(({ follower }) => (
-          <RequestingUserCard key={follower.id} user={follower} />
-        ))}
-      </ol>
+        <ol className="mt-3 grid gap-1">
+          {followerRequests?.map(({ follower }) => (
+            <RequestingUserCard key={follower.id} user={follower} />
+          ))}
+        </ol>
+
+        <Toast />
+      </ToastProvider>
     </ModalContent>
   );
 }
