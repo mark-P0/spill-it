@@ -273,7 +273,7 @@ function FollowButton() {
   );
 }
 
-function ActionButton() {
+function ProfileActionButton() {
   const { user } = useUserContext();
   const { profile, follow } = useProfileLoader();
 
@@ -317,7 +317,7 @@ export function ProfileCard() {
       </div>
 
       <div className="col-start-2 row-start-1 place-self-start">
-        <ActionButton />
+        <ProfileActionButton />
       </div>
 
       <div className="col-start-3 row-start-1 row-span-3">
