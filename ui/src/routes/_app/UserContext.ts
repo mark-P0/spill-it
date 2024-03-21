@@ -8,6 +8,7 @@ import { getFromStorage } from "../../utils/storage";
 
 export const [useUserContext, UserProvider] = createNewContext(() => {
   const [user, setUser] = useState<UserPublic | null>(null);
+  const [isUserInitialized, setIsUserInitialized] = useState(false);
   async function reflectUser() {
     const headerAuthResult = safe(() => getFromStorage("SESS"));
     if (!headerAuthResult.success) {
@@ -30,9 +31,16 @@ export const [useUserContext, UserProvider] = createNewContext(() => {
     setUser(user);
   }
   useEffect(() => {
-    logger.debug("Reflecting user...");
-    reflectUser();
+    (async () => {
+      logger.debug("Reflecting user...");
+      await reflectUser();
+
+      setIsUserInitialized(true);
+    })();
   }, []);
 
-  return { user, reflectUser };
+  return {
+    ...{ user, reflectUser },
+    isUserInitialized,
+  };
 });
