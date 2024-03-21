@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useProfileLoader } from "../../[profile]";
+import { useUserContext } from "../../_app/UserContext";
 import { Modal, ModalContent } from "../../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../../_app/modal/ModalContext";
 import { Toast } from "../../_app/toast/Toast";
@@ -34,6 +36,17 @@ function _EditProfileModal() {
   return null;
 }
 export function EditProfileModal() {
+  const { user, isUserInitialized } = useUserContext();
+  const { profile } = useProfileLoader();
+
+  if (!isUserInitialized) return null;
+  if (user === null) {
+    throw new Error("Cannot edit own profile if current info is not available");
+  }
+  if (user.id !== profile.id) {
+    throw new Error("Cannot edit profile of other users");
+  }
+
   return (
     <ModalProvider>
       <_EditProfileModal />
