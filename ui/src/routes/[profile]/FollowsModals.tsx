@@ -249,6 +249,12 @@ function _FollowersModal() {
   return null;
 }
 export function FollowersModal() {
+  const { followers } = useProfileLoader();
+
+  if (followers === null) {
+    throw new Error("Followers info not available");
+  }
+
   return (
     <ModalProvider>
       <_FollowersModal />
@@ -342,6 +348,12 @@ function _FollowingModal() {
   return null;
 }
 export function FollowingModal() {
+  const { followings } = useProfileLoader();
+
+  if (followings === null) {
+    throw new Error("Followings info not available");
+  }
+
   return (
     <ModalProvider>
       <_FollowingModal />
