@@ -212,9 +212,15 @@ function FollowersModalContent() {
   return (
     <ModalContent>
       <header className="flex items-center gap-6">
-        <h2 className="text-xl">
-          People who follow <span className="font-bold">{handleName}</span>
-        </h2>
+        {isOwnProfile ? (
+          <h2 className="text-xl font-bold tracking-wide">
+            People who follow you
+          </h2>
+        ) : (
+          <h2 className="text-xl">
+            People who follow <span className="font-bold">{handleName}</span>
+          </h2>
+        )}
 
         <div className="ml-auto flex flex-row-reverse">
           <button onClick={closeModal} className={clsx(clsBtnIcon)}>
@@ -308,9 +314,13 @@ function FollowingModalContent() {
   return (
     <ModalContent>
       <header className="flex items-center gap-6">
-        <h2 className="text-xl">
-          People followed by <span className="font-bold">{handleName}</span>
-        </h2>
+        {isOwnProfile ? (
+          <h2 className="text-xl font-bold tracking-wide">People you follow</h2>
+        ) : (
+          <h2 className="text-xl">
+            People followed by <span className="font-bold">{handleName}</span>
+          </h2>
+        )}
 
         <div className="ml-auto flex flex-row-reverse">
           <button onClick={closeModal} className={clsx(clsBtnIcon)}>
