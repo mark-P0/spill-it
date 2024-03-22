@@ -1,11 +1,3 @@
-/**
- * The route objects in this file are exported to "silence" ESLint
- * as it seems to see them as React components.
- *
- * They have component-like properties and indeed React Router has a
- * `<Route>` "component" that can be used to the define the routes.
- */
-
 import { buildHeaderAuth } from "@spill-it/auth/headers";
 import { raise } from "@spill-it/utils/errors";
 import { RouteObject, redirect } from "react-router-dom";
@@ -28,7 +20,7 @@ import { isLoggedIn } from "./utils/is-logged-in";
 import { logger } from "./utils/logger";
 import { deleteFromStorage, setOnStorage } from "./utils/storage";
 
-export const ProfileRoute: RouteObject = {
+const profileRoute: RouteObject = {
   id: profileRouteId,
   path: endpoint("/:username"),
   loader: loadProfile,
@@ -49,7 +41,7 @@ export const ProfileRoute: RouteObject = {
   ],
 };
 
-export const HomeRoute: RouteObject = {
+const homeRoute: RouteObject = {
   path: endpoint("/home"),
   element: <HomeScreen />,
   async loader() {
@@ -65,7 +57,7 @@ export const HomeRoute: RouteObject = {
   },
 };
 
-export const LogoutRoute: RouteObject = {
+const logoutRoute: RouteObject = {
   path: endpoint("/logout"),
   element: null,
   loader() {
@@ -77,7 +69,7 @@ export const LogoutRoute: RouteObject = {
   },
 };
 
-export const LoginGoogleRedirectRoute: RouteObject = {
+const loginGoogleRedirectRoute: RouteObject = {
   path: endpoint("/login/google/redirect"),
   element: null,
   async loader({ request }) {
@@ -108,7 +100,7 @@ export const LoginGoogleRedirectRoute: RouteObject = {
     return redirect(endpoint("/"));
   },
 };
-export const WelcomeRoute: RouteObject = {
+const welcomeRoute: RouteObject = {
   path: endpoint("/welcome"),
   element: <WelcomeScreen />,
   async loader() {
@@ -124,7 +116,7 @@ export const WelcomeRoute: RouteObject = {
   },
 };
 
-export const RootRoute: RouteObject = {
+const rootRoute: RouteObject = {
   path: endpoint("/"),
   element: null,
   loader() {
@@ -132,18 +124,18 @@ export const RootRoute: RouteObject = {
     return redirect(endpoint("/home"));
   },
 };
-export const AppRoute: RouteObject = {
+export const appRoute: RouteObject = {
   element: <App />,
   children: [
     {
       errorElement: <ErrorScreen />,
       children: [
-        RootRoute,
-        WelcomeRoute,
-        LoginGoogleRedirectRoute,
-        LogoutRoute,
-        HomeRoute,
-        ProfileRoute,
+        rootRoute,
+        welcomeRoute,
+        loginGoogleRedirectRoute,
+        logoutRoute,
+        homeRoute,
+        profileRoute,
       ],
     },
   ],
