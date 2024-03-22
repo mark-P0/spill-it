@@ -7,6 +7,8 @@ import {
   useEffect,
   useRef,
 } from "react";
+import { Toast } from "../toast/Toast";
+import { ToastProvider } from "../toast/ToastContext";
 import { useModalContext } from "./ModalContext";
 
 /**
@@ -17,12 +19,16 @@ export function ModalContent(props: ComponentPropsWithoutRef<"article">) {
   const { children, className, ...attributes } = props;
 
   return (
-    <article
-      {...attributes}
-      className={clsx("rounded p-6", "bg-fuchsia-950 text-white", className)}
-    >
-      {children}
-    </article>
+    <ToastProvider>
+      <article
+        {...attributes}
+        className={clsx("rounded p-6", "bg-fuchsia-950 text-white", className)}
+      >
+        {children}
+      </article>
+
+      <Toast />
+    </ToastProvider>
   );
 }
 
