@@ -36,7 +36,7 @@ export function Screen(props: ComponentPropsWithoutRef<"div">) {
         >
           <div
             className={clsx(
-              "mx-auto max-w-screen-sm", // Centered, narrow
+              "mx-auto max-w-screen-sm min-h-screen", // Centered, narrow
               className,
             )}
           >
