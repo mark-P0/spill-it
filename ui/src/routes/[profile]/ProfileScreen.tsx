@@ -30,7 +30,7 @@ function PostsSection() {
     );
   }
 
-  const isOwnProfile = profile.id === user?.id;
+  const isOwnProfile = user?.id === profile.id;
   const isProfilePublic = !profile.isPrivate;
   const isFollowing = follow?.isAccepted ?? false;
   const canShowPosts = isOwnProfile || isProfilePublic || isFollowing;
