@@ -14,8 +14,7 @@ import { useUserContext } from "../_app/UserContext";
 import { clsBtnIcon, clsLink } from "../_app/classes";
 import { Modal, ModalContent } from "../_app/modal/Modal";
 import { ModalProvider, useModalContext } from "../_app/modal/ModalContext";
-import { Toast } from "../_app/toast/Toast";
-import { ToastProvider, useToastContext } from "../_app/toast/ToastContext";
+import { useToastContext } from "../_app/toast/ToastContext";
 
 function UserCard(props: { user: UserPublic }) {
   const { user } = props;
@@ -170,27 +169,23 @@ function FollowerRequestsModalContent() {
 
   return (
     <ModalContent>
-      <ToastProvider>
-        <header className="flex items-center gap-6">
-          <h2 className="text-xl font-bold tracking-wide">
-            People requesting to follow you
-          </h2>
+      <header className="flex items-center gap-6">
+        <h2 className="text-xl font-bold tracking-wide">
+          People requesting to follow you
+        </h2>
 
-          <div className="ml-auto flex flex-row-reverse">
-            <button onClick={closeModal} className={clsx(clsBtnIcon)}>
-              <BsXLg className="w-full h-full" />
-            </button>
-          </div>
-        </header>
+        <div className="ml-auto flex flex-row-reverse">
+          <button onClick={closeModal} className={clsx(clsBtnIcon)}>
+            <BsXLg className="w-full h-full" />
+          </button>
+        </div>
+      </header>
 
-        <ol className="mt-3 grid gap-1">
-          {followerRequests?.map(({ follower }) => (
-            <RequestingUserCard key={follower.id} user={follower} />
-          ))}
-        </ol>
-
-        <Toast />
-      </ToastProvider>
+      <ol className="mt-3 grid gap-1">
+        {followerRequests?.map(({ follower }) => (
+          <RequestingUserCard key={follower.id} user={follower} />
+        ))}
+      </ol>
     </ModalContent>
   );
 }
