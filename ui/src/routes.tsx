@@ -16,9 +16,8 @@ import { WelcomeScreen } from "./routes/welcome/WelcomeScreen";
 import { redirectUri } from "./routes/welcome/redirect-uri";
 import { endpoint } from "./utils/endpoints";
 import { fetchAPI } from "./utils/fetch-api";
-import { isLoggedIn } from "./utils/is-logged-in";
 import { logger } from "./utils/logger";
-import { deleteFromStorage, setOnStorage } from "./utils/storage";
+import { deleteFromStorage, isLoggedIn, setOnStorage } from "./utils/storage";
 
 const profileRoute: RouteObject = {
   id: profileRouteId,
