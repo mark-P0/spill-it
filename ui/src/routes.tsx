@@ -125,6 +125,7 @@ const rootRoute: RouteObject = {
 };
 export const appRoute: RouteObject = {
   element: <App />,
+  errorElement: <ErrorScreen />,
   children: [
     {
       errorElement: <ErrorScreen />,
