@@ -64,11 +64,11 @@ export function NavBar() {
   const { user } = useUserContext();
   const { profile } = useProfileLoader();
 
-  const isProfileOfUser = profile.id === user?.id;
+  const isOwnProfile = user?.id === profile.id;
 
   return (
     <nav className="flex items-center">
-      {isProfileOfUser && <LogoutButton />}
+      {isOwnProfile && <LogoutButton />}
 
       <div className="ml-auto">
         <Link

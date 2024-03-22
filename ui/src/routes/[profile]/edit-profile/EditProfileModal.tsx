@@ -29,11 +29,13 @@ export function EditProfileModal() {
   const { user, isUserInitialized } = useUserContext();
   const { profile } = useProfileLoader();
 
+  const isOwnProfile = user?.id === profile.id;
+
   if (!isUserInitialized) return null;
   if (user === null) {
     throw new Error("Cannot edit own profile if current info is not available");
   }
-  if (user.id !== profile.id) {
+  if (!isOwnProfile) {
     throw new Error("Cannot edit profile of other users");
   }
 
