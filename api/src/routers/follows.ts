@@ -15,72 +15,12 @@ import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { MiddlewareResult, convertHeaderAuthToUser } from "../middlewares";
+import {
+  MiddlewareResult,
+  convertHeaderAuthToUser,
+  ensureAllowedToViewDataOfAnotherUser,
+} from "../middlewares";
 import { localizeLogger } from "../utils/logger";
-
-/**
- * Ensure `requestingUserId` is allowed|authorized|"has permissions" to view
- * the data (e.g. posts, followers) of `requestedUserId`
- */
-async function ensureAllowedToViewDataOfAnotherUser<T extends Response>(
-  res: T,
-  requestedUserId: UserPublic["id"],
-  requestingUserId: UserPublic["id"] | undefined,
-): Promise<MiddlewareResult<null, T>> {
-  logger.info("Fetching info of data owner...");
-  const requestedUserResult = await safeAsync(() => readUser(requestedUserId));
-  if (!requestedUserResult.success) {
-    logger.error(formatError(requestedUserResult.error));
-    res.sendStatus(StatusCodes.BAD_GATEWAY);
-    return { success: false, res };
-  }
-  const requestedUser = requestedUserResult.value;
-
-  if (requestedUser === null) {
-    logger.error("Data owner does not exist");
-    res.sendStatus(StatusCodes.BAD_REQUEST);
-    return { success: false, res };
-  }
-  if (!requestedUser.isPrivate) {
-    return { success: true, value: null };
-  }
-  /* At this point, data owner is private */
-
-  if (requestingUserId === undefined) {
-    logger.error("Requested private data without authentication");
-    res.sendStatus(StatusCodes.UNAUTHORIZED);
-    return { success: false, res };
-  }
-  if (requestingUserId === requestedUser.id) {
-    logger.warn("Data owner is self; allowing...");
-    return { success: true, value: null };
-  }
-  /* At this point, data owner is another user */
-
-  logger.info("Fetching follow relationship with data owner...");
-  const followResult = await safeAsync(() =>
-    readFollowBetweenUsers(requestingUserId, requestedUser.id),
-  );
-  if (!followResult.success) {
-    logger.error(formatError(followResult.error));
-    res.sendStatus(StatusCodes.BAD_GATEWAY);
-    return { success: false, res };
-  }
-  const follow = followResult.value;
-
-  if (follow === null) {
-    logger.error("Requested private data without following owner");
-    res.sendStatus(StatusCodes.FORBIDDEN);
-    return { success: false, res };
-  }
-  if (!follow.isAccepted) {
-    logger.error("Requested private data with pending follow request to owner");
-    res.sendStatus(StatusCodes.FORBIDDEN);
-    return { success: false, res };
-  }
-
-  return { success: true, value: null };
-}
 
 const logger = localizeLogger(__filename);
 export const FollowsRouter = Router();
