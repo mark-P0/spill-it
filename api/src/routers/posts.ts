@@ -275,9 +275,19 @@ export const PostsRouter = Router();
     user: UserPublic | undefined,
   ): Promise<MiddlewareResult<UserPublic["id"], T>> {
     if (query.userId !== undefined) {
-      logger.info("Checking if posts of user can be fetched...");
+      logger.info("Checking if posts of requested user can be fetched...");
 
-      const requestedUser = await readUser(query.userId);
+      const requestedUserId = query.userId;
+      const requestedUserResult = await safeAsync(() =>
+        readUser(requestedUserId),
+      );
+      if (!requestedUserResult.success) {
+        logger.error("Failed fetching info of requested user");
+        res.sendStatus(StatusCodes.BAD_GATEWAY);
+        return { success: false, res };
+      }
+      const requestedUser = requestedUserResult.value;
+
       if (requestedUser === null) {
         logger.error("User whose posts are requested does not exist");
         res.sendStatus(StatusCodes.BAD_REQUEST);
@@ -297,7 +307,16 @@ export const PostsRouter = Router();
           return { success: true, value: user.id };
         }
 
-        const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
+        const followResult = await safeAsync(() =>
+          readFollowBetweenUsers(user.id, requestedUser.id),
+        );
+        if (!followResult.success) {
+          logger.error("Failed fetching follow relationship to requested user");
+          res.sendStatus(StatusCodes.BAD_GATEWAY);
+          return { success: false, res };
+        }
+        const follow = followResult.value;
+
         if (follow === null) {
           logger.error("Requested posts of private user that is not followed");
           res.sendStatus(StatusCodes.FORBIDDEN);
