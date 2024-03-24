@@ -6,7 +6,7 @@ import {
   readSessionWithUser,
 } from "@spill-it/db/tables/sessions";
 import { formatError } from "@spill-it/utils/errors";
-import { Result, safe, safeAsync } from "@spill-it/utils/safe";
+import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { env } from "../utils/env";
@@ -14,24 +14,23 @@ import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(__filename);
 
-export class ResponseAsError<T extends Response> extends Error {
-  constructor(public res: T) {
-    super("Express response packaged as an error");
-  }
-}
+/** Same functions as `Result` type at `@spill-it/utils/safe` */
+export type MiddlewareResult<TValue, T extends Response> =
+  | { success: true; value: TValue }
+  | { success: false; res: T };
 
 export async function convertHeaderAuthToUser<T extends Response>(
   res: T,
   authorization: string,
-): Promise<Result<UserPublic, ResponseAsError<T>>> {
+): Promise<MiddlewareResult<UserPublic, T>> {
   logger.info("Parsing header authorization...");
   const headerAuthResult = safe(() =>
     parseHeaderAuth("SPILLITSESS", authorization),
   );
   if (!headerAuthResult.success) {
     logger.error(formatError(headerAuthResult.error));
-    const error = new ResponseAsError(res.sendStatus(StatusCodes.BAD_REQUEST));
-    return { success: false, error };
+    res.sendStatus(StatusCodes.BAD_REQUEST);
+    return { success: false, res };
   }
   const headerAuth = headerAuthResult.value;
 
@@ -42,38 +41,36 @@ export async function convertHeaderAuthToUser<T extends Response>(
   );
   if (!isValidSignatureResult.success) {
     logger.error(formatError(isValidSignatureResult.error));
-    const error = new ResponseAsError(
-      res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR),
-    );
-    return { success: false, error };
+    res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    return { success: false, res };
   }
   const isValidSignature = isValidSignatureResult.value;
 
   if (!isValidSignature) {
     logger.error("Invalid signature");
-    const error = new ResponseAsError(res.sendStatus(StatusCodes.UNAUTHORIZED));
-    return { success: false, error };
+    res.sendStatus(StatusCodes.UNAUTHORIZED);
+    return { success: false, res };
   }
 
   logger.info("Fetching session info...");
   const sessionResult = await safeAsync(() => readSessionWithUser(id));
   if (!sessionResult.success) {
     logger.error(formatError(sessionResult.error));
-    const error = new ResponseAsError(res.sendStatus(StatusCodes.BAD_GATEWAY));
-    return { success: false, error };
+    res.sendStatus(StatusCodes.BAD_GATEWAY);
+    return { success: false, res };
   }
   const session = sessionResult.value;
 
   logger.info("Verifying session...");
   if (session === null) {
     logger.error("Session does not exist");
-    const error = new ResponseAsError(res.sendStatus(StatusCodes.UNAUTHORIZED));
-    return { success: false, error };
+    res.sendStatus(StatusCodes.UNAUTHORIZED);
+    return { success: false, res };
   }
   if (isSessionExpired(session)) {
     logger.error("Session is expired");
-    const error = new ResponseAsError(res.sendStatus(StatusCodes.UNAUTHORIZED));
-    return { success: false, error };
+    res.sendStatus(StatusCodes.UNAUTHORIZED);
+    return { success: false, res };
   }
 
   const { user } = session;
