@@ -465,16 +465,24 @@ export const FollowsRouter = Router();
     query: Input["query"],
     user: UserPublic | undefined,
   ): Promise<MiddlewareResult<null, T>> {
-    const requestedUser = await readUser(query.userId);
+    logger.info("Fetching requested user info...");
+    const requestedUserResult = await safeAsync(() => readUser(query.userId));
+    if (!requestedUserResult.success) {
+      logger.error(formatError(requestedUserResult.error));
+      res.sendStatus(StatusCodes.BAD_GATEWAY);
+      return { success: false, res };
+    }
+    const requestedUser = requestedUserResult.value;
+
     if (requestedUser === null) {
       logger.error("User whose followers are requested does not exist");
       res.sendStatus(StatusCodes.BAD_REQUEST);
       return { success: false, res };
     }
-
     if (!requestedUser.isPrivate) {
       return { success: true, value: null };
     }
+
     if (user === undefined) {
       logger.error(
         "Requested followers of private user without authentication",
@@ -482,13 +490,22 @@ export const FollowsRouter = Router();
       res.sendStatus(StatusCodes.UNAUTHORIZED);
       return { success: false, res };
     }
-
     if (user.id === requestedUser.id) {
       logger.warn("Queried own ID; will fetch own followers...");
       return { success: true, value: null };
     }
 
-    const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
+    logger.info("Fetching follow relationship with requested user...");
+    const followResult = await safeAsync(() =>
+      readFollowBetweenUsers(user.id, requestedUser.id),
+    );
+    if (!followResult.success) {
+      logger.error(formatError(followResult.error));
+      res.sendStatus(StatusCodes.BAD_GATEWAY);
+      return { success: false, res };
+    }
+    const follow = followResult.value;
+
     if (follow === null) {
       logger.error("Requested followers of private user that is not followed");
       res.sendStatus(StatusCodes.FORBIDDEN);
