@@ -9,8 +9,8 @@ import { formatError } from "@spill-it/utils/errors";
 import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { env } from "../utils/env";
-import { localizeLogger } from "../utils/logger";
+import { env } from "./utils/env";
+import { localizeLogger } from "./utils/logger";
 
 const logger = localizeLogger(__filename);
 

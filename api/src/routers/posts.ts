@@ -17,7 +17,7 @@ import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { convertHeaderAuthToUser } from "../middlewares/header-auth-user";
+import { convertHeaderAuthToUser } from "../middlewares";
 import { endpointWithParam } from "../utils/endpoints";
 import { apiHost } from "../utils/env";
 import { localizeLogger } from "../utils/logger";
