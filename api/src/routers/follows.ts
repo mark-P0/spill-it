@@ -11,12 +11,12 @@ import { readUser } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
-import { Result, safe, safeAsync } from "@spill-it/utils/safe";
+import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import {
-  ResponseAsError,
+  MiddlewareResult,
   convertHeaderAuthToUser,
 } from "../middlewares/header-auth-user";
 import { localizeLogger } from "../utils/logger";
@@ -288,7 +288,7 @@ export const FollowsRouter = Router();
     const { query } = input;
     const userIdsResult = determineUserIds(res, query, user);
     if (!userIdsResult.success) {
-      return userIdsResult.error.res;
+      return userIdsResult.res;
     }
     const { followerUserId, followingUserId } = userIdsResult.value;
 
@@ -351,7 +351,7 @@ export const FollowsRouter = Router();
     res: T,
     query: Input["query"],
     user: UserPublic,
-  ): Result<FollowUserIds, ResponseAsError<T>> {
+  ): MiddlewareResult<FollowUserIds, T> {
     const { followerUserId, followingUserId } = query;
 
     if (followerUserId !== undefined && followingUserId === undefined) {
@@ -375,10 +375,8 @@ export const FollowsRouter = Router();
 
     if (followerUserId === undefined || followingUserId === undefined) {
       logger.error("At least one (1) user ID must be provided");
-      const error = new ResponseAsError(
-        res.sendStatus(StatusCodes.BAD_REQUEST),
-      );
-      return { success: false, error };
+      res.sendStatus(StatusCodes.BAD_REQUEST);
+      return { success: false, res };
     }
     /* At this point, both user IDs are provided */
 
@@ -392,8 +390,8 @@ export const FollowsRouter = Router();
 
     /* Neither of the provided IDs are of the requesting user */
     logger.error("Cannot perform actions on follow entry of other users");
-    const error = new ResponseAsError(res.sendStatus(StatusCodes.FORBIDDEN));
-    return { success: false, error };
+    res.sendStatus(StatusCodes.FORBIDDEN);
+    return { success: false, res };
   }
 }
 
