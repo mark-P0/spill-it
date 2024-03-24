@@ -38,12 +38,12 @@ export const UsersRouter = Router();
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.data;
+    const { query } = inputParsing.data;
 
     // TODO Restrict access?
 
     logger.info("Routing to other handlers...");
-    const { username } = input.query;
+    const { username } = query;
     if (username !== undefined) {
       logger.info("Handling username query...");
       return await handleUsernameQuery(res, username);
@@ -101,10 +101,9 @@ export const UsersRouter = Router();
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.data;
+    const { headers } = inputParsing.data;
 
     logger.info("Converting header authorization to user info...");
-    const { headers } = input;
     const userResult = await convertHeaderAuthToUser(
       res,
       headers.Authorization,
@@ -150,17 +149,16 @@ export const UsersRouter = Router();
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.data;
+    const { headers, body } = inputParsing.data;
 
     // TODO Set these on endpoint schema?
     logger.info("Validating provided details...");
-    const validationResult = validateDetails(res, input.body);
+    const validationResult = validateDetails(res, body);
     if (!validationResult.success) {
       return validationResult.res;
     }
 
     logger.info("Converting header authorization to user info...");
-    const { headers } = input;
     const userResult = await convertHeaderAuthToUser(
       res,
       headers.Authorization,
@@ -171,7 +169,7 @@ export const UsersRouter = Router();
     const user = userResult.value;
 
     {
-      const { username } = input.body.details;
+      const { username } = body.details;
       if (username !== undefined) {
         logger.info("Checking username against database...");
         const existingUser = await readUserViaUsername(username);
@@ -184,7 +182,7 @@ export const UsersRouter = Router();
 
     logger.info("Updating user...");
     const updatedUserResult = await safeAsync(() =>
-      updateUser(user.id, input.body.details),
+      updateUser(user.id, body.details),
     );
     if (!updatedUserResult.success) {
       logger.error(formatError(updatedUserResult.error));

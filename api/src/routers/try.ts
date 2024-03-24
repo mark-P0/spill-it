@@ -25,10 +25,10 @@ export const TryRouter = Router();
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.data;
+    const { query } = inputParsing.data;
 
     logger.info("Parsing output...");
-    const { who = "world" } = input.query;
+    const { who = "world" } = query;
     const outputParsing = signature.output.safeParse({
       hello: `${who}!`,
     } satisfies Output);
