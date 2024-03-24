@@ -422,39 +422,13 @@ export const FollowsRouter = Router();
     }
 
     logger.info("Checking if followers can be fetched...");
-    const { query } = input;
-    const requestedUser = await readUser(query.userId);
-    if (requestedUser === null) {
-      logger.error("User whose followers are requested does not exist");
-      return res.sendStatus(StatusCodes.BAD_REQUEST);
-    }
-    if (requestedUser.isPrivate) {
-      if (user === undefined) {
-        logger.error(
-          "Requested followers of private user without authentication",
-        );
-        return res.sendStatus(StatusCodes.UNAUTHORIZED);
-      }
-
-      if (user.id !== requestedUser.id) {
-        const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
-        if (follow === null) {
-          logger.error(
-            "Requested followers of private user that is not followed",
-          );
-          return res.sendStatus(StatusCodes.FORBIDDEN);
-        }
-        if (!follow.isAccepted) {
-          logger.error(
-            "Requested followers of private user with follow request that is not yet accepted",
-          );
-          return res.sendStatus(StatusCodes.FORBIDDEN);
-        }
-      }
+    const permissionResult = await checkPermission(res, input.query, user);
+    if (!permissionResult.success) {
+      return permissionResult.res;
     }
 
     logger.info("Fetching followers...");
-    const followingUserId = query.userId;
+    const followingUserId = input.query.userId;
     const followersResult = await safeAsync(() =>
       readFollowers(followingUserId),
     );
@@ -485,6 +459,48 @@ export const FollowsRouter = Router();
     logger.info("Sending output...");
     return res.send(rawOutput);
   });
+
+  async function checkPermission<T extends Response>(
+    res: T,
+    query: Input["query"],
+    user: UserPublic | undefined,
+  ): Promise<MiddlewareResult<null, T>> {
+    const requestedUser = await readUser(query.userId);
+    if (requestedUser === null) {
+      logger.error("User whose followers are requested does not exist");
+      res.sendStatus(StatusCodes.BAD_REQUEST);
+      return { success: false, res };
+    }
+    if (requestedUser.isPrivate) {
+      if (user === undefined) {
+        logger.error(
+          "Requested followers of private user without authentication",
+        );
+        res.sendStatus(StatusCodes.UNAUTHORIZED);
+        return { success: false, res };
+      }
+
+      if (user.id !== requestedUser.id) {
+        const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
+        if (follow === null) {
+          logger.error(
+            "Requested followers of private user that is not followed",
+          );
+          res.sendStatus(StatusCodes.FORBIDDEN);
+          return { success: false, res };
+        }
+        if (!follow.isAccepted) {
+          logger.error(
+            "Requested followers of private user with follow request that is not yet accepted",
+          );
+          res.sendStatus(StatusCodes.FORBIDDEN);
+          return { success: false, res };
+        }
+      }
+    }
+
+    return { success: true, value: null };
+  }
 }
 {
   const details = endpointDetails("/api/v0/followings", "GET");
