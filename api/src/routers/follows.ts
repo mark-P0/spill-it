@@ -465,13 +465,19 @@ export const FollowsRouter = Router();
     query: Input["query"],
     user: UserPublic | undefined,
   ): Promise<MiddlewareResult<null, T>> {
-    const requestedUser = await readUser(query.userId);
+    const requestedUserResult = await safeAsync(() => readUser(query.userId));
+    if (!requestedUserResult.success) {
+      logger.error("Failed reading requested user");
+      res.sendStatus(StatusCodes.BAD_GATEWAY);
+      return { success: false, res };
+    }
+    const requestedUser = requestedUserResult.value;
+
     if (requestedUser === null) {
       logger.error("User whose followers are requested does not exist");
       res.sendStatus(StatusCodes.BAD_REQUEST);
       return { success: false, res };
     }
-
     if (!requestedUser.isPrivate) {
       return { success: true, value: null };
     }
