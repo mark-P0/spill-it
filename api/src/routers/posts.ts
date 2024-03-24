@@ -39,9 +39,8 @@ export const PostsRouter = Router();
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.data;
+    const { headers, query } = inputParsing.data;
 
-    const { headers, query } = input;
     const beforeISODateStr = query.beforeISODateStr ?? today().toISOString();
     const size = query.size ?? Math.floor(POST_CT_CAP / 2);
 
@@ -118,10 +117,9 @@ export const PostsRouter = Router();
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.data;
+    const { headers } = inputParsing.data;
 
     logger.info("Converting header authorization to user info...");
-    const { headers } = input;
     const userResult = await convertHeaderAuthToUser(
       res,
       headers.Authorization,
@@ -200,9 +198,8 @@ export const PostsRouter = Router();
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.data;
+    const { headers, query } = inputParsing.data;
 
-    const { headers, query } = input;
     const beforeISODateStr = query.beforeISODateStr ?? today().toISOString();
     const size = query.size ?? Math.floor(POST_CT_CAP / 2);
 
@@ -232,7 +229,7 @@ export const PostsRouter = Router();
     }
 
     logger.info("Determining user whose posts to fetch...");
-    const userId = input.query.userId ?? user?.id;
+    const userId = query.userId ?? user?.id;
     if (userId === undefined) {
       logger.error("Cannot determine user");
       return res.sendStatus(StatusCodes.BAD_REQUEST);
@@ -294,10 +291,9 @@ export const PostsRouter = Router();
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.data;
+    const { headers, body } = inputParsing.data;
 
     logger.info("Converting header authorization to user info...");
-    const { headers } = input;
     const userResult = await convertHeaderAuthToUser(
       res,
       headers.Authorization,
@@ -308,8 +304,8 @@ export const PostsRouter = Router();
     const user = userResult.value;
 
     logger.info("Creating post...");
+    const { content } = body;
     const userId = user.id;
-    const { content } = input.body;
     const postResult = await safeAsync(() => createPost({ content, userId }));
     if (!postResult.success) {
       logger.error(formatError(postResult.error));
@@ -368,10 +364,9 @@ export const PostsRouter = Router();
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.data;
+    const { headers, query } = inputParsing.data;
 
     logger.info("Converting header authorization to user info...");
-    const { headers } = input;
     const userResult = await convertHeaderAuthToUser(
       res,
       headers.Authorization,
@@ -382,7 +377,6 @@ export const PostsRouter = Router();
     const user = userResult.value;
 
     logger.info("Fetching post...");
-    const { query } = input;
     const postResult = await safeAsync(() => readPost(query.id));
     if (!postResult.success) {
       logger.error(formatError(postResult.error));

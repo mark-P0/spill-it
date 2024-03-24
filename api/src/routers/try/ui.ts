@@ -68,10 +68,10 @@ const redirectUri = new URL(endpoint("/try/ui/login/google/redirect"), apiHost)
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.data;
+    const { query } = inputParsing.data;
 
     logger.info("Building header auth...");
-    const { code } = input.query;
+    const { code } = query;
     const headerAuthResult = safe(() =>
       buildHeaderAuth("SPILLITGOOGLE", { code, redirectUri }),
     );

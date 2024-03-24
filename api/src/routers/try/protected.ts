@@ -60,9 +60,8 @@ const logger = localizeLogger(__filename);
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.data;
+    const { headers } = inputParsing.data;
 
-    const { headers } = input;
     const headerAuthResult = safe(() =>
       parseHeaderAuth("SPILLITSESS", headers.Authorization),
     );

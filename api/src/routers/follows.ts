@@ -38,10 +38,9 @@ export const FollowsRouter = Router();
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.data;
+    const { headers, query } = inputParsing.data;
 
     logger.info("Converting header authorization to user info...");
-    const { headers } = input;
     const userResult = await convertHeaderAuthToUser(
       res,
       headers.Authorization,
@@ -52,7 +51,6 @@ export const FollowsRouter = Router();
     const user = userResult.value;
 
     logger.info("Fetching follow info...");
-    const { query } = input;
     const followResult = await safeAsync(() =>
       readFollowBetweenUsers(user.id, query.followingUserId),
     );
@@ -176,10 +174,9 @@ export const FollowsRouter = Router();
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.data;
+    const { headers, query } = inputParsing.data;
 
     logger.info("Converting header authorization to user info...");
-    const { headers } = input;
     const userResult = await convertHeaderAuthToUser(
       res,
       headers.Authorization,
@@ -190,7 +187,7 @@ export const FollowsRouter = Router();
     const user = userResult.value;
 
     logger.info("Checking if user to follow exists...");
-    const { followingUserId } = input.query;
+    const { followingUserId } = query;
     const userToFollowResult = await safeAsync(() => readUser(followingUserId));
     if (!userToFollowResult.success) {
       logger.error(formatError(userToFollowResult.error));
@@ -272,10 +269,9 @@ export const FollowsRouter = Router();
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.data;
+    const { headers, query } = inputParsing.data;
 
     logger.info("Converting header authorization to user info...");
-    const { headers } = input;
     const userResult = await convertHeaderAuthToUser(
       res,
       headers.Authorization,
@@ -286,7 +282,6 @@ export const FollowsRouter = Router();
     const user = userResult.value;
 
     logger.info("Determining user IDs...");
-    const { query } = input;
     const userIdsResult = determineUserIds(res, query, user);
     if (!userIdsResult.success) {
       return userIdsResult.res;
@@ -409,9 +404,8 @@ export const FollowsRouter = Router();
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.data;
+    const { headers, query } = inputParsing.data;
 
-    const { headers } = input;
     let user: UserPublic | undefined;
     if (headers.Authorization !== undefined) {
       logger.info("Converting header authorization to user info...");
@@ -428,7 +422,7 @@ export const FollowsRouter = Router();
     logger.info("Checking if followers can be fetched...");
     const permissionResult = await ensureAllowedToViewDataOfAnotherUser(
       res,
-      input.query.userId,
+      query.userId,
       user?.id,
     );
     if (!permissionResult.success) {
@@ -436,7 +430,7 @@ export const FollowsRouter = Router();
     }
 
     logger.info("Fetching followers...");
-    const followingUserId = input.query.userId;
+    const followingUserId = query.userId;
     const followersResult = await safeAsync(() =>
       readFollowers(followingUserId),
     );
@@ -481,9 +475,8 @@ export const FollowsRouter = Router();
       logger.error(formatError(inputParsing.error));
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
-    const input = inputParsing.data;
+    const { headers, query } = inputParsing.data;
 
-    const { headers } = input;
     let user: UserPublic | undefined;
     if (headers.Authorization !== undefined) {
       logger.info("Converting header authorization to user info...");
@@ -500,7 +493,7 @@ export const FollowsRouter = Router();
     logger.info("Checking if followings can be fetched...");
     const permissionResult = await ensureAllowedToViewDataOfAnotherUser(
       res,
-      input.query.userId,
+      query.userId,
       user?.id,
     );
     if (!permissionResult.success) {
@@ -508,7 +501,7 @@ export const FollowsRouter = Router();
     }
 
     logger.info("Fetching followings...");
-    const followerUserId = input.query.userId;
+    const followerUserId = query.userId;
     const followingsResult = await safeAsync(() =>
       readFollowings(followerUserId),
     );
