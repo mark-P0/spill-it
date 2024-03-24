@@ -19,7 +19,7 @@ import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { convertHeaderAuthToUser } from "../middlewares";
+import { MiddlewareResult, convertHeaderAuthToUser } from "../middlewares";
 import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(__filename);
@@ -136,6 +136,7 @@ export const UsersRouter = Router();
     return res.send(rawOutput);
   });
 }
+
 {
   const details = endpointDetails("/api/v0/users/me", "PATCH");
   const [ep, , signature, method] = details;
@@ -152,55 +153,10 @@ export const UsersRouter = Router();
     const input = inputParsing.data;
 
     // TODO Set these on endpoint schema?
-    logger.info("Checking provided details...");
-    const { details } = input.body;
-    {
-      logger.info("Checking username...");
-      const { username } = details;
-
-      const schema = z
-        .string()
-        .min(USERNAME_LEN_MIN)
-        .max(USERNAME_LEN_MAX)
-        .refine(isUsernameCharsValid, "Invalid username characters")
-        .optional();
-      username satisfies z.infer<typeof schema>;
-
-      const parsing = schema.safeParse(username);
-      if (!parsing.success) {
-        logger.error(formatError(parsing.error));
-        return res.sendStatus(StatusCodes.BAD_REQUEST);
-      }
-    }
-    {
-      logger.info("Checking handle name...");
-      const { handleName } = details;
-
-      const schema = z
-        .string()
-        .min(HANDLE_LEN_MIN)
-        .max(HANDLE_LEN_MAX)
-        .optional();
-      handleName satisfies z.infer<typeof schema>;
-
-      const parsing = schema.safeParse(handleName);
-      if (!parsing.success) {
-        logger.error(formatError(parsing.error));
-        return res.sendStatus(StatusCodes.BAD_REQUEST);
-      }
-    }
-    {
-      logger.info("Checking bio...");
-      const { bio } = details;
-
-      const schema = z.string().min(BIO_LEN_MIN).max(BIO_LEN_MAX).optional();
-      bio satisfies z.infer<typeof schema>;
-
-      const parsing = schema.safeParse(bio);
-      if (!parsing.success) {
-        logger.error(formatError(parsing.error));
-        return res.sendStatus(StatusCodes.BAD_REQUEST);
-      }
+    logger.info("Validating provided details...");
+    const validationResult = validateDetails(res, input.body);
+    if (!validationResult.success) {
+      return validationResult.res;
     }
 
     logger.info("Converting header authorization to user info...");
@@ -215,7 +171,7 @@ export const UsersRouter = Router();
     const user = userResult.value;
 
     {
-      const { username } = details;
+      const { username } = input.body.details;
       if (username !== undefined) {
         logger.info("Checking username against database...");
         const existingUser = await readUserViaUsername(username);
@@ -228,7 +184,7 @@ export const UsersRouter = Router();
 
     logger.info("Updating user...");
     const updatedUserResult = await safeAsync(() =>
-      updateUser(user.id, details),
+      updateUser(user.id, input.body.details),
     );
     if (!updatedUserResult.success) {
       logger.error(formatError(updatedUserResult.error));
@@ -257,4 +213,67 @@ export const UsersRouter = Router();
     logger.info("Sending updated user info...");
     return res.send(rawOutput);
   });
+
+  function validateDetails<T extends Response>(
+    res: T,
+    body: Input["body"],
+  ): MiddlewareResult<null, T> {
+    const { details } = body;
+
+    {
+      logger.info("Checking username...");
+      const { username } = details;
+
+      const schema = z
+        .string()
+        .min(USERNAME_LEN_MIN)
+        .max(USERNAME_LEN_MAX)
+        .refine(isUsernameCharsValid, "Invalid username characters")
+        .optional();
+      username satisfies z.infer<typeof schema>;
+
+      const parsing = schema.safeParse(username);
+      if (!parsing.success) {
+        logger.error(formatError(parsing.error));
+        res.sendStatus(StatusCodes.BAD_REQUEST);
+        return { success: false, res };
+      }
+    }
+
+    {
+      logger.info("Checking handle name...");
+      const { handleName } = details;
+
+      const schema = z
+        .string()
+        .min(HANDLE_LEN_MIN)
+        .max(HANDLE_LEN_MAX)
+        .optional();
+      handleName satisfies z.infer<typeof schema>;
+
+      const parsing = schema.safeParse(handleName);
+      if (!parsing.success) {
+        logger.error(formatError(parsing.error));
+        res.sendStatus(StatusCodes.BAD_REQUEST);
+        return { success: false, res };
+      }
+    }
+
+    {
+      logger.info("Checking bio...");
+      const { bio } = details;
+
+      const schema = z.string().min(BIO_LEN_MIN).max(BIO_LEN_MAX).optional();
+      bio satisfies z.infer<typeof schema>;
+
+      const parsing = schema.safeParse(bio);
+      if (!parsing.success) {
+        logger.error(formatError(parsing.error));
+        res.sendStatus(StatusCodes.BAD_REQUEST);
+        return { success: false, res };
+      }
+    }
+
+    return { success: true, value: null };
+  }
 }
