@@ -483,22 +483,23 @@ export const FollowsRouter = Router();
       return { success: false, res };
     }
 
-    if (user.id !== requestedUser.id) {
-      const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
-      if (follow === null) {
-        logger.error(
-          "Requested followers of private user that is not followed",
-        );
-        res.sendStatus(StatusCodes.FORBIDDEN);
-        return { success: false, res };
-      }
-      if (!follow.isAccepted) {
-        logger.error(
-          "Requested followers of private user with follow request that is not yet accepted",
-        );
-        res.sendStatus(StatusCodes.FORBIDDEN);
-        return { success: false, res };
-      }
+    if (user.id === requestedUser.id) {
+      logger.warn("Queried own ID; will fetch own followers...");
+      return { success: true, value: null };
+    }
+
+    const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
+    if (follow === null) {
+      logger.error("Requested followers of private user that is not followed");
+      res.sendStatus(StatusCodes.FORBIDDEN);
+      return { success: false, res };
+    }
+    if (!follow.isAccepted) {
+      logger.error(
+        "Requested followers of private user with follow request that is not yet accepted",
+      );
+      res.sendStatus(StatusCodes.FORBIDDEN);
+      return { success: false, res };
     }
 
     return { success: true, value: null };
