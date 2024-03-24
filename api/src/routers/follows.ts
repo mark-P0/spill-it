@@ -422,7 +422,11 @@ export const FollowsRouter = Router();
     }
 
     logger.info("Checking if followers can be fetched...");
-    const permissionResult = await checkPermission(res, input.query, user);
+    const permissionResult = await ensureAllowedToViewDataOfAnotherUser(
+      res,
+      input.query.userId,
+      user?.id,
+    );
     if (!permissionResult.success) {
       return permissionResult.res;
     }
@@ -460,13 +464,19 @@ export const FollowsRouter = Router();
     return res.send(rawOutput);
   });
 
-  async function checkPermission<T extends Response>(
+  /**
+   * Ensure `requestingUserId` is allowed|authorized|"has permissions" to view
+   * the data (e.g. posts, followers) of `requestedUserId`
+   */
+  async function ensureAllowedToViewDataOfAnotherUser<T extends Response>(
     res: T,
-    query: Input["query"],
-    user: UserPublic | undefined,
+    requestedUserId: UserPublic["id"],
+    requestingUserId: UserPublic["id"] | undefined,
   ): Promise<MiddlewareResult<null, T>> {
-    logger.info("Fetching requested user info...");
-    const requestedUserResult = await safeAsync(() => readUser(query.userId));
+    logger.info("Fetching info of data owner...");
+    const requestedUserResult = await safeAsync(() =>
+      readUser(requestedUserId),
+    );
     if (!requestedUserResult.success) {
       logger.error(formatError(requestedUserResult.error));
       res.sendStatus(StatusCodes.BAD_GATEWAY);
@@ -475,29 +485,29 @@ export const FollowsRouter = Router();
     const requestedUser = requestedUserResult.value;
 
     if (requestedUser === null) {
-      logger.error("User whose followers are requested does not exist");
+      logger.error("Data owner does not exist");
       res.sendStatus(StatusCodes.BAD_REQUEST);
       return { success: false, res };
     }
     if (!requestedUser.isPrivate) {
       return { success: true, value: null };
     }
+    /* At this point, data owner is private */
 
-    if (user === undefined) {
-      logger.error(
-        "Requested followers of private user without authentication",
-      );
+    if (requestingUserId === undefined) {
+      logger.error("Requested private data without authentication");
       res.sendStatus(StatusCodes.UNAUTHORIZED);
       return { success: false, res };
     }
-    if (user.id === requestedUser.id) {
-      logger.warn("Queried own ID; will fetch own followers...");
+    if (requestingUserId === requestedUser.id) {
+      logger.warn("Data owner is self; allowing...");
       return { success: true, value: null };
     }
+    /* At this point, data owner is another user */
 
-    logger.info("Fetching follow relationship with requested user...");
+    logger.info("Fetching follow relationship with data owner...");
     const followResult = await safeAsync(() =>
-      readFollowBetweenUsers(user.id, requestedUser.id),
+      readFollowBetweenUsers(requestingUserId, requestedUser.id),
     );
     if (!followResult.success) {
       logger.error(formatError(followResult.error));
@@ -507,13 +517,13 @@ export const FollowsRouter = Router();
     const follow = followResult.value;
 
     if (follow === null) {
-      logger.error("Requested followers of private user that is not followed");
+      logger.error("Requested private data without following owner");
       res.sendStatus(StatusCodes.FORBIDDEN);
       return { success: false, res };
     }
     if (!follow.isAccepted) {
       logger.error(
-        "Requested followers of private user with follow request that is not yet accepted",
+        "Requested private data with pending follow request to owner",
       );
       res.sendStatus(StatusCodes.FORBIDDEN);
       return { success: false, res };
