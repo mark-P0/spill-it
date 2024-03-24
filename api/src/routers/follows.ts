@@ -471,31 +471,33 @@ export const FollowsRouter = Router();
       res.sendStatus(StatusCodes.BAD_REQUEST);
       return { success: false, res };
     }
-    if (requestedUser.isPrivate) {
-      if (user === undefined) {
+
+    if (!requestedUser.isPrivate) {
+      return { success: true, value: null };
+    }
+    if (user === undefined) {
+      logger.error(
+        "Requested followers of private user without authentication",
+      );
+      res.sendStatus(StatusCodes.UNAUTHORIZED);
+      return { success: false, res };
+    }
+
+    if (user.id !== requestedUser.id) {
+      const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
+      if (follow === null) {
         logger.error(
-          "Requested followers of private user without authentication",
+          "Requested followers of private user that is not followed",
         );
-        res.sendStatus(StatusCodes.UNAUTHORIZED);
+        res.sendStatus(StatusCodes.FORBIDDEN);
         return { success: false, res };
       }
-
-      if (user.id !== requestedUser.id) {
-        const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
-        if (follow === null) {
-          logger.error(
-            "Requested followers of private user that is not followed",
-          );
-          res.sendStatus(StatusCodes.FORBIDDEN);
-          return { success: false, res };
-        }
-        if (!follow.isAccepted) {
-          logger.error(
-            "Requested followers of private user with follow request that is not yet accepted",
-          );
-          res.sendStatus(StatusCodes.FORBIDDEN);
-          return { success: false, res };
-        }
+      if (!follow.isAccepted) {
+        logger.error(
+          "Requested followers of private user with follow request that is not yet accepted",
+        );
+        res.sendStatus(StatusCodes.FORBIDDEN);
+        return { success: false, res };
       }
     }
 
