@@ -20,6 +20,10 @@ export class ResponseAsError<T extends Response> extends Error {
   }
 }
 
+type MiddlewareResult<TValue, T extends Response> =
+  | { success: true; value: TValue }
+  | { success: false; res: T };
+
 export async function convertHeaderAuthToUser<T extends Response>(
   res: T,
   authorization: string,
