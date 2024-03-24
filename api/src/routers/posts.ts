@@ -274,7 +274,6 @@ export const PostsRouter = Router();
     query: Input["query"],
     user: UserPublic | undefined,
   ): Promise<MiddlewareResult<UserPublic["id"], T>> {
-    let userId: UserPublic["id"] | undefined;
     if (query.userId !== undefined) {
       logger.info("Checking if posts of user can be fetched...");
 
@@ -316,18 +315,17 @@ export const PostsRouter = Router();
       // TODO Check other authorization criteria?
 
       logger.info("Will fetch posts of another user");
-      userId = query.userId;
-    } else if (user !== undefined) {
-      logger.info("Will fetch own posts");
-      userId = user.id;
-    }
-    if (userId === undefined) {
-      logger.error("Cannot determine user");
-      res.sendStatus(StatusCodes.BAD_REQUEST);
-      return { success: false, res };
+      return { success: true, value: query.userId };
     }
 
-    return { success: true, value: userId };
+    if (user !== undefined) {
+      logger.info("Will fetch own posts");
+      return { success: true, value: user.id };
+    }
+
+    logger.error("Cannot determine user");
+    res.sendStatus(StatusCodes.BAD_REQUEST);
+    return { success: false, res };
   }
 }
 
