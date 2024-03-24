@@ -14,10 +14,10 @@ import { today } from "@spill-it/utils/dates";
 import { formatError } from "@spill-it/utils/errors";
 import { jsonPack } from "@spill-it/utils/json";
 import { safe, safeAsync } from "@spill-it/utils/safe";
-import { Router } from "express";
+import { Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
-import { convertHeaderAuthToUser } from "../middlewares";
+import { MiddlewareResult, convertHeaderAuthToUser } from "../middlewares";
 import { endpointWithParam } from "../utils/endpoints";
 import { apiHost } from "../utils/env";
 import { localizeLogger } from "../utils/logger";
@@ -231,61 +231,15 @@ export const PostsRouter = Router();
     }
 
     logger.info("Determining user whose posts to fetch...");
-    let userId: UserPublic["id"] | undefined;
-    if (query.userId !== undefined) {
-      logger.info("Checking if posts of user can be fetched...");
-
-      const requestedUser = await readUser(query.userId);
-      if (requestedUser === null) {
-        logger.error("User whose posts are requested does not exist");
-        return res.sendStatus(StatusCodes.BAD_REQUEST);
-      }
-
-      if (requestedUser.isPrivate) {
-        if (user === undefined) {
-          logger.error(
-            "Requested posts of private user without authentication",
-          );
-          return res.sendStatus(StatusCodes.UNAUTHORIZED);
-        }
-
-        if (user.id !== requestedUser.id) {
-          const follow = await readFollowBetweenUsers(
-            user.id,
-            requestedUser.id,
-          );
-          if (follow === null) {
-            logger.error(
-              "Requested posts of private user that is not followed",
-            );
-            return res.sendStatus(StatusCodes.FORBIDDEN);
-          }
-          if (!follow.isAccepted) {
-            logger.error(
-              "Requested posts of private user with follow request that is not yet accepted",
-            );
-            return res.sendStatus(StatusCodes.FORBIDDEN);
-          }
-        }
-      }
-
-      // TODO Check other authorization criteria?
-
-      logger.info("Will fetch posts of another user");
-      userId = query.userId;
-    } else if (user !== undefined) {
-      logger.info("Will fetch own posts");
-      userId = user.id;
+    const userIdResult = await determineUserId(res, input.query, user);
+    if (!userIdResult.success) {
+      return userIdResult.res;
     }
-    if (userId === undefined) {
-      logger.error("Cannot determine user");
-      return res.sendStatus(StatusCodes.BAD_REQUEST);
-    }
+    const userId = userIdResult.value;
 
     logger.info("Fetching posts...");
-    const _userId = userId;
     const postsResult = await safeAsync(() =>
-      readPostsWithAuthorViaUserBeforeTimestamp(_userId, beforeISODate, size),
+      readPostsWithAuthorViaUserBeforeTimestamp(userId, beforeISODate, size),
     );
     if (!postsResult.success) {
       logger.error(formatError(postsResult.error));
@@ -314,6 +268,70 @@ export const PostsRouter = Router();
     logger.info("Sending posts...");
     return res.send(rawOutput);
   });
+
+  async function determineUserId<T extends Response>(
+    res: T,
+    query: Input["query"],
+    user: UserPublic | undefined,
+  ): Promise<MiddlewareResult<UserPublic["id"], T>> {
+    let userId: UserPublic["id"] | undefined;
+    if (query.userId !== undefined) {
+      logger.info("Checking if posts of user can be fetched...");
+
+      const requestedUser = await readUser(query.userId);
+      if (requestedUser === null) {
+        logger.error("User whose posts are requested does not exist");
+        res.sendStatus(StatusCodes.BAD_REQUEST);
+        return { success: false, res };
+      }
+
+      if (requestedUser.isPrivate) {
+        if (user === undefined) {
+          logger.error(
+            "Requested posts of private user without authentication",
+          );
+          res.sendStatus(StatusCodes.UNAUTHORIZED);
+          return { success: false, res };
+        }
+
+        if (user.id !== requestedUser.id) {
+          const follow = await readFollowBetweenUsers(
+            user.id,
+            requestedUser.id,
+          );
+          if (follow === null) {
+            logger.error(
+              "Requested posts of private user that is not followed",
+            );
+            res.sendStatus(StatusCodes.FORBIDDEN);
+            return { success: false, res };
+          }
+          if (!follow.isAccepted) {
+            logger.error(
+              "Requested posts of private user with follow request that is not yet accepted",
+            );
+            res.sendStatus(StatusCodes.FORBIDDEN);
+            return { success: false, res };
+          }
+        }
+      }
+
+      // TODO Check other authorization criteria?
+
+      logger.info("Will fetch posts of another user");
+      userId = query.userId;
+    } else if (user !== undefined) {
+      logger.info("Will fetch own posts");
+      userId = user.id;
+    }
+    if (userId === undefined) {
+      logger.error("Cannot determine user");
+      res.sendStatus(StatusCodes.BAD_REQUEST);
+      return { success: false, res };
+    }
+
+    return { success: true, value: userId };
+  }
 }
 
 {
