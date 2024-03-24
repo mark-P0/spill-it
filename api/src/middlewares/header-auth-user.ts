@@ -6,7 +6,7 @@ import {
   readSessionWithUser,
 } from "@spill-it/db/tables/sessions";
 import { formatError } from "@spill-it/utils/errors";
-import { Result, safe, safeAsync } from "@spill-it/utils/safe";
+import { safe, safeAsync } from "@spill-it/utils/safe";
 import { Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { env } from "../utils/env";
@@ -14,6 +14,7 @@ import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(__filename);
 
+/** Same functions as `Result` type at `@spill-it/utils/safe` */
 export type MiddlewareResult<TValue, T extends Response> =
   | { success: true; value: TValue }
   | { success: false; res: T };
