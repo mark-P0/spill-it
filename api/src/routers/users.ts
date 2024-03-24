@@ -1,3 +1,5 @@
+import { User } from "@spill-it/db/schema/drizzle";
+import { readFollowBetweenUsers } from "@spill-it/db/tables/follows";
 import {
   isUsernameCharsValid,
   readUserViaUsername,
@@ -43,10 +45,11 @@ export const UsersRouter = Router();
     // TODO Restrict access?
 
     logger.info("Routing to other handlers...");
+    const { Authorization } = input.headers;
     const { username } = input.query;
     if (username !== undefined) {
       logger.info("Handling username query...");
-      return await handleUsernameQuery(res, username);
+      return await handleUsernameQuery(res, Authorization, username);
     }
 
     logger.error("Request likely unsupported; has no handler");
@@ -55,6 +58,7 @@ export const UsersRouter = Router();
 
   async function handleUsernameQuery<T extends Response>(
     res: T,
+    Authorization: Input["headers"]["Authorization"],
     username: NonNullable<Input["query"]["username"]>,
   ): Promise<T> {
     logger.info("Fetching user info...");
@@ -65,9 +69,35 @@ export const UsersRouter = Router();
     }
     const user = userResult.value;
 
+    logger.info("Checking follow acceptance...");
+    let followAcceptance: boolean | null = null;
+    if (Authorization !== undefined && user !== null) {
+      logger.info("Converting header authorization to user info...");
+      const requestingUserResult = await convertHeaderAuthToUser(
+        res,
+        Authorization,
+      );
+      if (!requestingUserResult.success) {
+        return requestingUserResult.error.res;
+      }
+      const requestingUser = requestingUserResult.value;
+
+      logger.info("Fetching follow info...");
+      const followResult = await safeAsync(() =>
+        readFollowBetweenUsers(requestingUser.id, user.id),
+      );
+      if (!followResult.success) {
+        logger.error(formatError(followResult.error));
+        return res.sendStatus(StatusCodes.BAD_GATEWAY);
+      }
+      const follow = followResult.value;
+
+      followAcceptance = follow?.isAccepted ?? null;
+    }
+
     logger.info("Parsing output...");
     const outputParsing = signature.output.safeParse({
-      data: removeFalseish([user !== null && user]),
+      data: removeFalseish([user !== null && { user, followAcceptance }]),
     } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));

@@ -53,16 +53,20 @@ export const endpointMap = {
   "/api/v0/users": {
     GET: {
       input: z.object({
-        // TODO Restrict access to user data?
-        // headers: z.object({
-        //   Authorization: z.string(),
-        // }),
+        headers: z.object({
+          Authorization: z.string().optional(),
+        }),
         query: z.object({
           username: z.optional(zodUserPublic.shape.username),
         }),
       }),
       output: z.object({
-        data: z.array(zodUserPublic),
+        data: z.array(
+          z.object({
+            user: zodUserPublic,
+            followAcceptance: z.union([z.null(), z.boolean()]),
+          }),
+        ),
       }),
     },
   },
