@@ -293,26 +293,23 @@ export const PostsRouter = Router();
           res.sendStatus(StatusCodes.UNAUTHORIZED);
           return { success: false, res };
         }
+        if (user.id === requestedUser.id) {
+          logger.warn("Queried own ID; will fetch own posts...");
+          return { success: true, value: user.id };
+        }
 
-        if (user.id !== requestedUser.id) {
-          const follow = await readFollowBetweenUsers(
-            user.id,
-            requestedUser.id,
+        const follow = await readFollowBetweenUsers(user.id, requestedUser.id);
+        if (follow === null) {
+          logger.error("Requested posts of private user that is not followed");
+          res.sendStatus(StatusCodes.FORBIDDEN);
+          return { success: false, res };
+        }
+        if (!follow.isAccepted) {
+          logger.error(
+            "Requested posts of private user with follow request that is not yet accepted",
           );
-          if (follow === null) {
-            logger.error(
-              "Requested posts of private user that is not followed",
-            );
-            res.sendStatus(StatusCodes.FORBIDDEN);
-            return { success: false, res };
-          }
-          if (!follow.isAccepted) {
-            logger.error(
-              "Requested posts of private user with follow request that is not yet accepted",
-            );
-            res.sendStatus(StatusCodes.FORBIDDEN);
-            return { success: false, res };
-          }
+          res.sendStatus(StatusCodes.FORBIDDEN);
+          return { success: false, res };
         }
       }
 
