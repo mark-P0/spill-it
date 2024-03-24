@@ -110,7 +110,7 @@ export const UsersRouter = Router();
       headers.Authorization,
     );
     if (!userResult.success) {
-      return userResult.error.res;
+      return userResult.res;
     }
     const user = userResult.value;
 
@@ -210,7 +210,7 @@ export const UsersRouter = Router();
       headers.Authorization,
     );
     if (!userResult.success) {
-      return userResult.error.res;
+      return userResult.res;
     }
     const user = userResult.value;
 

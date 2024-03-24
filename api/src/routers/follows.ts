@@ -46,7 +46,7 @@ export const FollowsRouter = Router();
       headers.Authorization,
     );
     if (!userResult.success) {
-      return userResult.error.res;
+      return userResult.res;
     }
     const user = userResult.value;
 
@@ -110,7 +110,7 @@ export const FollowsRouter = Router();
       headers.Authorization,
     );
     if (!userResult.success) {
-      return userResult.error.res;
+      return userResult.res;
     }
     const user = userResult.value;
 
@@ -184,7 +184,7 @@ export const FollowsRouter = Router();
       headers.Authorization,
     );
     if (!userResult.success) {
-      return userResult.error.res;
+      return userResult.res;
     }
     const user = userResult.value;
 
@@ -280,7 +280,7 @@ export const FollowsRouter = Router();
       headers.Authorization,
     );
     if (!userResult.success) {
-      return userResult.error.res;
+      return userResult.res;
     }
     const user = userResult.value;
 
@@ -421,7 +421,7 @@ export const FollowsRouter = Router();
         headers.Authorization,
       );
       if (!userResult.success) {
-        return userResult.error.res;
+        return userResult.res;
       }
       user = userResult.value;
     }
@@ -515,7 +515,7 @@ export const FollowsRouter = Router();
         headers.Authorization,
       );
       if (!userResult.success) {
-        return userResult.error.res;
+        return userResult.res;
       }
       user = userResult.value;
     }
