@@ -27,6 +27,7 @@ function LogoutModalContent() {
       <form className="grid gap-3 mt-6">
         <Link
           to={endpoint("/logout")}
+          onClick={closeModal}
           className={clsx(
             "text-center", // Link/Anchor texts are not centered by default like in buttons
             clsLinkBtn,
