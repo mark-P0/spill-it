@@ -44,6 +44,16 @@ export function createNewContext<T>(useContextValue: () => T) {
   return [useNewContext, NewContextProvider] as const;
 }
 
+export function useError() {
+  const [error, setError] = useState<Error | null>(null);
+  if (error !== null) {
+    logger.error(error);
+    throw error;
+  }
+
+  return { setError };
+}
+
 /**
  * Loosely follows an NPM package
  * - https://www.npmjs.com/package/react-intersection-observer
