@@ -1,5 +1,6 @@
 import { buildAuthUrl } from "@spill-it/auth/google";
 import { ensureError } from "@spill-it/utils/errors";
+import { randomChoice } from "@spill-it/utils/random";
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import { E, EE } from "../../utils/dom";
@@ -110,8 +111,47 @@ export function WelcomeScreen() {
   document.title = "Welcome! ✨ Spill.it!";
 
   return (
-    <Screen className="grid place-items-center">
-      <LoginWithGoogle />
+    <Screen className="grid grid-rows-[4fr_5fr]">
+      <div className="mb-6 justify-self-center self-end">
+        <figure className="select-none">
+          {/** Animations defined via regular CSS */}
+          <div className="grid *:row-[1] *:col-[1]">
+            <div className="text-6xl __animate-welcome-brand [--idx:1]">🍵</div>
+            <div className="text-6xl __animate-welcome-brand [--idx:2]">💅</div>
+            <div className="text-6xl __animate-welcome-brand [--idx:3]">✨</div>
+            <div className="text-6xl __animate-welcome-brand [--idx:4]">🧹</div>
+            <div className="text-6xl __animate-welcome-brand [--idx:5]">🎊</div>
+            <div className="text-6xl __animate-welcome-brand [--idx:6]">📢</div>
+          </div>
+          <figcaption className="sr-only">Spill.it logo</figcaption>
+        </figure>
+      </div>
+
+      <div className="justify-self-center">
+        <header className="mb-6">
+          <h1 className="mb-1 text-center text-3xl font-bold tracking-wide">
+            The most sublime tea 😋
+          </h1>
+          <p className="text-center text-xl italic text-white/50">
+            {randomChoice([
+              <>Throw mean shades</>,
+              <>Serve your realness</>,
+              <>Dig up dirt</>,
+              <>Tell tattle tales</>,
+              <>Show some sass</>,
+            ])}
+          </p>
+        </header>
+
+        <main>
+          <h2 className="mb-3 text-center">
+            Are you ready to <span className="font-bold">spill it</span>?
+          </h2>
+          <div className="w-min mx-auto">
+            <LoginWithGoogle />
+          </div>
+        </main>
+      </div>
     </Screen>
   );
 }
