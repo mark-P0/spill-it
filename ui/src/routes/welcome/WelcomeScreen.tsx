@@ -113,8 +113,16 @@ export function WelcomeScreen() {
   return (
     <Screen className="grid grid-rows-[4fr_5fr]">
       <div className="mb-6 justify-self-center self-end">
-        <figure>
-          <span className="select-none text-6xl">🍵</span>
+        <figure className="select-none">
+          {/** Animations defined via regular CSS */}
+          <div className="grid *:row-[1] *:col-[1]">
+            <div className="text-6xl __animate-welcome-brand [--idx:1]">🍵</div>
+            <div className="text-6xl __animate-welcome-brand [--idx:2]">💅</div>
+            <div className="text-6xl __animate-welcome-brand [--idx:3]">✨</div>
+            <div className="text-6xl __animate-welcome-brand [--idx:4]">🧹</div>
+            <div className="text-6xl __animate-welcome-brand [--idx:5]">🎊</div>
+            <div className="text-6xl __animate-welcome-brand [--idx:6]">📢</div>
+          </div>
           <figcaption className="sr-only">Spill.it logo</figcaption>
         </figure>
       </div>
