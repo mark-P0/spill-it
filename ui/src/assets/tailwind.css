@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  @apply selection:bg-emerald-700 selection:text-white;
-}
-
 @keyframes welcome {
   0.00% {
     transform: scale(90%);
