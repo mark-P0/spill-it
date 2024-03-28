@@ -51,3 +51,8 @@ pnpm --filter=@spill-it/ui i --workspace @spill-it/endpoints
 
 - Install `<workspace-package-name-2>` from the current workspace as a [development] dependency of `<workspace-package-name-1>`
 - `<workspace-package-name-2>` must be included in the scope of `pnpm-workspace.yaml`
+
+## Credits
+
+- [Favicon.io](https://favicon.io/)
+  - [Teacup emoji](https://favicon.io/emoji-favicons/teacup-without-handle)
