@@ -1,3 +1,4 @@
+import TailwindScrollbar from "tailwind-scrollbar";
 import { AnimatePalettePlugin } from "./src/assets/tailwind/animate-palette.plugin";
 import { AnimateToastPlugin } from "./src/assets/tailwind/animate-toast.plugin";
 
@@ -7,5 +8,5 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [AnimateToastPlugin, AnimatePalettePlugin],
+  plugins: [TailwindScrollbar, ...[AnimateToastPlugin, AnimatePalettePlugin]],
 };
