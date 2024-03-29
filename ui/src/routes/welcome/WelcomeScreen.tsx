@@ -1,17 +1,14 @@
-import { buildAuthUrl } from "@spill-it/auth/google";
-import { ensureError } from "@spill-it/utils/errors";
 import { randomChoice } from "@spill-it/utils/random";
 import clsx from "clsx";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { E, EE } from "../../utils/dom";
 import { env } from "../../utils/env";
 import { logger } from "../../utils/logger";
-import { useError } from "../../utils/react";
 import { Screen } from "../_app/Screen";
-import { redirectUri } from "./redirect-uri";
+import { useWelcomeLoader } from "../welcome";
 
-function _LoginWithGoogle(props: { link: string }) {
-  const { link } = props;
+function LoginWithGoogle() {
+  const { link } = useWelcomeLoader();
 
   const divRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
@@ -85,30 +82,6 @@ function _LoginWithGoogle(props: { link: string }) {
       </div>
     </div>
   );
-}
-function LoginWithGoogle() {
-  const { setError } = useError();
-  const [link, setLink] = useState<string | null>(null);
-  async function initializeLink() {
-    try {
-      const link = await buildAuthUrl(
-        env.VITE_AUTH_GOOGLE_CLIENT_ID,
-        redirectUri,
-      );
-      setLink(link);
-    } catch (caughtError) {
-      setError(ensureError(caughtError));
-    }
-  }
-  useEffect(() => {
-    initializeLink();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Only run once, on initial render...
-  }, []);
-
-  if (link === null) return null;
-
-  return <_LoginWithGoogle link={link} />;
 }
 
 export function WelcomeScreen() {

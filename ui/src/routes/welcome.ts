@@ -1,8 +1,11 @@
+import { buildAuthUrl } from "@spill-it/auth/google";
 import { redirect } from "react-router-dom";
 import { endpoint } from "../utils/endpoints";
+import { env } from "../utils/env";
 import { logger } from "../utils/logger";
 import { createLoader } from "../utils/react";
 import { isLoggedIn } from "../utils/storage";
+import { redirectUri } from "./welcome/redirect-uri";
 
 export const welcomeRouteId = "welcome";
 export const [loadWelcome, useWelcomeLoader] = createLoader(
@@ -15,7 +18,13 @@ export const [loadWelcome, useWelcomeLoader] = createLoader(
       return redirect(endpoint("/home"));
     }
 
+    logger.debug("Building authorization URL...");
+    const link = await buildAuthUrl(
+      env.VITE_AUTH_GOOGLE_CLIENT_ID,
+      redirectUri,
+    );
+
     logger.info("Showing welcome page...");
-    return null;
+    return { link };
   },
 );
