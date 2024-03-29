@@ -12,6 +12,7 @@ import { EditProfileModal } from "./routes/[profile]/edit-profile/EditProfileMod
 import { App } from "./routes/_app/App";
 import { ErrorScreen } from "./routes/_app/ErrorScreen";
 import { HomeScreen } from "./routes/home/HomeScreen";
+import { loadWelcome, welcomeRouteId } from "./routes/welcome";
 import { WelcomeScreen } from "./routes/welcome/WelcomeScreen";
 import { redirectUri } from "./routes/welcome/redirect-uri";
 import { endpoint } from "./utils/endpoints";
@@ -100,19 +101,10 @@ const loginGoogleRedirectRoute: RouteObject = {
   },
 };
 const welcomeRoute: RouteObject = {
+  id: welcomeRouteId,
   path: endpoint("/welcome"),
   element: <WelcomeScreen />,
-  async loader() {
-    logger.debug("Checking if logged in...");
-    const canShowHome = await isLoggedIn();
-    if (canShowHome) {
-      logger.info("Is logged in; redirecting to home page...");
-      return redirect(endpoint("/home"));
-    }
-
-    logger.info("Showing welcome page...");
-    return null;
-  },
+  loader: loadWelcome,
 };
 
 const rootRoute: RouteObject = {
