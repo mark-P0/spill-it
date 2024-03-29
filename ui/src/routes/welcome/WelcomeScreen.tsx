@@ -10,30 +10,11 @@ import { useError } from "../../utils/react";
 import { Screen } from "../_app/Screen";
 import { redirectUri } from "./redirect-uri";
 
-function LoginWithGoogle() {
-  const { setError } = useError();
-  const [link, setLink] = useState<string | null>(null);
-  async function initializeLink() {
-    try {
-      const link = await buildAuthUrl(
-        env.VITE_AUTH_GOOGLE_CLIENT_ID,
-        redirectUri,
-      );
-      setLink(link);
-    } catch (caughtError) {
-      setError(ensureError(caughtError));
-    }
-  }
-  useEffect(() => {
-    initializeLink();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Only run once, on initial render...
-  }, []);
+function _LoginWithGoogle(props: { link: string }) {
+  const { link } = props;
 
   const divRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    if (link === null) return; // Only add script if button is rendered
-
     const div = divRef.current;
     if (div == null) return;
 
@@ -47,7 +28,6 @@ function LoginWithGoogle() {
     ]);
   }, [link]);
 
-  if (link === null) return null;
   return (
     <div
       className="flex" // Used to contain Google button as it seems to resize on its own...
@@ -105,6 +85,30 @@ function LoginWithGoogle() {
       </div>
     </div>
   );
+}
+function LoginWithGoogle() {
+  const { setError } = useError();
+  const [link, setLink] = useState<string | null>(null);
+  async function initializeLink() {
+    try {
+      const link = await buildAuthUrl(
+        env.VITE_AUTH_GOOGLE_CLIENT_ID,
+        redirectUri,
+      );
+      setLink(link);
+    } catch (caughtError) {
+      setError(ensureError(caughtError));
+    }
+  }
+  useEffect(() => {
+    initializeLink();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Only run once, on initial render...
+  }, []);
+
+  if (link === null) return null;
+
+  return <_LoginWithGoogle link={link} />;
 }
 
 export function WelcomeScreen() {
