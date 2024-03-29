@@ -12,9 +12,8 @@ import { EditProfileModal } from "./routes/[profile]/edit-profile/EditProfileMod
 import { App } from "./routes/_app/App";
 import { ErrorScreen } from "./routes/_app/ErrorScreen";
 import { HomeScreen } from "./routes/home/HomeScreen";
-import { loadWelcome, welcomeRouteId } from "./routes/welcome";
+import { loadWelcome, redirectUri, welcomeRouteId } from "./routes/welcome";
 import { WelcomeScreen } from "./routes/welcome/WelcomeScreen";
-import { redirectUri } from "./routes/welcome/redirect-uri";
 import { endpoint } from "./utils/endpoints";
 import { fetchAPI } from "./utils/fetch-api";
 import { logger } from "./utils/logger";

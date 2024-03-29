@@ -1,11 +1,13 @@
 import { buildAuthUrl } from "@spill-it/auth/google";
 import { redirect } from "react-router-dom";
 import { endpoint } from "../utils/endpoints";
-import { env } from "../utils/env";
+import { env, uiHost } from "../utils/env";
 import { logger } from "../utils/logger";
 import { createLoader } from "../utils/react";
 import { isLoggedIn } from "../utils/storage";
-import { redirectUri } from "./welcome/redirect-uri";
+
+export const redirectUri = new URL(endpoint("/login/google/redirect"), uiHost)
+  .href;
 
 export const welcomeRouteId = "welcome";
 export const [loadWelcome, useWelcomeLoader] = createLoader(
