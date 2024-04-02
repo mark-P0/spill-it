@@ -99,6 +99,23 @@ const loginGoogleRedirectRoute: RouteObject = {
     return redirect(endpoint("/"));
   },
 };
+const loginGuestRoute: RouteObject = {
+  path: endpoint("/login/guest"),
+  element: null,
+  async loader() {
+    logger.debug("Fetching guest session...");
+    const result = await fetchAPI("/api/v0/sessions/guest", "GET", {});
+    const { Authorization } = result.success
+      ? result.value
+      : raise("Failed retrieving guest session", result.error);
+
+    logger.debug("Storing guest session...");
+    setOnStorage("SESS", Authorization);
+
+    logger.info("Redirecting to site root...");
+    return redirect(endpoint("/"));
+  },
+};
 const welcomeRoute: RouteObject = {
   id: welcomeRouteId,
   path: endpoint("/welcome"),
@@ -123,6 +140,7 @@ export const appRoute: RouteObject = {
       children: [
         rootRoute,
         welcomeRoute,
+        loginGuestRoute,
         loginGoogleRedirectRoute,
         logoutRoute,
         homeRoute,
