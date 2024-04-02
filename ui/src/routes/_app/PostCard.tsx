@@ -2,7 +2,7 @@ import { PostWithAuthor } from "@spill-it/db/schema/drizzle";
 import { ensureError, raise } from "@spill-it/utils/errors";
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
-import { useState } from "react";
+import { ComponentProps, useState } from "react";
 import { BsTrashFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
@@ -32,8 +32,7 @@ async function deletePost(post: PostWithAuthor) {
   });
   if (!deleteResult.success) raise("Failed deleting", deleteResult.error);
 }
-
-function DeletePostModalContent(props: {
+function DeletePostForm(props: {
   postToDelete: PostWithAuthor;
   onDeleteEnd?: () => void;
 }) {
@@ -74,32 +73,37 @@ function DeletePostModalContent(props: {
   }
 
   return (
-    <ModalContent>
+    <form className="relative">
       <h4 className="text-xl font-bold tracking-wide">
         Are you sure you want to delete this post?
       </h4>
       <p>This cannot be undone!</p>
 
-      <form className="relative">
-        <fieldset disabled={isDeleting} className="grid gap-3 mt-6">
-          <button
-            type="button"
-            onClick={triggerDelete}
-            className={clsx(clsBtnNegative)}
-          >
-            Delete 🗑
-          </button>
-          <button
-            type="button"
-            onClick={closeModal}
-            className={clsx(clsBtnOutline)}
-          >
-            On second thought...
-          </button>
-        </fieldset>
+      <fieldset disabled={isDeleting} className="grid gap-3 mt-6">
+        <button
+          type="button"
+          onClick={triggerDelete}
+          className={clsx(clsBtnNegative)}
+        >
+          Delete 🗑
+        </button>
+        <button
+          type="button"
+          onClick={closeModal}
+          className={clsx(clsBtnOutline)}
+        >
+          On second thought...
+        </button>
+      </fieldset>
 
-        {isDeleting && <LoadingCursorAbsoluteOverlay />}
-      </form>
+      {isDeleting && <LoadingCursorAbsoluteOverlay />}
+    </form>
+  );
+}
+function DeletePostModalContent(props: ComponentProps<typeof DeletePostForm>) {
+  return (
+    <ModalContent>
+      <DeletePostForm {...props} />
     </ModalContent>
   );
 }
