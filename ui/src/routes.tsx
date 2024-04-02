@@ -58,7 +58,7 @@ const homeRoute: RouteObject = {
 
 const logoutRoute: RouteObject = {
   path: endpoint("/logout"),
-  element: null,
+  element: <ErrorScreen />,
   loader() {
     logger.debug("Deleting session info...");
     deleteFromStorage("SESS");
@@ -70,7 +70,7 @@ const logoutRoute: RouteObject = {
 
 const loginGoogleRedirectRoute: RouteObject = {
   path: endpoint("/login/google/redirect"),
-  element: null,
+  element: <ErrorScreen />,
   async loader({ request }) {
     logger.debug("Parsing query string...");
     /** https://github.com/remix-run/react-router/issues/9171#issuecomment-1220717197 */
@@ -101,7 +101,7 @@ const loginGoogleRedirectRoute: RouteObject = {
 };
 const loginGuestRoute: RouteObject = {
   path: endpoint("/login/guest"),
-  element: null,
+  element: <ErrorScreen />,
   async loader() {
     logger.debug("Fetching guest session...");
     const result = await fetchAPI("/api/v0/sessions/guest", "GET", {});
@@ -125,7 +125,7 @@ const welcomeRoute: RouteObject = {
 
 const rootRoute: RouteObject = {
   path: endpoint("/"),
-  element: null,
+  element: <ErrorScreen />,
   loader() {
     logger.info("Redirecting to home page...");
     return redirect(endpoint("/home"));
