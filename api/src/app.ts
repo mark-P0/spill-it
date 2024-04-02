@@ -1,4 +1,4 @@
-import { endpoints } from "@spill-it/endpoints";
+import { endpoint, endpoints } from "@spill-it/endpoints";
 import { ensureError, formatError } from "@spill-it/utils/errors";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -119,6 +119,10 @@ app.use(express.static(path.join(__dirname, "public")));
  * Only allow GET requests from guest user
  */
 {
+  const endpointsToSkip = new Set<string>([
+    endpoint("/api/v0/sessions"),
+    endpoint("/api/v0/sessions/guest"),
+  ]);
   const zodExpectedGuestRequest = z.object({
     headers: z.object({
       Authorization: z.string(),
@@ -126,6 +130,11 @@ app.use(express.static(path.join(__dirname, "public")));
   });
 
   app.use(async (req, res, next) => {
+    if (endpointsToSkip.has(req.path)) {
+      logger.warn("Requested endpoint exempted; skipping guest-GET check...");
+      return next();
+    }
+
     logger.info("Checking if request is from guest and GET...");
 
     const reqParsing = zodExpectedGuestRequest.safeParse(req);
