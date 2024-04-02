@@ -1,6 +1,6 @@
 import { safe } from "@spill-it/utils/safe";
 import clsx from "clsx";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
@@ -115,6 +115,14 @@ function PostForm() {
 
 export function HomeScreen() {
   document.title = "Home 🍵 Spill.it!";
+
+  const { reflectUser } = useUserContext();
+
+  useEffect(() => {
+    reflectUser();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Run only once, intended for when transitioning from login to home
+  }, []);
 
   return (
     <FeedProvider>
