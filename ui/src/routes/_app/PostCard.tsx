@@ -1,5 +1,6 @@
 import { PostWithAuthor } from "@spill-it/db/schema/drizzle";
 import { ensureError, raise } from "@spill-it/utils/errors";
+import { sleep } from "@spill-it/utils/sleep";
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
 import { ComponentProps, useState } from "react";
@@ -59,17 +60,18 @@ function DeletePostForm(props: {
     try {
       logger.debug("Deleting...");
       await deletePost(postToDelete);
+      onDeleteEnd?.();
 
       showOnToast(<>Spill cleaned... 🧹</>, "critical");
+      await sleep(1);
+      showOnToast(null);
+      closeModal();
     } catch (caughtError) {
       logger.error(ensureError(caughtError));
       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
     }
     setIsDeleting(false);
     makeModalCancellable(true);
-
-    onDeleteEnd?.();
-    closeModal();
   }
 
   return (
