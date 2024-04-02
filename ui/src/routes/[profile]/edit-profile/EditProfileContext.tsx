@@ -132,6 +132,12 @@ export const [useEditProfileContext, EditProfileProvider] = createNewContext(
         return;
       }
 
+      if (user?.username === "guest") {
+        logger.error("Guests cannot edit profiles");
+        showOnToast(<>Ready to spill? 😋</>, "info");
+        return;
+      }
+
       setIsProcessing(true);
       makeModalCancellable(false);
       try {

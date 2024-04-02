@@ -51,6 +51,7 @@ async function submitPost(content: string) {
   if (!fetchResult.success) raise("Failed creating post", fetchResult.error);
 }
 function PostForm() {
+  const { user } = useUserContext();
   const { showOnToast } = useToastContext();
   const { extendFeedWithRecent } = useFeedContext();
   const [content, setContent] = useState("");
@@ -62,6 +63,12 @@ function PostForm() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (user?.username === "guest") {
+      logger.error("Guests cannot create posts");
+      showOnToast(<>Ready to spill? 😋</>, "info");
+      return;
+    }
 
     setIsSubmitting(true);
     try {

@@ -43,11 +43,18 @@ async function sendCancelFollowRequest(followingUserId: string) {
 }
 function CancelRequestButton() {
   const revalidator = useRevalidator();
+  const { user } = useUserContext();
   const { showOnToast } = useToastContext();
   const { profile } = useProfileLoader();
   const [isProcessing, setIsProcessing] = useState(false);
 
   async function cancel() {
+    if (user?.username === "guest") {
+      logger.error("Guests cannot cancel follow requests");
+      showOnToast(<>Ready to spill? 😋</>, "info");
+      return;
+    }
+
     setIsProcessing(true);
     try {
       logger.debug("Sending cancel follow request...");
@@ -115,11 +122,18 @@ async function sendUnfollow(followingUserId: string) {
 }
 function UnfollowButton() {
   const revalidator = useRevalidator();
+  const { user } = useUserContext();
   const { showOnToast } = useToastContext();
   const { profile } = useProfileLoader();
   const [isProcessing, setIsProcessing] = useState(false);
 
   async function unfollow() {
+    if (user?.username === "guest") {
+      logger.error("Guests cannot unfollow");
+      showOnToast(<>Ready to spill? 😋</>, "info");
+      return;
+    }
+
     setIsProcessing(true);
     try {
       logger.debug("Sending unfollow request...");
@@ -187,11 +201,18 @@ async function sendFollow(followingUserId: string) {
 }
 function FollowButton() {
   const revalidator = useRevalidator();
+  const { user } = useUserContext();
   const { showOnToast } = useToastContext();
   const { profile } = useProfileLoader();
   const [isProcessing, setIsProcessing] = useState(false);
 
   async function follow() {
+    if (user?.username === "guest") {
+      logger.error("Guests cannot follow");
+      showOnToast(<>Ready to spill? 😋</>, "info");
+      return;
+    }
+
     setIsProcessing(true);
     try {
       logger.debug("Sending follow request...");

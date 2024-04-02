@@ -37,12 +37,19 @@ function DeletePostModalContent(props: {
   postToDelete: PostWithAuthor;
   onDeleteEnd?: () => void;
 }) {
+  const { user } = useUserContext();
   const { showOnToast } = useToastContext();
   const { closeModal, makeModalCancellable } = useModalContext();
   const { postToDelete, onDeleteEnd } = props;
   const [isDeleting, setIsDeleting] = useState(false);
 
   async function triggerDelete() {
+    if (user?.username === "guest") {
+      logger.error("Guests cannot delete posts");
+      showOnToast(<>Ready to spill? 😋</>, "info");
+      return;
+    }
+
     if (isDeleting) {
       logger.warn("Cannot delete if already deleting; ignoring...");
       return;
