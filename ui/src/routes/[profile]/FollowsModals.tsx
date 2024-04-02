@@ -65,11 +65,18 @@ async function sendAcceptFollowRequest(followerUserId: string) {
 // TODO Reuse existing user card?
 function RequestingFollowerCard(props: { follower: UserPublic }) {
   const revalidator = useRevalidator();
+  const { user } = useUserContext();
   const { showOnToast } = useToastContext();
   const [isProcessing, setIsProcessing] = useState(false);
   const { follower } = props;
 
   async function decline() {
+    if (user?.username === "guest") {
+      logger.error("Guests cannot decline follow requests");
+      showOnToast(<>Ready to spill? 😋</>, "info");
+      return;
+    }
+
     setIsProcessing(true);
     try {
       logger.debug("Sending decline follow request...");
@@ -91,6 +98,12 @@ function RequestingFollowerCard(props: { follower: UserPublic }) {
     setIsProcessing(false);
   }
   async function accept() {
+    if (user?.username === "guest") {
+      logger.error("Guests cannot accept follow requests");
+      showOnToast(<>Ready to spill? 😋</>, "info");
+      return;
+    }
+
     setIsProcessing(true);
     try {
       logger.debug("Sending accept follow request...");
