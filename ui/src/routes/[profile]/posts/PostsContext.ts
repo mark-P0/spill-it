@@ -79,9 +79,12 @@ export const [usePostsContext, PostsProvider] = createNewContext(() => {
       }
       const nextPosts = nextPostsResult.value.data;
 
+      const hasExtraPost = nextPosts.length > POSTS_IN_VIEW_CT;
+      const extension = !hasExtraPost ? nextPosts : nextPosts.slice(0, -1);
+
       if (!ctl.shouldProceed) return;
-      setPosts([...posts, ...nextPosts.slice(0, -1)]);
-      if (nextPosts.length < POSTS_IN_VIEW_CT) setHasNextPosts(false);
+      if (!hasExtraPost) setHasNextPosts(false);
+      setPosts([...posts, ...extension]);
     },
     [profile, posts],
   );
