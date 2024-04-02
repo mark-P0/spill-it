@@ -14,6 +14,14 @@ import { POST_CT_CAP } from "@spill-it/db/utils/constants";
 import { z } from "zod";
 
 export const endpointMap = {
+  "/api/v0/sessions/guest": {
+    GET: {
+      input: z.object({}),
+      output: z.object({
+        Authorization: z.string(),
+      }),
+    },
+  },
   "/api/v0/sessions": {
     GET: {
       input: z.object({

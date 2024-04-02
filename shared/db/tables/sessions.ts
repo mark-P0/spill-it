@@ -4,9 +4,29 @@ import { isPast } from "date-fns";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { Session, SessionWithUser, SessionsTable } from "../schema/drizzle";
+import { readUserViaUsername } from "./users";
 
 export function isSessionExpired(session: Session) {
   return isPast(session.expiry);
+}
+
+export async function readSessionOfGuest(): Promise<Session> {
+  return await db.transaction(async (tx) => {
+    const guest =
+      (await readUserViaUsername("guest")) ??
+      raise("Guest user does not exist...?");
+
+    const sessions = await tx
+      .select()
+      .from(SessionsTable)
+      .where(eq(SessionsTable.userId, guest.id))
+      .limit(2);
+
+    if (sessions.length > 1) raise("Multiple sessions for guest...?");
+    const session = sessions[0] ?? raise("Guest session does not exist...?");
+
+    return session;
+  });
 }
 
 export async function readSessionViaUser(

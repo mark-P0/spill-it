@@ -7,6 +7,8 @@ import helmet from "helmet";
 import { StatusCodes } from "http-status-codes";
 import morgan from "morgan";
 import path from "path";
+import { z } from "zod";
+import { convertHeaderAuthToUser } from "./middlewares";
 import { FollowsRouter } from "./routers/follows";
 import { PostsRouter } from "./routers/posts";
 import { SessionsRouter } from "./routers/sessions";
@@ -110,6 +112,51 @@ app.use(express.static(path.join(__dirname, "public")));
     }
 
     next();
+  });
+}
+
+/**
+ * Only allow GET requests from guest user
+ */
+{
+  const zodExpectedGuestRequest = z.object({
+    headers: z.object({
+      Authorization: z.string(),
+    }),
+  });
+
+  app.use(async (req, res, next) => {
+    logger.info("Checking if request is from guest and GET...");
+
+    const reqParsing = zodExpectedGuestRequest.safeParse(req);
+    if (!reqParsing.success) {
+      logger.warn("Could not determine if request is from guest; allowing...");
+      return next();
+    }
+    const { headers } = reqParsing.data;
+
+    logger.info("Converting header authorization to user info...");
+    const userResult = await convertHeaderAuthToUser(
+      res,
+      headers.Authorization,
+    );
+    if (!userResult.success) {
+      return userResult.res;
+    }
+    const user = userResult.value;
+
+    if (user.username !== "guest") {
+      logger.info("Request is not from guest");
+      return next();
+    }
+
+    if (req.method.toUpperCase() === "GET") {
+      logger.info("Guest request is GET");
+      return next();
+    }
+
+    logger.error("Guest is only allowed to perform GET requests");
+    res.sendStatus(StatusCodes.FORBIDDEN);
   });
 }
 
