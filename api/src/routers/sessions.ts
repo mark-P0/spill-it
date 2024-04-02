@@ -8,6 +8,7 @@ import {
   createSession,
   deleteSession,
   isSessionExpired,
+  readSessionOfGuest,
   readSessionViaUser,
 } from "@spill-it/db/tables/sessions";
 import {
@@ -26,6 +27,65 @@ import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(__filename);
 export const SessionsRouter = Router();
+
+{
+  const details = endpointDetails("/api/v0/sessions/guest", "GET");
+  const [ep, , signature, method] = details;
+  type Input = z.infer<typeof signature.input>;
+  type Output = z.infer<typeof signature.output>;
+
+  SessionsRouter[method](ep, async (req, res, next) => {
+    logger.info("Fetching guest session...");
+    const sessionResult = await safeAsync(() => readSessionOfGuest());
+    if (!sessionResult.success) {
+      logger.error(formatError(sessionResult.error));
+      return res.sendStatus(StatusCodes.BAD_GATEWAY);
+    }
+    const session = sessionResult.value;
+
+    logger.info("Signing session ID...");
+    const sessionIdSignatureResult = safe(() => sign(env.HMAC_KEY, session.id));
+    if (!sessionIdSignatureResult.success) {
+      logger.error(formatError(sessionIdSignatureResult.error));
+      return res.sendStatus(StatusCodes.BAD_GATEWAY);
+    }
+    const sessionIdSignature = sessionIdSignatureResult.value;
+
+    logger.info("Building authorization header string...");
+    const authResult = safe(() =>
+      buildHeaderAuth("SPILLITSESS", {
+        id: session.id,
+        signature: sessionIdSignature,
+      }),
+    );
+    if (!authResult.success) {
+      logger.error(formatError(authResult.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const Authorization = authResult.value;
+
+    logger.info("Parsing output...");
+    const outputParsing = signature.output.safeParse({
+      Authorization,
+    } satisfies Output);
+    if (!outputParsing.success) {
+      logger.error(formatError(outputParsing.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const output = outputParsing.data;
+
+    logger.info("Packaging output...");
+    const rawOutputResult = safe(() => jsonPack(output));
+    if (!rawOutputResult.success) {
+      logger.error(formatError(rawOutputResult.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const rawOutput = rawOutputResult.value;
+
+    logger.info("Sending guest session ID...");
+    return res.send(rawOutput);
+  });
+}
 
 /** Get a session ID using Google authorization code */
 {
@@ -134,12 +194,22 @@ export const SessionsRouter = Router();
     }
     const sessionIdSignature = sessionIdSignatureResult.value;
 
-    logger.info("Parsing output...");
-    const outputParsing = signature.output.safeParse({
-      Authorization: buildHeaderAuth("SPILLITSESS", {
+    logger.info("Building authorization header string...");
+    const authResult = safe(() =>
+      buildHeaderAuth("SPILLITSESS", {
         id: sessionId,
         signature: sessionIdSignature,
       }),
+    );
+    if (!authResult.success) {
+      logger.error(formatError(authResult.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const Authorization = authResult.value;
+
+    logger.info("Parsing output...");
+    const outputParsing = signature.output.safeParse({
+      Authorization,
     } satisfies Output);
     if (!outputParsing.success) {
       logger.error(formatError(outputParsing.error));
