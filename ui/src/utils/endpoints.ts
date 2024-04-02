@@ -5,6 +5,7 @@ const endpoints = [
   "/",
   "/welcome",
   "/login/google/redirect",
+  "/login/guest",
   "/logout",
   "/home",
   ...[

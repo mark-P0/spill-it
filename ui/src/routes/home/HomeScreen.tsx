@@ -1,6 +1,6 @@
-import { safe } from "@spill-it/utils/safe";
+import { ensureError, raise } from "@spill-it/utils/errors";
 import clsx from "clsx";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
@@ -41,7 +41,17 @@ function ProfileButtonLink() {
   );
 }
 
+async function submitPost(content: string) {
+  const headerAuth = getFromStorage("SESS");
+
+  const fetchResult = await fetchAPI("/api/v0/posts", "POST", {
+    headers: { Authorization: headerAuth },
+    body: { content },
+  });
+  if (!fetchResult.success) raise("Failed creating post", fetchResult.error);
+}
 function PostForm() {
+  const { user } = useUserContext();
   const { showOnToast } = useToastContext();
   const { extendFeedWithRecent } = useFeedContext();
   const [content, setContent] = useState("");
@@ -52,37 +62,28 @@ function PostForm() {
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
-    logger.debug("Submitting post...");
     event.preventDefault();
+
+    if (user?.username === "guest") {
+      logger.error("Guests cannot create posts");
+      showOnToast(<>Ready to spill? 😋</>, "info");
+      return;
+    }
+
     setIsSubmitting(true);
+    try {
+      logger.debug("Submitting post...");
+      await submitPost(content);
 
-    logger.debug("Retrieving session info...");
-    const headerAuthResult = safe(() => getFromStorage("SESS"));
-    if (!headerAuthResult.success) {
-      logger.error(headerAuthResult.error);
+      extendFeedWithRecent();
+      reset();
+
+      showOnToast(<>Spilt! 😋</>, "info");
+    } catch (caughtError) {
+      logger.error(ensureError(caughtError));
       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
-      setIsSubmitting(false);
-      return;
     }
-    const headerAuth = headerAuthResult.value;
-
-    logger.debug("Sending post...");
-    const fetchResult = await fetchAPI("/api/v0/posts", "POST", {
-      headers: { Authorization: headerAuth },
-      body: { content },
-    });
-    if (!fetchResult.success) {
-      logger.error(fetchResult.error);
-      showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
-      setIsSubmitting(false);
-      return;
-    }
-
-    logger.debug("Finishing submission...");
-    extendFeedWithRecent();
-    showOnToast(<>Spilt! 😋</>, "info");
     setIsSubmitting(false);
-    reset();
   }
 
   return (
@@ -115,6 +116,14 @@ function PostForm() {
 
 export function HomeScreen() {
   document.title = "Home 🍵 Spill.it!";
+
+  const { reflectUser } = useUserContext();
+
+  useEffect(() => {
+    reflectUser();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Run only once, intended for when transitioning from login to home
+  }, []);
 
   return (
     <FeedProvider>

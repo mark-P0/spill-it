@@ -63,21 +63,28 @@ async function sendAcceptFollowRequest(followerUserId: string) {
   if (!result.success) raise("Failed accepting follow request", result.error);
 }
 // TODO Reuse existing user card?
-function RequestingUserCard(props: { user: UserPublic }) {
+function RequestingFollowerCard(props: { follower: UserPublic }) {
   const revalidator = useRevalidator();
+  const { user } = useUserContext();
   const { showOnToast } = useToastContext();
   const [isProcessing, setIsProcessing] = useState(false);
-  const { user } = props;
+  const { follower } = props;
 
   async function decline() {
+    if (user?.username === "guest") {
+      logger.error("Guests cannot decline follow requests");
+      showOnToast(<>Ready to spill? 😋</>, "info");
+      return;
+    }
+
     setIsProcessing(true);
     try {
       logger.debug("Sending decline follow request...");
-      await sendDeclineFollowRequest(user.id);
+      await sendDeclineFollowRequest(follower.id);
       showOnToast(
         <>
           You have rejected the request of{" "}
-          <span className="font-bold">{user.handleName}</span> 👋
+          <span className="font-bold">{follower.handleName}</span> 👋
         </>,
         "critical",
       );
@@ -91,14 +98,20 @@ function RequestingUserCard(props: { user: UserPublic }) {
     setIsProcessing(false);
   }
   async function accept() {
+    if (user?.username === "guest") {
+      logger.error("Guests cannot accept follow requests");
+      showOnToast(<>Ready to spill? 😋</>, "info");
+      return;
+    }
+
     setIsProcessing(true);
     try {
       logger.debug("Sending accept follow request...");
-      await sendAcceptFollowRequest(user.id);
+      await sendAcceptFollowRequest(follower.id);
       showOnToast(
         <>
-          <span className="font-bold">{user.handleName}</span> is now following
-          you! 🎊
+          <span className="font-bold">{follower.handleName}</span> is now
+          following you! 🎊
         </>,
         "info",
       );
@@ -112,7 +125,7 @@ function RequestingUserCard(props: { user: UserPublic }) {
     setIsProcessing(false);
   }
 
-  const { handleName, username, portraitUrl } = user;
+  const { handleName, username, portraitUrl } = follower;
   const isLoading = isProcessing || revalidator.state === "loading";
 
   return (
@@ -183,7 +196,7 @@ function FollowerRequestsModalContent() {
 
       <ol className="mt-3 grid gap-1">
         {followerRequests?.map(({ follower }) => (
-          <RequestingUserCard key={follower.id} user={follower} />
+          <RequestingFollowerCard key={follower.id} follower={follower} />
         ))}
       </ol>
     </ModalContent>

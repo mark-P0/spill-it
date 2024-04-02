@@ -1,10 +1,13 @@
 import { randomChoice } from "@spill-it/utils/random";
 import clsx from "clsx";
 import { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { E, EE } from "../../utils/dom";
+import { endpoint } from "../../utils/endpoints";
 import { env } from "../../utils/env";
 import { logger } from "../../utils/logger";
 import { Screen } from "../_app/Screen";
+import { clsLinkTranslucent } from "../_app/classes";
 import { useWelcomeLoader } from "../welcome";
 
 function LoginWithGoogle() {
@@ -120,13 +123,22 @@ export function WelcomeScreen() {
           </p>
         </header>
 
-        <main>
-          <h2 className="mb-3 text-center">
+        <main className="grid gap-3">
+          <h2 className="text-center">
             Are you ready to <span className="font-bold">spill it</span>?
           </h2>
-          <div className="w-min mx-auto">
+          <div className="mx-auto">
             <LoginWithGoogle />
           </div>
+          <p className="text-center text-white/50">
+            or{" "}
+            <Link
+              to={endpoint("/login/guest")}
+              className={clsx(clsLinkTranslucent)}
+            >
+              continue as a guest
+            </Link>
+          </p>
         </main>
       </div>
     </Screen>
