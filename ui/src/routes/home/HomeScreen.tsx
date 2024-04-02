@@ -1,4 +1,4 @@
-import { safe } from "@spill-it/utils/safe";
+import { ensureError, raise } from "@spill-it/utils/errors";
 import clsx from "clsx";
 import { FormEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -41,6 +41,15 @@ function ProfileButtonLink() {
   );
 }
 
+async function submitPost(content: string) {
+  const headerAuth = getFromStorage("SESS");
+
+  const fetchResult = await fetchAPI("/api/v0/posts", "POST", {
+    headers: { Authorization: headerAuth },
+    body: { content },
+  });
+  if (!fetchResult.success) raise("Failed creating post", fetchResult.error);
+}
 function PostForm() {
   const { showOnToast } = useToastContext();
   const { extendFeedWithRecent } = useFeedContext();
@@ -52,37 +61,22 @@ function PostForm() {
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
-    logger.debug("Submitting post...");
     event.preventDefault();
+
     setIsSubmitting(true);
+    try {
+      logger.debug("Submitting post...");
+      await submitPost(content);
 
-    logger.debug("Retrieving session info...");
-    const headerAuthResult = safe(() => getFromStorage("SESS"));
-    if (!headerAuthResult.success) {
-      logger.error(headerAuthResult.error);
+      extendFeedWithRecent();
+      reset();
+
+      showOnToast(<>Spilt! 😋</>, "info");
+    } catch (caughtError) {
+      logger.error(ensureError(caughtError));
       showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
-      setIsSubmitting(false);
-      return;
     }
-    const headerAuth = headerAuthResult.value;
-
-    logger.debug("Sending post...");
-    const fetchResult = await fetchAPI("/api/v0/posts", "POST", {
-      headers: { Authorization: headerAuth },
-      body: { content },
-    });
-    if (!fetchResult.success) {
-      logger.error(fetchResult.error);
-      showOnToast(<>😫 We spilt too much! Please try again.</>, "warn");
-      setIsSubmitting(false);
-      return;
-    }
-
-    logger.debug("Finishing submission...");
-    extendFeedWithRecent();
-    showOnToast(<>Spilt! 😋</>, "info");
     setIsSubmitting(false);
-    reset();
   }
 
   return (
