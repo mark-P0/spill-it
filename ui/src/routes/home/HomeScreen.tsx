@@ -1,4 +1,4 @@
-import { zodPostContent } from "@spill-it/constraints";
+import { POST_CONTENT_LEN_MAX, zodPostContent } from "@spill-it/constraints";
 import { ensureError, raise } from "@spill-it/utils/errors";
 import clsx from "clsx";
 import { FormEvent, useCallback, useEffect, useState } from "react";
@@ -100,6 +100,7 @@ function PostForm() {
     setIsSubmitting(false);
   }
 
+  const remainingCharCt = POST_CONTENT_LEN_MAX - content.length;
   const isContentValid = contentValidity === "";
 
   return (
@@ -120,10 +121,27 @@ function PostForm() {
             )}
           />
         </label>
-        <div className="ml-auto">
+        <div className="ml-auto flex flex-row-reverse items-center gap-3">
           <button disabled={!isContentValid} className={clsx(clsBtn)}>
             {isSubmitting ? <>Spilling...</> : <>Spill! 🍵</>}
           </button>
+
+          {remainingCharCt < 16 && (
+            <span
+              className={clsx(
+                //
+                "text-lg font-bold tracking-widest",
+                "transition",
+                remainingCharCt < 0
+                  ? "text-rose-500"
+                  : remainingCharCt < 8
+                    ? "text-yellow-500"
+                    : "text-white",
+              )}
+            >
+              {remainingCharCt}
+            </span>
+          )}
         </div>
       </fieldset>
 
