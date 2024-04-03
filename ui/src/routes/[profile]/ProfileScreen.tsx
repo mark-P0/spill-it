@@ -71,13 +71,16 @@ export function ProfileScreen() {
   document.title = `${handleName} (${username}) 👀 Spill.it!`;
 
   return (
-    <Screen className="grid auto-rows-min gap-6 p-6">
-      <header className="grid grid-rows-subgrid row-span-2">
+    <Screen>
+      <div className="p-6 pb-0">
         <NavBar />
-        <ProfileCard />
-      </header>
+      </div>
 
-      <main>
+      <div className="p-6 sticky top-0 backdrop-blur-md">
+        <ProfileCard />
+      </div>
+
+      <main className="p-6 pt-0">
         <PostsSection />
       </main>
 
