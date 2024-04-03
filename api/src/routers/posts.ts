@@ -1,4 +1,4 @@
-import { POSTS_CT_MAX_API } from "@spill-it/constraints";
+import { POSTS_CT_MAX_API, zodPostContent } from "@spill-it/constraints";
 import { UserPublic } from "@spill-it/db/schema/drizzle";
 import {
   createPost,
@@ -302,6 +302,16 @@ export const PostsRouter = Router();
       return userResult.res;
     }
     const user = userResult.value;
+
+    logger.info("Validating post content...");
+    {
+      const parsing = zodPostContent.safeParse(body.content);
+      if (!parsing.success) {
+        logger.error(formatError(parsing.error));
+        res.sendStatus(StatusCodes.BAD_REQUEST);
+        return { success: false, res };
+      }
+    }
 
     logger.info("Creating post...");
     const { content } = body;
