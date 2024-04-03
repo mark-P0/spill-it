@@ -123,6 +123,7 @@ export const zodPost: DrizzleZodPost = z.object({
   userId: zodUserPublic.shape.id,
   timestamp: z.date(),
   content: z.string(),
+  isDeleted: z.boolean(),
 });
 export const zodPostWithAuthor: DrizzleZodPostWithAuthor = zodPost.extend({
   author: zodUserPublic,

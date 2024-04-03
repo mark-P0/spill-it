@@ -177,6 +177,7 @@ export const PostsTable = pgTable("posts", {
   userId: uuid("userId").notNull(),
   timestamp: timestamp("timestamp").notNull().defaultNow(),
   content: text("content").notNull(),
+  isDeleted: boolean("isDeleted").notNull().default(false),
 });
 const drizzleZodPost = createSelectSchema(PostsTable);
 export type DrizzleZodPost = typeof drizzleZodPost;
