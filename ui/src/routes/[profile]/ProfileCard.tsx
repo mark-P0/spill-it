@@ -1,5 +1,6 @@
 import clsx from "clsx";
-import { BsLockFill } from "react-icons/bs";
+import { format } from "date-fns";
+import { BsCalendarEvent, BsLockFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
 import { useProfileLoader } from "../[profile]";
@@ -33,10 +34,35 @@ function FollowCountsNav() {
   );
 }
 
+function formatJoinDate(date: Date): string {
+  const MMM_YYYY = "LLL y";
+  return format(date, MMM_YYYY);
+}
+function JoinDate(props: { date: Date }) {
+  const { date } = props;
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-white/50">
+        <BsCalendarEvent />
+      </span>
+
+      <p className="text-white/50">Joined {formatJoinDate(date)}</p>
+    </div>
+  );
+}
+
 export function ProfileCard() {
   const { profile } = useProfileLoader();
 
-  const { handleName, username, bio, portraitUrl, isPrivate } = profile;
+  const {
+    registrationDate,
+    handleName,
+    username,
+    bio,
+    portraitUrl,
+    isPrivate,
+  } = profile;
 
   return (
     <article className="grid grid-cols-[auto_1fr_auto] gap-x-6">
@@ -51,7 +77,11 @@ export function ProfileCard() {
       </div>
 
       <div className="col-span-2">
-        {bio !== "" && <p className="my-1">{bio}</p>}
+        {bio !== "" && <p className="my-2">{bio}</p>}
+      </div>
+
+      <div className="col-span-2">
+        <JoinDate date={registrationDate} />
       </div>
 
       <div className="col-span-2">
