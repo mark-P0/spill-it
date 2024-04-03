@@ -5,7 +5,7 @@ import {
   zodFollowWithUsers,
   zodFollowers,
   zodFollowings,
-  zodPost,
+  zodPostPublic,
   zodPostWithAuthor,
   zodSample,
   zodUserPublic,
@@ -172,7 +172,7 @@ export const endpointMap = {
         }),
       }),
       output: z.object({
-        data: zodPost,
+        data: zodPostPublic,
         links: z.object({
           self: z.string().url(),
         }),
@@ -199,7 +199,7 @@ export const endpointMap = {
           Authorization: z.string(),
         }),
         query: z.object({
-          id: zodPost.shape.id,
+          id: zodPostPublic.shape.id,
         }),
       }),
       output: z.object({}),
@@ -229,7 +229,7 @@ export const endpointMap = {
         }),
       }),
       output: z.object({
-        data: zodPost,
+        data: zodPostPublic,
       }),
     },
   },
