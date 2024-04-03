@@ -23,7 +23,7 @@ export async function readPost(id: Post["id"]): Promise<Post | null> {
   const posts = await db
     .select()
     .from(PostsTable)
-    .where(eq(PostsTable.id, id))
+    .where(and(eq(PostsTable.isDeleted, false), eq(PostsTable.id, id)))
     .limit(2); // There should only be at most 1. If there are 2 (or more), something has gone wrong...
 
   if (posts.length > 1) raise("Multiple posts for an ID...?");
@@ -36,7 +36,7 @@ export async function readPostsWithAuthorViaUser(
   userId: PostWithAuthor["userId"],
 ): Promise<PostWithAuthor[]> {
   const posts = await db.query.PostsTable.findMany({
-    where: eq(PostsTable.userId, userId),
+    where: and(eq(PostsTable.isDeleted, false), eq(PostsTable.userId, userId)),
     orderBy: desc(PostsTable.timestamp),
     with: { author: true },
   });
@@ -53,6 +53,7 @@ export async function readPostsWithAuthorViaUserBeforeTimestamp(
 
   const posts = await db.query.PostsTable.findMany({
     where: and(
+      eq(PostsTable.isDeleted, false),
       eq(PostsTable.userId, userId), // Posts of user
       lt(PostsTable.timestamp, timestamp), // Before a particular time
     ),
@@ -95,6 +96,7 @@ export async function readPostsFeedWithAuthorViaUserBeforeTimestamp(
 
     const posts = await tx.query.PostsTable.findMany({
       where: and(
+        eq(PostsTable.isDeleted, false),
         or(
           inArray(PostsTable.userId, sqFollowingUserIds), // Posts of followed users, or
           eq(PostsTable.userId, userId), // Posts of user
