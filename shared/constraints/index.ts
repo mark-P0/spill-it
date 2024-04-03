@@ -1,4 +1,5 @@
 export const POST_CT_CAP = 16;
+export const POSTS_IN_VIEW_CT = 8;
 
 export const USERNAME_LEN_MIN = 6;
 export const USERNAME_LEN_MAX = 18;

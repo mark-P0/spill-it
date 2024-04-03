@@ -190,6 +190,9 @@ importers:
       '@spill-it/auth':
         specifier: workspace:^
         version: link:../shared/auth
+      '@spill-it/constraints':
+        specifier: workspace:^
+        version: link:../shared/constraints
       '@spill-it/endpoints':
         specifier: workspace:^
         version: link:../shared/endpoints

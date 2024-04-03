@@ -1,3 +1,4 @@
+import { POSTS_IN_VIEW_CT } from "@spill-it/constraints";
 import { PostWithAuthor } from "@spill-it/db/schema/drizzle";
 import { tomorrow } from "@spill-it/utils/dates";
 import { safe } from "@spill-it/utils/safe";
@@ -7,8 +8,6 @@ import { logger } from "../../../utils/logger";
 import { Controller, createNewContext } from "../../../utils/react";
 import { getFromStorage } from "../../../utils/storage";
 import { useProfileLoader } from "../../[profile]";
-
-const POSTS_IN_VIEW_CT = 8;
 
 type PostStatus = "fetching" | "error" | "ok";
 export const [usePostsContext, PostsProvider] = createNewContext(() => {
