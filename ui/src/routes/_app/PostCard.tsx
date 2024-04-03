@@ -5,7 +5,7 @@ import { sleep } from "@spill-it/utils/sleep";
 import clsx from "clsx";
 import { differenceInHours, format, formatDistanceToNow } from "date-fns";
 import { ComponentProps, useState } from "react";
-import { BsTrashFill } from "react-icons/bs";
+import { BsLockFill, BsTrashFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
@@ -136,7 +136,7 @@ export function PostCard(props: {
   const { showOnModal } = useModalContext();
   const { post, onDeleteEnd } = props;
   const { content, timestamp, author } = post;
-  const { username, handleName, portraitUrl } = author;
+  const { username, handleName, portraitUrl, isPrivate } = author;
 
   const canDelete = user?.id === author?.id;
 
@@ -157,7 +157,7 @@ export function PostCard(props: {
       </div>
 
       <div>
-        <header className="flex flex-wrap items-baseline gap-x-3">
+        <header className="flex flex-wrap items-baseline gap-2">
           <h3>
             <Link
               to={endpointWithParam("/:username", { username })}
@@ -166,6 +166,12 @@ export function PostCard(props: {
               {handleName}
             </Link>
           </h3>
+
+          {isPrivate && (
+            <div>
+              <BsLockFill className="text-emerald-500" />
+            </div>
+          )}
 
           <p className="text-white/50 select-none">
             {username}
