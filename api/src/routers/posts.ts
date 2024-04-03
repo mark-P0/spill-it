@@ -1,4 +1,4 @@
-import { POST_CT_CAP } from "@spill-it/constraints";
+import { POSTS_CT_MAX_API } from "@spill-it/constraints";
 import { UserPublic } from "@spill-it/db/schema/drizzle";
 import {
   createPost,
@@ -42,9 +42,9 @@ export const PostsRouter = Router();
     const { headers, query } = inputParsing.data;
 
     const beforeISODateStr = query.beforeISODateStr ?? today().toISOString();
-    const size = query.size ?? Math.floor(POST_CT_CAP / 2);
+    const size = query.size ?? Math.floor(POSTS_CT_MAX_API / 2);
 
-    if (size > POST_CT_CAP) {
+    if (size > POSTS_CT_MAX_API) {
       logger.error("Requested post count greater than set cap");
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }
@@ -201,9 +201,9 @@ export const PostsRouter = Router();
     const { headers, query } = inputParsing.data;
 
     const beforeISODateStr = query.beforeISODateStr ?? today().toISOString();
-    const size = query.size ?? Math.floor(POST_CT_CAP / 2);
+    const size = query.size ?? Math.floor(POSTS_CT_MAX_API / 2);
 
-    if (size > POST_CT_CAP) {
+    if (size > POSTS_CT_MAX_API) {
       logger.error("Requested post count greater than set cap");
       return res.sendStatus(StatusCodes.BAD_REQUEST);
     }

@@ -1,4 +1,4 @@
-import { POST_CT_CAP } from "@spill-it/constraints";
+import { POSTS_CT_MAX_API } from "@spill-it/constraints";
 import {
   zodFollow,
   zodFollowPublicDetails,
@@ -186,7 +186,7 @@ export const endpointMap = {
         query: z.object({
           userId: z.optional(zodUserPublic.shape.id),
           beforeISODateStr: z.string().datetime().optional(), // Should be parseable to same format as `zodPost.shape.timestamp`
-          size: z.coerce.number().max(POST_CT_CAP).optional(),
+          size: z.coerce.number().max(POSTS_CT_MAX_API).optional(),
         }),
       }),
       output: z.object({
@@ -213,7 +213,7 @@ export const endpointMap = {
         }),
         query: z.object({
           beforeISODateStr: z.string().datetime().optional(),
-          size: z.coerce.number().max(POST_CT_CAP).optional(),
+          size: z.coerce.number().max(POSTS_CT_MAX_API).optional(),
         }),
       }),
       output: z.object({
