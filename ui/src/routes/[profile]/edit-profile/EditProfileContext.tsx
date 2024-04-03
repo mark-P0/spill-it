@@ -1,8 +1,7 @@
 import {
   BIO_LEN_MAX,
   BIO_LEN_MIN,
-  HANDLE_LEN_MAX,
-  HANDLE_LEN_MIN,
+  zodHandle,
   zodUsername,
 } from "@spill-it/constraints";
 import { ensureError, raise } from "@spill-it/utils/errors";
@@ -35,7 +34,6 @@ function useFieldState<T, U>(defaultValue: T, validator: (newValue: T) => U) {
   return [value, validity, updateValue] as const;
 }
 
-const zodHandle = z.string().min(HANDLE_LEN_MIN).max(HANDLE_LEN_MAX).optional();
 const zodBio = z.string().min(BIO_LEN_MIN).max(BIO_LEN_MAX).optional();
 
 async function sendUpdate(

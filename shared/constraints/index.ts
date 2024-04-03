@@ -20,6 +20,11 @@ export const zodUsername = z
 
 export const HANDLE_LEN_MIN = 1;
 export const HANDLE_LEN_MAX = 24;
+export const zodHandle = z
+  .string()
+  .min(HANDLE_LEN_MIN)
+  .max(HANDLE_LEN_MAX)
+  .optional();
 
 export const BIO_LEN_MIN = 0;
 export const BIO_LEN_MAX = 128;

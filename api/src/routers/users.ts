@@ -1,8 +1,7 @@
 import {
   BIO_LEN_MAX,
   BIO_LEN_MIN,
-  HANDLE_LEN_MAX,
-  HANDLE_LEN_MIN,
+  zodHandle,
   zodUsername,
 } from "@spill-it/constraints";
 import { readUserViaUsername, updateUser } from "@spill-it/db/tables/users";
@@ -229,14 +228,7 @@ export const UsersRouter = Router();
       logger.info("Checking handle name...");
       const { handleName } = details;
 
-      const schema = z
-        .string()
-        .min(HANDLE_LEN_MIN)
-        .max(HANDLE_LEN_MAX)
-        .optional();
-      handleName satisfies z.infer<typeof schema>;
-
-      const parsing = schema.safeParse(handleName);
+      const parsing = zodHandle.safeParse(handleName);
       if (!parsing.success) {
         logger.error(formatError(parsing.error));
         res.sendStatus(StatusCodes.BAD_REQUEST);
