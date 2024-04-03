@@ -1,3 +1,4 @@
+import { POSTS_CT_MAX_API } from "@spill-it/constraints";
 import { raise } from "@spill-it/utils/errors";
 import { and, desc, eq, inArray, lt, or } from "drizzle-orm";
 import { db } from "../db";
@@ -8,7 +9,6 @@ import {
   PostWithAuthor,
   PostsTable,
 } from "../schema/drizzle";
-import { POST_CT_CAP } from "../utils/constants";
 
 export async function createPost(details: PostDetails): Promise<Post> {
   const posts = await db.insert(PostsTable).values(details).returning();
@@ -49,7 +49,7 @@ export async function readPostsWithAuthorViaUserBeforeTimestamp(
   timestamp: PostWithAuthor["timestamp"],
   ct: number,
 ): Promise<PostWithAuthor[]> {
-  if (ct > POST_CT_CAP) raise("Requested post count greater than set cap");
+  if (ct > POSTS_CT_MAX_API) raise("Requested post count greater than set cap");
 
   const posts = await db.query.PostsTable.findMany({
     where: and(
@@ -70,7 +70,7 @@ export async function readPostsFeedWithAuthorViaUserBeforeTimestamp(
   timestamp: PostWithAuthor["timestamp"],
   ct: number,
 ): Promise<PostWithAuthor[]> {
-  if (ct > POST_CT_CAP) raise("Requested post count greater than set cap");
+  if (ct > POSTS_CT_MAX_API) raise("Requested post count greater than set cap");
 
   return await db.transaction(async (tx) => {
     /**

@@ -1,9 +1,7 @@
-import { User } from "@spill-it/db/schema/drizzle";
+import { zodBio, zodHandle, zodUsername } from "@spill-it/constraints";
 import { ensureError, raise } from "@spill-it/utils/errors";
 import { sleep } from "@spill-it/utils/sleep";
-import { digits, letters } from "@spill-it/utils/strings";
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { z } from "zod";
 import { redirectFull } from "../../../utils/dom";
 import { endpointWithParam } from "../../../utils/endpoints";
 import { fetchAPI } from "../../../utils/fetch-api";
@@ -29,29 +27,6 @@ function useFieldState<T, U>(defaultValue: T, validator: (newValue: T) => U) {
 
   return [value, validity, updateValue] as const;
 }
-
-// TODO Reuse these from DB package?
-const charset = new Set([...letters, ...digits]);
-function isUsernameCharsValid(username: User["username"]): boolean {
-  return username.split("").every((char) => charset.has(char));
-}
-
-const HANDLE_LEN_MIN = 1;
-const HANDLE_LEN_MAX = 24;
-const zodHandle = z.string().min(HANDLE_LEN_MIN).max(HANDLE_LEN_MAX).optional();
-
-const USERNAME_LEN_MIN = 6;
-const USERNAME_LEN_MAX = 18;
-const zodUsername = z
-  .string()
-  .min(USERNAME_LEN_MIN)
-  .max(USERNAME_LEN_MAX)
-  .refine(isUsernameCharsValid, "Invalid username characters")
-  .optional();
-
-const BIO_LEN_MIN = 0;
-const BIO_LEN_MAX = 128;
-const zodBio = z.string().min(BIO_LEN_MIN).max(BIO_LEN_MAX).optional();
 
 async function sendUpdate(
   username: string | undefined,

@@ -1,3 +1,4 @@
+import { POSTS_CT_MAX_UI } from "@spill-it/constraints";
 import { PostWithAuthor } from "@spill-it/db/schema/drizzle";
 import { tomorrow } from "@spill-it/utils/dates";
 import { safe } from "@spill-it/utils/safe";
@@ -6,8 +7,6 @@ import { fetchAPI } from "../../../utils/fetch-api";
 import { logger } from "../../../utils/logger";
 import { Controller, createNewContext } from "../../../utils/react";
 import { getFromStorage } from "../../../utils/storage";
-
-const POSTS_IN_VIEW_CT = 8;
 
 type FeedStatus = "fetching" | "error" | "ok";
 export const [useFeedContext, FeedProvider] = createNewContext(() => {
@@ -29,7 +28,7 @@ export const [useFeedContext, FeedProvider] = createNewContext(() => {
       headers: { Authorization: headerAuth },
       query: {
         beforeISODateStr: tomorrow().toISOString(), // Use a "future" date to ensure most recent posts are also fetched
-        size: POSTS_IN_VIEW_CT,
+        size: POSTS_CT_MAX_UI,
       },
     });
     if (!fetchResult.success) {
@@ -66,7 +65,7 @@ export const [useFeedContext, FeedProvider] = createNewContext(() => {
         headers: { Authorization: headerAuth },
         query: {
           beforeISODateStr: date.toISOString(),
-          size: POSTS_IN_VIEW_CT + 1, // Fetch 1 additional to "check" if there is still more next
+          size: POSTS_CT_MAX_UI + 1, // Fetch 1 additional to "check" if there is still more next
         },
       });
       if (!nextPostsResult.success) {
@@ -76,7 +75,7 @@ export const [useFeedContext, FeedProvider] = createNewContext(() => {
       }
       const nextPosts = nextPostsResult.value.data;
 
-      const hasExtraPost = nextPosts.length > POSTS_IN_VIEW_CT;
+      const hasExtraPost = nextPosts.length > POSTS_CT_MAX_UI;
       const extension = !hasExtraPost ? nextPosts : nextPosts.slice(0, -1);
 
       if (!ctl.shouldProceed) return;
@@ -99,7 +98,7 @@ export const [useFeedContext, FeedProvider] = createNewContext(() => {
       headers: { Authorization: headerAuth },
       query: {
         beforeISODateStr: tomorrow().toISOString(),
-        size: POSTS_IN_VIEW_CT, // TODO Is this enough? Too much?
+        size: POSTS_CT_MAX_UI, // TODO Is this enough? Too much?
       },
     });
     if (!recentPostsResult.success) {

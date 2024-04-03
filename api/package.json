@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@spill-it/auth": "workspace:^",
+    "@spill-it/constraints": "workspace:^",
     "@spill-it/db": "workspace:^",
     "@spill-it/endpoints": "workspace:^",
     "@spill-it/utils": "workspace:^",

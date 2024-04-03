@@ -1,16 +1,11 @@
 import {
-  isUsernameCharsValid,
-  readUserViaUsername,
-  updateUser,
-} from "@spill-it/db/tables/users";
-import {
   BIO_LEN_MAX,
   BIO_LEN_MIN,
-  HANDLE_LEN_MAX,
-  HANDLE_LEN_MIN,
-  USERNAME_LEN_MAX,
-  USERNAME_LEN_MIN,
-} from "@spill-it/db/utils/constants";
+  zodBio,
+  zodHandle,
+  zodUsername,
+} from "@spill-it/constraints";
+import { readUserViaUsername, updateUser } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
 import { removeFalseish } from "@spill-it/utils/falseish";
@@ -222,15 +217,7 @@ export const UsersRouter = Router();
       logger.info("Checking username...");
       const { username } = details;
 
-      const schema = z
-        .string()
-        .min(USERNAME_LEN_MIN)
-        .max(USERNAME_LEN_MAX)
-        .refine(isUsernameCharsValid, "Invalid username characters")
-        .optional();
-      username satisfies z.infer<typeof schema>;
-
-      const parsing = schema.safeParse(username);
+      const parsing = zodUsername.safeParse(username);
       if (!parsing.success) {
         logger.error(formatError(parsing.error));
         res.sendStatus(StatusCodes.BAD_REQUEST);
@@ -242,14 +229,7 @@ export const UsersRouter = Router();
       logger.info("Checking handle name...");
       const { handleName } = details;
 
-      const schema = z
-        .string()
-        .min(HANDLE_LEN_MIN)
-        .max(HANDLE_LEN_MAX)
-        .optional();
-      handleName satisfies z.infer<typeof schema>;
-
-      const parsing = schema.safeParse(handleName);
+      const parsing = zodHandle.safeParse(handleName);
       if (!parsing.success) {
         logger.error(formatError(parsing.error));
         res.sendStatus(StatusCodes.BAD_REQUEST);
@@ -261,10 +241,7 @@ export const UsersRouter = Router();
       logger.info("Checking bio...");
       const { bio } = details;
 
-      const schema = z.string().min(BIO_LEN_MIN).max(BIO_LEN_MAX).optional();
-      bio satisfies z.infer<typeof schema>;
-
-      const parsing = schema.safeParse(bio);
+      const parsing = zodBio.safeParse(bio);
       if (!parsing.success) {
         logger.error(formatError(parsing.error));
         res.sendStatus(StatusCodes.BAD_REQUEST);
