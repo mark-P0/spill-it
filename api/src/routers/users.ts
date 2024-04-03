@@ -1,16 +1,16 @@
 import {
-  isUsernameCharsValid,
-  readUserViaUsername,
-  updateUser,
-} from "@spill-it/db/tables/users";
-import {
   BIO_LEN_MAX,
   BIO_LEN_MIN,
   HANDLE_LEN_MAX,
   HANDLE_LEN_MIN,
   USERNAME_LEN_MAX,
   USERNAME_LEN_MIN,
-} from "@spill-it/db/utils/constants";
+} from "@spill-it/constraints";
+import {
+  isUsernameCharsValid,
+  readUserViaUsername,
+  updateUser,
+} from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
 import { removeFalseish } from "@spill-it/utils/falseish";

@@ -1,3 +1,4 @@
+import { USERNAME_LEN_MAX, USERNAME_LEN_MIN } from "@spill-it/constraints";
 import { raise } from "@spill-it/utils/errors";
 import { randomChoice } from "@spill-it/utils/random";
 import { digits, letters } from "@spill-it/utils/strings";
@@ -5,7 +6,6 @@ import { eq, sql } from "drizzle-orm";
 import { DBTransaction, db } from "../db";
 import { User, UserDetails, UsersTable } from "../schema/drizzle";
 import { UserPublicWithFollows } from "../schema/zod";
-import { USERNAME_LEN_MAX, USERNAME_LEN_MIN } from "../utils/constants";
 
 export async function readUser(id: User["id"]): Promise<User | null> {
   const users = await db
