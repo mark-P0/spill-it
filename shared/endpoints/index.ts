@@ -1,4 +1,4 @@
-import { POSTS_CT_MAX_API } from "@spill-it/constraints";
+import { POSTS_CT_MAX_API, zodPostContent } from "@spill-it/constraints";
 import {
   zodFollow,
   zodFollowPublicDetails,
@@ -168,7 +168,7 @@ export const endpointMap = {
           Authorization: z.string(),
         }),
         body: z.object({
-          content: z.string(),
+          content: zodPostContent,
         }),
       }),
       output: z.object({
