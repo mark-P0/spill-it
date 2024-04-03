@@ -11,6 +11,9 @@ importers:
       '@spill-it/auth':
         specifier: workspace:^
         version: link:../shared/auth
+      '@spill-it/constraints':
+        specifier: workspace:^
+        version: link:../shared/constraints
       '@spill-it/db':
         specifier: workspace:^
         version: link:../shared/db
@@ -110,8 +113,13 @@ importers:
         specifier: ^20.10.6
         version: 20.11.5
 
+  shared/constraints: {}
+
   shared/db:
     dependencies:
+      '@spill-it/constraints':
+        specifier: workspace:^
+        version: link:../constraints
       '@spill-it/utils':
         specifier: workspace:^
         version: link:../utils
@@ -152,6 +160,9 @@ importers:
 
   shared/endpoints:
     dependencies:
+      '@spill-it/constraints':
+        specifier: workspace:^
+        version: link:../constraints
       '@spill-it/db':
         specifier: workspace:^
         version: link:../db

@@ -1,3 +1,4 @@
+import { POST_CT_CAP } from "@spill-it/constraints";
 import { raise } from "@spill-it/utils/errors";
 import { and, desc, eq, inArray, lt, or } from "drizzle-orm";
 import { db } from "../db";
@@ -8,7 +9,6 @@ import {
   PostWithAuthor,
   PostsTable,
 } from "../schema/drizzle";
-import { POST_CT_CAP } from "../utils/constants";
 
 export async function createPost(details: PostDetails): Promise<Post> {
   const posts = await db.insert(PostsTable).values(details).returning();

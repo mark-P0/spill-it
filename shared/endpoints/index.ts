@@ -1,3 +1,4 @@
+import { POST_CT_CAP } from "@spill-it/constraints";
 import {
   zodFollow,
   zodFollowPublicDetails,
@@ -10,7 +11,6 @@ import {
   zodUserPublic,
   zodUserPublicDetails,
 } from "@spill-it/db/schema/zod";
-import { POST_CT_CAP } from "@spill-it/db/utils/constants";
 import { z } from "zod";
 
 export const endpointMap = {

@@ -1,3 +1,4 @@
+import { POST_CT_CAP } from "@spill-it/constraints";
 import { UserPublic } from "@spill-it/db/schema/drizzle";
 import {
   createPost,
@@ -6,7 +7,6 @@ import {
   readPostsFeedWithAuthorViaUserBeforeTimestamp,
   readPostsWithAuthorViaUserBeforeTimestamp,
 } from "@spill-it/db/tables/posts";
-import { POST_CT_CAP } from "@spill-it/db/utils/constants";
 import { endpointDetails } from "@spill-it/endpoints";
 import { today } from "@spill-it/utils/dates";
 import { formatError } from "@spill-it/utils/errors";
