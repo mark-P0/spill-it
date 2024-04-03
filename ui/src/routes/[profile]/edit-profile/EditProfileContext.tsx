@@ -1,3 +1,11 @@
+import {
+  BIO_LEN_MAX,
+  BIO_LEN_MIN,
+  HANDLE_LEN_MAX,
+  HANDLE_LEN_MIN,
+  USERNAME_LEN_MAX,
+  USERNAME_LEN_MIN,
+} from "@spill-it/constraints";
 import { User } from "@spill-it/db/schema/drizzle";
 import { ensureError, raise } from "@spill-it/utils/errors";
 import { sleep } from "@spill-it/utils/sleep";
@@ -36,21 +44,13 @@ function isUsernameCharsValid(username: User["username"]): boolean {
   return username.split("").every((char) => charset.has(char));
 }
 
-const HANDLE_LEN_MIN = 1;
-const HANDLE_LEN_MAX = 24;
 const zodHandle = z.string().min(HANDLE_LEN_MIN).max(HANDLE_LEN_MAX).optional();
-
-const USERNAME_LEN_MIN = 6;
-const USERNAME_LEN_MAX = 18;
 const zodUsername = z
   .string()
   .min(USERNAME_LEN_MIN)
   .max(USERNAME_LEN_MAX)
   .refine(isUsernameCharsValid, "Invalid username characters")
   .optional();
-
-const BIO_LEN_MIN = 0;
-const BIO_LEN_MAX = 128;
 const zodBio = z.string().min(BIO_LEN_MIN).max(BIO_LEN_MAX).optional();
 
 async function sendUpdate(
