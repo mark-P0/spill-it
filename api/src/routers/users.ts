@@ -3,14 +3,9 @@ import {
   BIO_LEN_MIN,
   HANDLE_LEN_MAX,
   HANDLE_LEN_MIN,
-  USERNAME_LEN_MAX,
-  USERNAME_LEN_MIN,
+  zodUsername,
 } from "@spill-it/constraints";
-import {
-  isUsernameCharsValid,
-  readUserViaUsername,
-  updateUser,
-} from "@spill-it/db/tables/users";
+import { readUserViaUsername, updateUser } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
 import { removeFalseish } from "@spill-it/utils/falseish";
@@ -222,15 +217,7 @@ export const UsersRouter = Router();
       logger.info("Checking username...");
       const { username } = details;
 
-      const schema = z
-        .string()
-        .min(USERNAME_LEN_MIN)
-        .max(USERNAME_LEN_MAX)
-        .refine(isUsernameCharsValid, "Invalid username characters")
-        .optional();
-      username satisfies z.infer<typeof schema>;
-
-      const parsing = schema.safeParse(username);
+      const parsing = zodUsername.safeParse(username);
       if (!parsing.success) {
         logger.error(formatError(parsing.error));
         res.sendStatus(StatusCodes.BAD_REQUEST);

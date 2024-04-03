@@ -1,4 +1,8 @@
-import { USERNAME_LEN_MAX, USERNAME_LEN_MIN } from "@spill-it/constraints";
+import {
+  USERNAME_LEN_MAX,
+  USERNAME_LEN_MIN,
+  usernameCharset,
+} from "@spill-it/constraints";
 import { raise } from "@spill-it/utils/errors";
 import { randomChoice } from "@spill-it/utils/random";
 import { digits, letters } from "@spill-it/utils/strings";
@@ -90,15 +94,11 @@ export async function readUserWithFollowsViaUsername(
   return user;
 }
 
-const charset = new Set([...letters, ...digits]);
-export function isUsernameCharsValid(username: User["username"]): boolean {
-  return username.split("").every((char) => charset.has(char));
-}
 function buildUsernameBase(handleName: string): string {
   let base = handleName
     .toLowerCase()
     .split("")
-    .filter((char) => charset.has(char))
+    .filter((char) => usernameCharset.has(char))
     .join("");
 
   const missingCharCt = USERNAME_LEN_MIN - base.length;
