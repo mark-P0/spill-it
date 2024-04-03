@@ -6,27 +6,11 @@ import { redirectFull } from "../../../utils/dom";
 import { endpointWithParam } from "../../../utils/endpoints";
 import { fetchAPI } from "../../../utils/fetch-api";
 import { logger } from "../../../utils/logger";
-import { createNewContext } from "../../../utils/react";
+import { createNewContext, useFieldState } from "../../../utils/react";
 import { getFromStorage } from "../../../utils/storage";
 import { useUserContext } from "../../_app/UserContext";
 import { useModalContext } from "../../_app/modal/ModalContext";
 import { useToastContext } from "../../_app/toast/ToastContext";
-
-/** `validator` must be wrapped in a `useCallback()` hook */
-function useFieldState<T, U>(defaultValue: T, validator: (newValue: T) => U) {
-  const [value, setValue] = useState(defaultValue);
-  const [validity, setValidity] = useState(validator(defaultValue));
-
-  const updateValue = useCallback(
-    (newValue: T) => {
-      setValue(newValue);
-      setValidity(validator(newValue));
-    },
-    [validator],
-  );
-
-  return [value, validity, updateValue] as const;
-}
 
 async function sendUpdate(
   username: string | undefined,
