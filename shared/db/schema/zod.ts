@@ -4,6 +4,8 @@ import {
   DrizzleZodFollowPublicDetails,
   DrizzleZodFollowWithUsers,
   DrizzleZodPost,
+  DrizzleZodPostPublic,
+  DrizzleZodPostPublicDetails,
   DrizzleZodPostWithAuthor,
   DrizzleZodSample,
   DrizzleZodSession,
@@ -123,7 +125,26 @@ export const zodPost: DrizzleZodPost = z.object({
   userId: zodUserPublic.shape.id,
   timestamp: z.date(),
   content: z.string(),
+  isDeleted: z.boolean(),
 });
-export const zodPostWithAuthor: DrizzleZodPostWithAuthor = zodPost.extend({
-  author: zodUserPublic,
+export const zodPostPublic: DrizzleZodPostPublic = zodPost.pick({
+  id: true,
+  userId: true,
+  timestamp: true,
+  content: true,
+  // isDeleted: true,
 });
+export const zodPostPublicDetails: DrizzleZodPostPublicDetails = zodPostPublic
+  .pick({
+    // id: true,
+    userId: true,
+    // timestamp: true,
+    content: true,
+    // isDeleted: true,
+  })
+  .partial();
+export const zodPostWithAuthor: DrizzleZodPostWithAuthor = zodPostPublic.extend(
+  {
+    author: zodUserPublic,
+  },
+);

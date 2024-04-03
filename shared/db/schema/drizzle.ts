@@ -177,6 +177,7 @@ export const PostsTable = pgTable("posts", {
   userId: uuid("userId").notNull(),
   timestamp: timestamp("timestamp").notNull().defaultNow(),
   content: text("content").notNull(),
+  isDeleted: boolean("isDeleted").notNull().default(false),
 });
 const drizzleZodPost = createSelectSchema(PostsTable);
 export type DrizzleZodPost = typeof drizzleZodPost;
@@ -186,13 +187,35 @@ export type PostDetails = typeof PostsTable.$inferInsert;
   (userId: Post["userId"]) => userId satisfies User["id"];
 }
 
+const drizzleZodPostPublic = drizzleZodPost.pick({
+  id: true,
+  userId: true,
+  timestamp: true,
+  content: true,
+  // isDeleted: true,
+});
+export type DrizzleZodPostPublic = typeof drizzleZodPostPublic;
+export type PostPublic = z.infer<DrizzleZodPostPublic>;
+
+const drizzleZodPostPublicDetails = drizzleZodPostPublic
+  .pick({
+    // id: true,
+    userId: true,
+    // timestamp: true,
+    content: true,
+    // isDeleted: true,
+  })
+  .partial();
+export type DrizzleZodPostPublicDetails = typeof drizzleZodPostPublicDetails;
+export type PostPublicDetails = z.infer<DrizzleZodPostPublicDetails>;
+
 export const PostsRelations = relations(PostsTable, ({ one }) => ({
   author: one(UsersTable, {
     fields: [PostsTable.userId],
     references: [UsersTable.id],
   }),
 }));
-const drizzleZodPostWithAuthor = drizzleZodPost.extend({
+const drizzleZodPostWithAuthor = drizzleZodPostPublic.extend({
   author: drizzleZodUserPublic,
 });
 export type DrizzleZodPostWithAuthor = typeof drizzleZodPostWithAuthor;
