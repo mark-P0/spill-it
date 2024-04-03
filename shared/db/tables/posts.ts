@@ -110,6 +110,17 @@ export async function readPostsFeedWithAuthorViaUserBeforeTimestamp(
   });
 }
 
-export async function deletePost(id: Post["id"]) {
-  await db.delete(PostsTable).where(eq(PostsTable.id, id));
+export async function deletePost(id: Post["id"]): Promise<Post> {
+  return db.transaction(async (tx) => {
+    const posts = await tx
+      .update(PostsTable)
+      .set({ isDeleted: true })
+      .where(eq(PostsTable.id, id))
+      .returning();
+
+    if (posts.length > 1) raise("Multiple posts deleted...?");
+    const post = posts[0] ?? raise("Deleted post does not exist...?");
+
+    return post;
+  });
 }
