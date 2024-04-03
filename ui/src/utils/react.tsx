@@ -3,6 +3,7 @@ import {
   Key,
   PropsWithChildren,
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -52,6 +53,25 @@ export function useError() {
   }
 
   return { setError };
+}
+
+/** `validator` must be wrapped in a `useCallback()` hook */
+export function useFieldState<T, U>(
+  defaultValue: T,
+  validator: (newValue: T) => U,
+) {
+  const [value, setValue] = useState(defaultValue);
+  const [validity, setValidity] = useState(validator(defaultValue));
+
+  const updateValue = useCallback(
+    (newValue: T) => {
+      setValue(newValue);
+      setValidity(validator(newValue));
+    },
+    [validator],
+  );
+
+  return [value, validity, updateValue] as const;
 }
 
 /**
