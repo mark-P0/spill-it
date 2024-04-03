@@ -1,10 +1,12 @@
+import { zodPostContent } from "@spill-it/constraints";
 import { ensureError, raise } from "@spill-it/utils/errors";
 import clsx from "clsx";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { endpointWithParam } from "../../utils/endpoints";
 import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
+import { useFieldState } from "../../utils/react";
 import { getFromStorage } from "../../utils/storage";
 import { TextArea } from "../_app/Input";
 import { LoadingCursorAbsoluteOverlay } from "../_app/Loading";
@@ -54,11 +56,23 @@ function PostForm() {
   const { user } = useUserContext();
   const { showOnToast } = useToastContext();
   const { extendFeedWithRecent } = useFeedContext();
-  const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const contentDefault: string = "";
+  const [content, contentValidity, updateContent] = useFieldState(
+    contentDefault,
+    useCallback((incoming) => {
+      const parsing = zodPostContent.safeParse(incoming);
+      if (!parsing.success) {
+        return parsing.error.issues[0]?.message ?? "Invalid handle name";
+      }
+
+      return "";
+    }, []),
+  );
+
   function reset() {
-    setContent("");
+    updateContent("");
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -86,6 +100,8 @@ function PostForm() {
     setIsSubmitting(false);
   }
 
+  const isContentValid = contentValidity === "";
+
   return (
     <form onSubmit={submit} className="relative">
       <fieldset disabled={isSubmitting} className="grid gap-3">
@@ -93,8 +109,10 @@ function PostForm() {
           <span className="sr-only">Tea 🍵</span>
           <TextArea
             value={content}
-            onChange={(event) => setContent(event.currentTarget.value)}
+            onChange={(event) => updateContent(event.currentTarget.value)}
             placeholder="What's the tea sis?!"
+            validity={contentValidity}
+            // reportValidity
             className={clsx(
               "resize-none placeholder:text-white/50",
               "w-full rounded p-3",
@@ -103,7 +121,7 @@ function PostForm() {
           />
         </label>
         <div className="ml-auto">
-          <button disabled={content === ""} className={clsx(clsBtn)}>
+          <button disabled={!isContentValid} className={clsx(clsBtn)}>
             {isSubmitting ? <>Spilling...</> : <>Spill! 🍵</>}
           </button>
         </div>
