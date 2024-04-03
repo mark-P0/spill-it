@@ -28,3 +28,4 @@ export const zodHandle = z
 
 export const BIO_LEN_MIN = 0;
 export const BIO_LEN_MAX = 128;
+export const zodBio = z.string().min(BIO_LEN_MIN).max(BIO_LEN_MAX).optional();

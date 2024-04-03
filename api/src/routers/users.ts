@@ -1,6 +1,7 @@
 import {
   BIO_LEN_MAX,
   BIO_LEN_MIN,
+  zodBio,
   zodHandle,
   zodUsername,
 } from "@spill-it/constraints";
@@ -240,10 +241,7 @@ export const UsersRouter = Router();
       logger.info("Checking bio...");
       const { bio } = details;
 
-      const schema = z.string().min(BIO_LEN_MIN).max(BIO_LEN_MAX).optional();
-      bio satisfies z.infer<typeof schema>;
-
-      const parsing = schema.safeParse(bio);
+      const parsing = zodBio.safeParse(bio);
       if (!parsing.success) {
         logger.error(formatError(parsing.error));
         res.sendStatus(StatusCodes.BAD_REQUEST);

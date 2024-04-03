@@ -1,13 +1,7 @@
-import {
-  BIO_LEN_MAX,
-  BIO_LEN_MIN,
-  zodHandle,
-  zodUsername,
-} from "@spill-it/constraints";
+import { zodBio, zodHandle, zodUsername } from "@spill-it/constraints";
 import { ensureError, raise } from "@spill-it/utils/errors";
 import { sleep } from "@spill-it/utils/sleep";
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { z } from "zod";
 import { redirectFull } from "../../../utils/dom";
 import { endpointWithParam } from "../../../utils/endpoints";
 import { fetchAPI } from "../../../utils/fetch-api";
@@ -33,8 +27,6 @@ function useFieldState<T, U>(defaultValue: T, validator: (newValue: T) => U) {
 
   return [value, validity, updateValue] as const;
 }
-
-const zodBio = z.string().min(BIO_LEN_MIN).max(BIO_LEN_MAX).optional();
 
 async function sendUpdate(
   username: string | undefined,
