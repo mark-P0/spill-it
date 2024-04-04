@@ -116,7 +116,7 @@ function PostForm() {
             // reportValidity
             className={clsx(
               "resize-none placeholder:text-white/50",
-              "w-full rounded p-3",
+              "w-full rounded-lg p-3",
               "bg-white/10 disabled:opacity-50",
             )}
           />

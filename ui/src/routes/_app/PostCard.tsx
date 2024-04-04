@@ -147,7 +147,7 @@ export function PostCard(props: {
   }
 
   return (
-    <article className="grid grid-cols-[auto_1fr_auto] gap-6 rounded p-6 bg-white/10">
+    <article className="grid grid-cols-[auto_1fr_auto] gap-4 rounded-lg p-4 bg-white/10">
       <div>
         <img
           src={portraitUrl}
@@ -157,7 +157,7 @@ export function PostCard(props: {
       </div>
 
       <div>
-        <header className="flex flex-wrap items-baseline gap-2">
+        <header className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
           <h3>
             <Link
               to={endpointWithParam("/:username", { username })}
@@ -173,16 +173,14 @@ export function PostCard(props: {
             </div>
           )}
 
-          <p className="text-white/50 select-none">
-            {username}
-            <> • </>
-            <span className="text-xs uppercase tracking-wide">
-              {formatPostDate(timestamp)}
-            </span>
-          </p>
+          <span className="text-white/50 select-none text-sm">{username}</span>
+          <span className="text-white/50 select-none">•</span>
+          <span className="text-white/50 select-none text-xs uppercase tracking-wide">
+            {formatPostDate(timestamp)}
+          </span>
         </header>
 
-        <p className="whitespace-pre-wrap">{content}</p>
+        <p className="mt-1 whitespace-pre-wrap">{content}</p>
       </div>
 
       <div>
