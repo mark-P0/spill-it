@@ -174,7 +174,7 @@ export function HomeScreen() {
           </header>
         </div>
 
-        <div className="p-6 sticky top-0 backdrop-blur-md">
+        <div className="p-6 sticky top-0 backdrop-blur-md bg-fuchsia-950/50">
           <PostForm />
         </div>
 
