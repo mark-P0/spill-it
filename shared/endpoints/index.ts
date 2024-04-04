@@ -161,6 +161,34 @@ export const endpointMap = {
       }),
     },
   },
+  "/api/v0/posts/feed": {
+    GET: {
+      input: z.object({
+        headers: z.object({
+          Authorization: z.string(),
+        }),
+        query: z.object({
+          beforeISODateStr: z.string().datetime().optional(),
+          size: z.coerce.number().max(POSTS_CT_MAX_API).optional(),
+        }),
+      }),
+      output: z.object({
+        data: z.array(zodPostWithAuthor),
+      }),
+    },
+  },
+  "/api/v0/posts/:postId": {
+    GET: {
+      input: z.object({
+        headers: z.object({
+          Authorization: z.string(),
+        }),
+      }),
+      output: z.object({
+        data: zodPostPublic,
+      }),
+    },
+  },
   "/api/v0/posts": {
     POST: {
       input: z.object({
@@ -203,34 +231,6 @@ export const endpointMap = {
         }),
       }),
       output: z.object({}),
-    },
-  },
-  "/api/v0/posts/feed": {
-    GET: {
-      input: z.object({
-        headers: z.object({
-          Authorization: z.string(),
-        }),
-        query: z.object({
-          beforeISODateStr: z.string().datetime().optional(),
-          size: z.coerce.number().max(POSTS_CT_MAX_API).optional(),
-        }),
-      }),
-      output: z.object({
-        data: z.array(zodPostWithAuthor),
-      }),
-    },
-  },
-  "/api/v0/posts/:postId": {
-    GET: {
-      input: z.object({
-        headers: z.object({
-          Authorization: z.string(),
-        }),
-      }),
-      output: z.object({
-        data: zodPostPublic,
-      }),
     },
   },
   "/try/hello": {
