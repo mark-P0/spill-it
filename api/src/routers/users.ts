@@ -1,10 +1,4 @@
-import {
-  BIO_LEN_MAX,
-  BIO_LEN_MIN,
-  zodBio,
-  zodHandle,
-  zodUsername,
-} from "@spill-it/constraints";
+import { zodBio, zodHandle, zodUsername } from "@spill-it/constraints";
 import { readUserViaUsername, updateUser } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
@@ -19,69 +13,6 @@ import { localizeLogger } from "../utils/logger";
 
 const logger = localizeLogger(__filename);
 export const UsersRouter = Router();
-
-{
-  const details = endpointDetails("/api/v0/users", "GET");
-  const [ep, , signature, method] = details;
-  type Input = z.infer<typeof signature.input>;
-  type Output = z.infer<typeof signature.output>;
-
-  UsersRouter[method](ep, async (req, res, next) => {
-    logger.info("Parsing input...");
-    const inputParsing = signature.input.safeParse(req);
-    if (!inputParsing.success) {
-      logger.error(formatError(inputParsing.error));
-      return res.sendStatus(StatusCodes.BAD_REQUEST);
-    }
-    const { query } = inputParsing.data;
-
-    // TODO Restrict access?
-
-    logger.info("Routing to other handlers...");
-    const { username } = query;
-    if (username !== undefined) {
-      logger.info("Handling username query...");
-      return await handleUsernameQuery(res, username);
-    }
-
-    logger.error("Request likely unsupported; has no handler");
-    return res.sendStatus(StatusCodes.BAD_REQUEST);
-  });
-
-  async function handleUsernameQuery<T extends Response>(
-    res: T,
-    username: NonNullable<Input["query"]["username"]>,
-  ): Promise<T> {
-    logger.info("Fetching user info...");
-    const userResult = await safeAsync(() => readUserViaUsername(username));
-    if (!userResult.success) {
-      logger.error(formatError(userResult.error));
-      return res.sendStatus(StatusCodes.BAD_GATEWAY);
-    }
-    const user = userResult.value;
-
-    logger.info("Parsing output...");
-    const outputParsing = signature.output.safeParse({
-      data: removeFalseish([user !== null && user]),
-    } satisfies Output);
-    if (!outputParsing.success) {
-      logger.error(formatError(outputParsing.error));
-      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
-    }
-    const output = outputParsing.data;
-
-    logger.info("Packaging output...");
-    const rawOutputResult = safe(() => jsonPack(output));
-    if (!rawOutputResult.success) {
-      logger.error(formatError(rawOutputResult.error));
-      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
-    }
-    const rawOutput = rawOutputResult.value;
-
-    logger.info("Sending user info...");
-    return res.send(rawOutput);
-  }
-}
 
 {
   const details = endpointDetails("/api/v0/users/me", "GET");
@@ -250,5 +181,68 @@ export const UsersRouter = Router();
     }
 
     return { success: true, value: null };
+  }
+}
+
+{
+  const details = endpointDetails("/api/v0/users", "GET");
+  const [ep, , signature, method] = details;
+  type Input = z.infer<typeof signature.input>;
+  type Output = z.infer<typeof signature.output>;
+
+  UsersRouter[method](ep, async (req, res, next) => {
+    logger.info("Parsing input...");
+    const inputParsing = signature.input.safeParse(req);
+    if (!inputParsing.success) {
+      logger.error(formatError(inputParsing.error));
+      return res.sendStatus(StatusCodes.BAD_REQUEST);
+    }
+    const { query } = inputParsing.data;
+
+    // TODO Restrict access?
+
+    logger.info("Routing to other handlers...");
+    const { username } = query;
+    if (username !== undefined) {
+      logger.info("Handling username query...");
+      return await handleUsernameQuery(res, username);
+    }
+
+    logger.error("Request likely unsupported; has no handler");
+    return res.sendStatus(StatusCodes.BAD_REQUEST);
+  });
+
+  async function handleUsernameQuery<T extends Response>(
+    res: T,
+    username: NonNullable<Input["query"]["username"]>,
+  ): Promise<T> {
+    logger.info("Fetching user info...");
+    const userResult = await safeAsync(() => readUserViaUsername(username));
+    if (!userResult.success) {
+      logger.error(formatError(userResult.error));
+      return res.sendStatus(StatusCodes.BAD_GATEWAY);
+    }
+    const user = userResult.value;
+
+    logger.info("Parsing output...");
+    const outputParsing = signature.output.safeParse({
+      data: removeFalseish([user !== null && user]),
+    } satisfies Output);
+    if (!outputParsing.success) {
+      logger.error(formatError(outputParsing.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const output = outputParsing.data;
+
+    logger.info("Packaging output...");
+    const rawOutputResult = safe(() => jsonPack(output));
+    if (!rawOutputResult.success) {
+      logger.error(formatError(rawOutputResult.error));
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    const rawOutput = rawOutputResult.value;
+
+    logger.info("Sending user info...");
+    return res.send(rawOutput);
   }
 }
