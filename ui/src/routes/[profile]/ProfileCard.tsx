@@ -65,40 +65,34 @@ export function ProfileCard() {
   } = profile;
 
   return (
-    <article className="grid grid-cols-[auto_1fr_auto] gap-x-6">
-      <div>
-        <header>
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold">{handleName}</h1>
-            {isPrivate && <BsLockFill className="h-6 w-6 text-emerald-500" />}
-          </div>
-          <p className="text-lg text-white/50">{username}</p>
-        </header>
+    <article>
+      <div className="flex items-start gap-x-3">
+        <div>
+          <img
+            src={portraitUrl}
+            alt={`Portrait of "${handleName}"`}
+            className="w-24 aspect-square rounded-full"
+          />
+        </div>
+
+        <div className="ml-auto">
+          <ProfileActionButton />
+        </div>
       </div>
 
-      <div className="col-span-2">
-        {bio !== "" && <p className="my-2">{bio}</p>}
-      </div>
+      <header className="mt-3">
+        <h1 className="text-3xl font-bold">
+          <span className="mr-3">{handleName}</span>
+          {isPrivate && (
+            <BsLockFill className="inline align-baseline h-6 w-6 text-emerald-500" />
+          )}
+        </h1>
+        <p className="text-lg text-white/50">{username}</p>
+      </header>
 
-      <div className="col-span-2">
-        <JoinDate date={registrationDate} />
-      </div>
-
-      <div className="col-span-2">
-        <FollowCountsNav />
-      </div>
-
-      <div className="col-start-2 row-start-1 place-self-start">
-        <ProfileActionButton />
-      </div>
-
-      <div className="col-start-3 row-start-1 row-span-3">
-        <img
-          src={portraitUrl}
-          alt={`Portrait of "${handleName}"`}
-          className="w-20 aspect-square rounded-full"
-        />
-      </div>
+      {bio !== "" && <p className="my-2">{bio}</p>}
+      <JoinDate date={registrationDate} />
+      <FollowCountsNav />
     </article>
   );
 }
