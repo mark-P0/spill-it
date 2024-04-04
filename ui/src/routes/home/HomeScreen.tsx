@@ -165,7 +165,7 @@ export function HomeScreen() {
     <FeedProvider>
       <Screen className="grid auto-rows-min gap-6 p-6">
         <header className="flex items-center gap-3">
-          <h1 className="text-3xl">Home</h1>
+          <h1 className="sr-only">Home</h1>
 
           <div className="ml-auto">
             <ProfileButtonLink />
