@@ -1,10 +1,4 @@
-import {
-  BIO_LEN_MAX,
-  BIO_LEN_MIN,
-  zodBio,
-  zodHandle,
-  zodUsername,
-} from "@spill-it/constraints";
+import { zodBio, zodHandle, zodUsername } from "@spill-it/constraints";
 import { readUserViaUsername, updateUser } from "@spill-it/db/tables/users";
 import { endpointDetails } from "@spill-it/endpoints";
 import { formatError } from "@spill-it/utils/errors";
