@@ -20,7 +20,7 @@ export function Toast() {
       className={clsx(
         "fixed bottom-9",
         "flex items-center gap-3",
-        "rounded px-6 py-3",
+        "rounded-lg px-6 py-3",
         "shadow-lg shadow-black/50",
         level === "info" && "bg-fuchsia-500 text-white",
         level === "warn" && "bg-yellow-500 text-black",

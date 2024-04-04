@@ -21,7 +21,7 @@ function UserCard(props: { user: UserPublic }) {
 
   const { handleName, username, portraitUrl } = user;
   return (
-    <article className="flex items-center gap-3 rounded p-3 bg-white/10">
+    <article className="flex items-center gap-3 rounded-lg p-3 bg-white/10">
       <img
         src={portraitUrl}
         alt={`Portrait of "${handleName}"`}
@@ -129,7 +129,7 @@ function RequestingFollowerCard(props: { follower: UserPublic }) {
   const isLoading = isProcessing || revalidator.state === "loading";
 
   return (
-    <article className="flex items-center gap-3 rounded p-3 bg-white/10">
+    <article className="flex items-center gap-3 rounded-lg p-3 bg-white/10">
       <img
         src={portraitUrl}
         alt={`Portrait of "${handleName}"`}
@@ -194,7 +194,7 @@ function FollowerRequestsModalContent() {
         </div>
       </header>
 
-      <ol className="mt-3 grid gap-1">
+      <ol className="mt-3 grid gap-2">
         {followerRequests?.map(({ follower }) => (
           <RequestingFollowerCard key={follower.id} follower={follower} />
         ))}
@@ -242,7 +242,7 @@ function FollowersModalContent() {
         </div>
       </header>
 
-      <ol className="mt-3 grid gap-1">
+      <ol className="mt-3 grid gap-2">
         {followers.map(({ follower }) => (
           <UserCard key={follower.id} user={follower} />
         ))}
@@ -296,7 +296,7 @@ function FollowingRequestsModalContent() {
         </div>
       </header>
 
-      <ol className="mt-3 grid gap-1">
+      <ol className="mt-3 grid gap-2">
         {followingRequests?.map(({ following }) => (
           <UserCard key={following.id} user={following} />
         ))}
@@ -345,7 +345,7 @@ function FollowingModalContent() {
         </div>
       </header>
 
-      <ol className="mt-3 grid gap-1">
+      <ol className="mt-3 grid gap-2">
         {followings.map(({ following }) => (
           <UserCard key={following.id} user={following} />
         ))}

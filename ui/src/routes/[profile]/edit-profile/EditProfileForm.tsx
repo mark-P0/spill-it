@@ -43,7 +43,7 @@ function HandleNameField() {
         reportValidity={areFieldsInitialized}
         className={clsx(
           "bg-transparent",
-          "border rounded px-2 py-1",
+          "border rounded-lg px-2 py-1",
           ...[
             "transition",
             "disabled:opacity-50",
@@ -87,7 +87,7 @@ function UsernameField() {
         reportValidity={areFieldsInitialized}
         className={clsx(
           "bg-transparent",
-          "border rounded px-2 py-1",
+          "border rounded-lg px-2 py-1",
           ...[
             "transition",
             "disabled:opacity-50",
@@ -132,7 +132,7 @@ function BioField() {
           "resize-none",
           clsBreakAnywhere,
           "bg-transparent",
-          "border rounded px-2 py-1",
+          "border rounded-lg px-2 py-1",
           ...[
             "transition",
             "disabled:opacity-50",

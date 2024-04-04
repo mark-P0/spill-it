@@ -22,7 +22,11 @@ export function ModalContent(props: ComponentPropsWithoutRef<"article">) {
     <ToastProvider>
       <article
         {...attributes}
-        className={clsx("rounded p-6", "bg-fuchsia-950 text-white", className)}
+        className={clsx(
+          "rounded-lg p-6",
+          "bg-fuchsia-950 text-white",
+          className,
+        )}
       >
         {children}
       </article>

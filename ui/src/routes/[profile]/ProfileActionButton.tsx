@@ -21,6 +21,7 @@ function EditProfileButtonLink() {
     <Link
       to={endpointWithParam("/:username/edit", { username })}
       className={clsx(
+        "whitespace-nowrap",
         "font-bold tracking-wide",
         clsLinkBlock,
         clsLinkBtnOutline,
