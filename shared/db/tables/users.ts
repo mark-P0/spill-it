@@ -7,9 +7,11 @@ import { raise } from "@spill-it/utils/errors";
 import { randomChoice } from "@spill-it/utils/random";
 import { digits, letters } from "@spill-it/utils/strings";
 import { eq, sql } from "drizzle-orm";
+import { z } from "zod";
 import { DBTransaction, db } from "../db";
 import { User, UserDetails, UsersTable } from "../schema/drizzle";
 import { UserPublicWithFollows } from "../schema/zod";
+import { env } from "../utils/env";
 
 export async function readUser(id: User["id"]): Promise<User | null> {
   const users = await db
@@ -127,10 +129,58 @@ async function _buildUsernameFromHandle(
   raise("Built username too many times");
 }
 
+const zodUrl = z.string().url();
+/**
+ * - https://stackoverflow.com/a/75540113
+ * - https://stackoverflow.com/a/48568899
+ */
+async function uploadToStorage(
+  srcUrl: string,
+  filename: string,
+): Promise<string> {
+  const {
+    SUPABASE_PROJECT_REF,
+    SUPABASE_STORAGE_PORTRAITS_BUCKET_NAME,
+    SUPABASE_SERVICE_KEY,
+  } = env;
+  const urls = {
+    src: zodUrl.parse(srcUrl),
+    dest: zodUrl.parse(
+      `https://${SUPABASE_PROJECT_REF}.supabase.co/storage/v1/object/${SUPABASE_STORAGE_PORTRAITS_BUCKET_NAME}/${filename}`,
+    ),
+    public: zodUrl.parse(
+      // TODO Prone to failure... more or less the same as upload endpoint but with "public" path in the middle
+      `https://${SUPABASE_PROJECT_REF}.supabase.co/storage/v1/object/public/${SUPABASE_STORAGE_PORTRAITS_BUCKET_NAME}/${filename}`,
+    ),
+  };
+
+  const srcRes = await fetch(urls.src);
+  const blob = await srcRes.blob();
+
+  const req = new Request(urls.dest, {
+    method: "POST",
+    body: blob,
+    headers: { Authorization: `Bearer ${SUPABASE_SERVICE_KEY}` },
+  });
+
+  const res = await fetch(req);
+  const json = await res.json();
+  if (!res.ok) {
+    const { message } = z
+      .object({ message: z.string().default("[unknown error]") })
+      .parse(json);
+
+    raise(`Failed uploading to storage: ${message}`);
+  }
+
+  return urls.public;
+}
+
 export async function createUserFromGoogle(
   googleId: string,
   handleName: string,
-  portraitUrl: string,
+  portraitUrlGoogle: string,
+  portraitUrlPlaceholder = env.PLACEHOLDER_PORTRAIT_URL,
 ): Promise<User> {
   return await db.transaction(async (tx) => {
     const existingUser = await _readUserViaGoogleId(tx, googleId);
@@ -138,13 +188,28 @@ export async function createUserFromGoogle(
       raise("Google ID already associated with a user");
 
     const username = await _buildUsernameFromHandle(tx, handleName);
-    const users = await tx
+    const initialUsers = await tx
       .insert(UsersTable)
-      .values({ username, handleName, portraitUrl, googleId, loginCt: 0 })
+      .values({
+        ...{ username, handleName, googleId, loginCt: 0 },
+        portraitUrl: portraitUrlPlaceholder,
+      })
       .returning();
+    if (initialUsers.length > 1) raise("Multiple Google users inserted...?");
+    const initialUser =
+      initialUsers[0] ?? raise("Inserted Google user does not exist...?");
 
-    if (users.length > 1) raise("Multiple Google users inserted...?");
-    const user = users[0] ?? raise("Inserted Google user does not exist...?");
+    const portraitUrlActual = await uploadToStorage(
+      portraitUrlGoogle,
+      initialUser.id,
+    );
+    const users = await tx
+      .update(UsersTable)
+      .set({ portraitUrl: portraitUrlActual })
+      .where(eq(UsersTable.id, initialUser.id))
+      .returning();
+    if (users.length > 1) raise("Multiple Google users updated...?");
+    const user = users[0] ?? raise("Updated Google user does not exist...?");
 
     return user;
   });
