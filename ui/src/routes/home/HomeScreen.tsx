@@ -163,21 +163,26 @@ export function HomeScreen() {
 
   return (
     <FeedProvider>
-      <Screen className="grid auto-rows-min gap-6 p-6">
-        <header className="flex items-center gap-3">
-          <h1 className="sr-only">Home</h1>
+      <Screen>
+        <div className="p-6 pb-0">
+          <header className="flex items-center gap-3">
+            <h1 className="sr-only">Home</h1>
 
-          <div className="ml-auto">
-            <ProfileButtonLink />
-          </div>
-        </header>
-        <PostForm />
+            <nav className="ml-auto">
+              <ProfileButtonLink />
+            </nav>
+          </header>
+        </div>
 
-        <main>
+        <div className="p-6 sticky top-0 backdrop-blur-md bg-fuchsia-950/50">
+          <PostForm />
+        </div>
+
+        <div className="p-6 pt-0">
           <h2 className="sr-only">Spills 🍵</h2>
 
           <Feed />
-        </main>
+        </div>
       </Screen>
     </FeedProvider>
   );
