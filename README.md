@@ -1,4 +1,27 @@
-# Spill.it
+# Spill.it 🍵
+
+<!-- What's the tea?! React Router and Express app -->
+
+> Client (UI) and Server (API) source code monorepo for Spill.it
+
+## Screenshots
+
+|                                                                                                           |                                                                                                   |
+| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| ![](https://scpihgegjljiirbbwpzs.supabase.co/storage/v1/object/public/screenshots/welcome.png)            | ![](https://scpihgegjljiirbbwpzs.supabase.co/storage/v1/object/public/screenshots/home.png)       |
+| ![](https://scpihgegjljiirbbwpzs.supabase.co/storage/v1/object/public/screenshots/posts-delete.png)       | ![](https://scpihgegjljiirbbwpzs.supabase.co/storage/v1/object/public/screenshots/profile.png)    |
+| ![](https://scpihgegjljiirbbwpzs.supabase.co/storage/v1/object/public/screenshots/followers-requests.png) | ![](https://scpihgegjljiirbbwpzs.supabase.co/storage/v1/object/public/screenshots/followings.png) |
+| ![](https://scpihgegjljiirbbwpzs.supabase.co/storage/v1/object/public/screenshots/profile-edit.png)       | ![](https://scpihgegjljiirbbwpzs.supabase.co/storage/v1/object/public/screenshots/logout.png)     |
+|                                                                                                           |                                                                                                   |
+
+## Credits
+
+- [Quicksand](https://fonts.google.com/specimen/Quicksand) font
+  - Sourced from [Fontpair](https://www.fontpair.co/fonts/quicksand)
+- [Teacup emoji](https://favicon.io/emoji-favicons/teacup-without-handle) fav/icon
+  - Sourced from [Favicon.io](https://favicon.io/)
+
+---
 
 ## Scripts
 
@@ -51,8 +74,3 @@ pnpm --filter=@spill-it/ui i --workspace @spill-it/endpoints
 
 - Install `<workspace-package-name-2>` from the current workspace as a [development] dependency of `<workspace-package-name-1>`
 - `<workspace-package-name-2>` must be included in the scope of `pnpm-workspace.yaml`
-
-## Credits
-
-- [Favicon.io](https://favicon.io/)
-  - [Teacup emoji](https://favicon.io/emoji-favicons/teacup-without-handle)
