@@ -1,0 +1,7 @@
+# https://pnpm.io/docker#example-2-build-multiple-docker-images-in-a-monorepo
+
+node_modules
+.git
+.gitignore
+*.md
+dist
