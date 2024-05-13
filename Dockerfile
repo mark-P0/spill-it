@@ -22,5 +22,5 @@ COPY --from=build /prod/api /prod/api
 WORKDIR /prod/api
 EXPOSE 8000
 
-# CMD [ "pnpm", "start" ]
-CMD [ "pnpm", "dev" ]
+CMD [ "pnpm", "start" ]
+# CMD [ "pnpm", "dev" ]
