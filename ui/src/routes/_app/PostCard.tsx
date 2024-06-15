@@ -128,6 +128,12 @@ function formatPostDate(date: PostWithAuthor["timestamp"]): string {
   const DD_MMM_YYYY = "d LLL y";
   return format(date, DD_MMM_YYYY);
 }
+function PostDateText(props: { date: Date }) {
+  const { date } = props;
+
+  return formatPostDate(date);
+}
+
 export function PostCard(props: {
   post: PostWithAuthor;
   onDeleteEnd?: () => void;
@@ -176,7 +182,7 @@ export function PostCard(props: {
           <span className="text-white/50 select-none text-sm">{username}</span>
           <span className="text-white/50 select-none">•</span>
           <span className="text-white/50 select-none text-xs uppercase tracking-wide">
-            {formatPostDate(timestamp)}
+            <PostDateText date={timestamp} />
           </span>
         </header>
 
