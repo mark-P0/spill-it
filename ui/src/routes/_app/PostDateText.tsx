@@ -36,7 +36,7 @@ function formatPostDate(date: PostWithAuthor["timestamp"]): string {
   return format(date, DD_MMM_YYYY);
 }
 
-export function PostDateText(props: { date: Date }) {
+export function PostDateText(props: { date: PostWithAuthor["timestamp"] }) {
   const { date } = props;
   useRerenderOnTabFocus();
 
