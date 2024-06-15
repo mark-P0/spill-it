@@ -1,9 +1,7 @@
 import { PostWithAuthor } from "@spill-it/db/schema/drizzle";
-import { today } from "@spill-it/utils/dates";
 import { ensureError, raise } from "@spill-it/utils/errors";
 import { sleep } from "@spill-it/utils/sleep";
 import clsx from "clsx";
-import { differenceInHours, format, formatDistanceToNow } from "date-fns";
 import { ComponentProps, useState } from "react";
 import { BsLockFill, BsTrashFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
@@ -12,6 +10,7 @@ import { fetchAPI } from "../../utils/fetch-api";
 import { logger } from "../../utils/logger";
 import { getFromStorage } from "../../utils/storage";
 import { LoadingCursorAbsoluteOverlay } from "./Loading";
+import { PostDateText } from "./PostDateText";
 import { useUserContext } from "./UserContext";
 import {
   clsBtnNegative,
@@ -109,29 +108,6 @@ function DeletePostModalContent(props: ComponentProps<typeof DeletePostForm>) {
       <DeletePostForm {...props} />
     </ModalContent>
   );
-}
-
-function formatPostDate(date: PostWithAuthor["timestamp"]): string {
-  const isInThePastDay = differenceInHours(today(), date) < 24;
-  if (isInThePastDay) {
-    return formatDistanceToNow(date, {
-      addSuffix: true,
-      includeSeconds: true,
-    });
-  }
-
-  /**
-   * e.g. 16 Mar 2020
-   *
-   * https://date-fns.org/v3.6.0/docs/format
-   */
-  const DD_MMM_YYYY = "d LLL y";
-  return format(date, DD_MMM_YYYY);
-}
-function PostDateText(props: { date: Date }) {
-  const { date } = props;
-
-  return formatPostDate(date);
 }
 
 export function PostCard(props: {
