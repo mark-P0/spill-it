@@ -34,7 +34,7 @@ async function deletePost(post: PostWithAuthor) {
   });
   if (!deleteResult.success) raise("Failed deleting", deleteResult.error);
 }
-function DeletePostForm(props: {
+function PostDeletionForm(props: {
   postToDelete: PostWithAuthor;
   onDeleteEnd?: () => void;
 }) {
@@ -103,10 +103,12 @@ function DeletePostForm(props: {
     </form>
   );
 }
-function DeletePostModalContent(props: ComponentProps<typeof DeletePostForm>) {
+function PostDeletionModalContent(
+  props: ComponentProps<typeof PostDeletionForm>,
+) {
   return (
     <ModalContent>
-      <DeletePostForm {...props} />
+      <PostDeletionForm {...props} />
     </ModalContent>
   );
 }
@@ -132,7 +134,10 @@ export function PostCard(props: {
 
   function promptDelete() {
     showOnModal(
-      <DeletePostModalContent postToDelete={post} onDeleteEnd={onDeleteEnd} />,
+      <PostDeletionModalContent
+        postToDelete={post}
+        onDeleteEnd={onDeleteEnd}
+      />,
     );
   }
 
