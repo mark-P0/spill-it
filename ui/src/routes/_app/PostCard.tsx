@@ -2,6 +2,7 @@ import { PostWithAuthor } from "@spill-it/db/schema/drizzle";
 import { ensureError, raise } from "@spill-it/utils/errors";
 import { sleep } from "@spill-it/utils/sleep";
 import clsx from "clsx";
+import { format } from "date-fns";
 import { ComponentProps, useState } from "react";
 import { BsLockFill, BsTrashFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
@@ -110,6 +111,13 @@ function DeletePostModalContent(props: ComponentProps<typeof DeletePostForm>) {
   );
 }
 
+function formatPostDateTooltip(date: PostWithAuthor["timestamp"]) {
+  /** e.g. 'Wed, 18 Sep 2019 19:00:52 GMT' */
+  const formatStr = "iii, d LLL y HH:mm:ss OOO";
+  const str = format(date, formatStr);
+
+  return str;
+}
 export function PostCard(props: {
   post: PostWithAuthor;
   onDeleteEnd?: () => void;
@@ -157,7 +165,10 @@ export function PostCard(props: {
 
           <span className="text-white/50 select-none text-sm">{username}</span>
           <span className="text-white/50 select-none">•</span>
-          <span className="text-white/50 select-none text-xs uppercase tracking-wide">
+          <span
+            title={formatPostDateTooltip(timestamp)}
+            className="text-white/50 select-none text-xs uppercase tracking-wide"
+          >
             <PostDateText date={timestamp} />
           </span>
         </header>
