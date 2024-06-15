@@ -1,6 +1,22 @@
 import { PostWithAuthor } from "@spill-it/db/schema/drizzle";
 import { today } from "@spill-it/utils/dates";
 import { differenceInHours, format, formatDistanceToNow } from "date-fns";
+import { useEffect, useState } from "react";
+
+function useRerenderOnTabFocus() {
+  const [, setFlag] = useState(true);
+
+  useEffect(() => {
+    function reRender() {
+      setFlag((flag) => !flag);
+    }
+
+    window.addEventListener("focus", reRender);
+    return () => {
+      window.removeEventListener("focus", reRender);
+    };
+  }, []);
+}
 
 function formatPostDate(date: PostWithAuthor["timestamp"]): string {
   const isInThePastDay = differenceInHours(today(), date) < 24;
@@ -22,6 +38,7 @@ function formatPostDate(date: PostWithAuthor["timestamp"]): string {
 
 export function PostDateText(props: { date: Date }) {
   const { date } = props;
+  useRerenderOnTabFocus();
 
   return formatPostDate(date);
 }
