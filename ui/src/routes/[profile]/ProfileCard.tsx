@@ -65,7 +65,7 @@ export function ProfileCard() {
   } = profile;
 
   return (
-    <article>
+    <article className="text-sm md:text-base">
       <div className="flex items-start gap-x-3">
         <div>
           <img
@@ -81,13 +81,13 @@ export function ProfileCard() {
       </div>
 
       <header className="mt-3">
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-2xl md:text-3xl font-bold">
           <span className="mr-3">{handleName}</span>
           {isPrivate && (
             <BsLockFill className="inline align-baseline h-6 w-6 text-emerald-500" />
           )}
         </h1>
-        <p className="text-lg text-white/50">{username}</p>
+        <p className="text-md md:text-lg text-white/50">{username}</p>
       </header>
 
       {bio !== "" && <p className="my-2">{bio}</p>}

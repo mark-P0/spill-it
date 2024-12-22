@@ -39,7 +39,7 @@ export function PostCard(props: {
   }
 
   return (
-    <article className="grid grid-cols-[auto_1fr_auto] gap-4 rounded-lg p-4 bg-white/10">
+    <article className="grid grid-cols-[auto_1fr_auto] gap-4 md:rounded-lg p-3 md:p-4 bg-white/10 text-sm md:text-base">
       <div>
         <img
           src={portraitUrl}
