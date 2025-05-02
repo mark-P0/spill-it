@@ -80,7 +80,7 @@ const _clsBtn = (options?: {
   const { withoutDisabled = false, type = "positive" } = options ?? {};
   return clsx(
     "select-none",
-    "rounded-full px-6 py-3",
+    "rounded-full px-5 py-2 md:px-6 md:py-3",
     "font-bold tracking-wide",
     ...[
       "transition",

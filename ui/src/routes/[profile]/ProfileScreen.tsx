@@ -80,7 +80,7 @@ export function ProfileScreen() {
         <ProfileCard />
       </div>
 
-      <main className="p-6 pt-0">
+      <main className="px-0 md:p-6 md:pt-0">
         <PostsSection />
       </main>
 

@@ -104,7 +104,7 @@ function PostForm() {
   const isContentValid = contentValidity === "";
 
   return (
-    <form onSubmit={submit} className="relative">
+    <form onSubmit={submit} className="relative text-sm md:text-base">
       <fieldset disabled={isSubmitting} className="grid gap-3">
         <label>
           <span className="sr-only">Tea 🍵</span>
@@ -116,7 +116,7 @@ function PostForm() {
             // reportValidity
             className={clsx(
               "resize-none placeholder:text-white/50",
-              "w-full rounded-lg p-3",
+              "w-full md:rounded-lg p-3",
               "bg-white/10 disabled:opacity-50",
             )}
           />
@@ -129,8 +129,8 @@ function PostForm() {
           {remainingCharCt < 16 && (
             <span
               className={clsx(
-                //
-                "text-lg font-bold tracking-widest",
+                "text-md md:text-lg",
+                "font-bold tracking-widest",
                 "transition",
                 remainingCharCt < 0
                   ? "text-rose-500"
@@ -164,7 +164,7 @@ export function HomeScreen() {
   return (
     <FeedProvider>
       <Screen>
-        <div className="p-6 pb-0">
+        <div className="p-4 pb-0 md:p-6 md:pb-0">
           <header className="flex items-center gap-3">
             <h1 className="sr-only">Home</h1>
 
@@ -174,11 +174,11 @@ export function HomeScreen() {
           </header>
         </div>
 
-        <div className="p-6 sticky top-0 backdrop-blur-md bg-fuchsia-950/50">
+        <div className="px-0 py-4 md:p-6 sticky top-0 backdrop-blur-md bg-fuchsia-950/50">
           <PostForm />
         </div>
 
-        <div className="p-6 pt-0">
+        <div className="px-0 md:p-6 md:pt-0">
           <h2 className="sr-only">Spills 🍵</h2>
 
           <Feed />
